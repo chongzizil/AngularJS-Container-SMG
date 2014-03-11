@@ -1,7 +1,7 @@
-var serverUrl = "http://3.smg-server.appspot.com/container/";
+var serverUrl = "http://2.smg-server.appspot.com/container/";
 
 var gameid = 1;
-var playerid = 42;
+var playerId = 42;
 var hasTimeoutSupport = {"gameId" : gameid, "timeoutSupport" : true};
 var noTimeoutSupport = {"gameId" : gameid, "timeoutSupport" : false};
 var hasInviteFriendSupport = {"gameId" : gameid, "playerId" : playerId, "inviteFriend" : true};
