@@ -9,6 +9,7 @@ var startMatchWithGameId = '{"accessSignature": "...", "playerIds": "...", "game
 var joinMatchWithMatchId = '{"accessSignature": "...", "playerIds": "...", "matchId": "..."}';
 var makeMove = '{"accessSignature": "...", "SetTurn":"...", "operation":"..."}';
 var verifyMoveDone = '{"accessSignature": "...", "hackerPlayerId":"0", "message":"null"}';
+var endGame = '{"SetTurn":"...", "EndGame": "xxx"}';
 var Email = "chongzizil@gmail.com";
 var validPassword = "1234";
 var invalidPassword = "xxxxxxxxxx";
@@ -248,6 +249,43 @@ test("Recieve the player of the current turn from the server", function(){
 		}
 	};
 	xhr.send();
+});
+
+/* 
+ * Send a end game operation to the server
+ * Should return gameOverScores and gameOverReason
+ */
+test("Send a end game operation to the server", function(){
+	var xhr;
+	if (window.XMLHttpRequest){
+		// code for IE7+, Firefox, Chrome, Opera, Safari
+		xhr=new XMLHttpRequest();
+	} else {
+		// code for IE6, IE5
+		xhr=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xhr.open("POST", matchesUrl + '/matchId/', true);
+	xhr.responseType = 'json';
+	xhr.onreadystatechange = function(){
+		var status;
+		var data;
+		if(xhr.readyState == 4){
+			status = xhr.status;
+			if (status == 200){
+				data = xhr.response;
+				ok(data.has(gameOverScores));
+				ok(data.has(gameOverReason));
+			} else {
+				throws(
+						function(){
+							throw "error";
+						}, "xmlhttprequest do not have a right status!"
+				);
+			}
+		}
+	};
+	xhr.setRequestHeader("Content-type", "application/json");
+	xhr.send(endGame);
 });
 
 /* 
