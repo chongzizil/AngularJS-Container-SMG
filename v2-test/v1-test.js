@@ -1,10 +1,7 @@
-// url for tests.
 var playersUrl = "http://1.smg-server.appspot.com/players";
 var matchesUrl = "http://1.smg-server.appspot.com/matches";
 var gamesUrl = "http://1.smg-server.appspot.com/container/gamesUrl";
 var nonExistUrl = "http://this-is-a-fake-url.nyu.edu";
-
-// assume that we only have two players with player id: 42 and 43.
 var startMatchWithGameId = '{"accessSignature": "...", "playerIds": "...", "gameId": "..."}';
 var joinMatchWithMatchId = '{"accessSignature": "...", "playerIds": "...", "matchId": "..."}';
 var makeMove = '{"accessSignature": "...", "SetTurn":"...", "operation":"..."}';
@@ -41,13 +38,7 @@ test("Start(Insert) a new match", function(){
 			if (status == 200){
 				data = xhr.response;
 				ok(data.has(matchId));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.setRequestHeader("Content-type", "application/json");
@@ -78,13 +69,7 @@ test("Join a match through a matchId", function(){
 				data = xhr.response;
 				ok(data.has(gameId));
 				ok(data.has(playerIds));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.setRequestHeader("Content-type", "application/json");
@@ -118,13 +103,7 @@ test("Receive the initial game infomation from the server", function(){
 				ok(data.has(pics));
 				ok(data.has(height));
 				ok(data.has(width));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.send();
@@ -160,13 +139,7 @@ test("Send the player's move to the server", function(){
 				ok(data.has(lastMove));
 				ok(data.has(lastMovePlayerId));
 				ok(data.has(playerIdToNumberOfTokensInPot));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.setRequestHeader("Content-type", "application/json");
@@ -203,13 +176,7 @@ test("Send the verifyMoveDone to the server", function(){
 				ok(data.has(lastMove));
 				ok(data.has(lastMovePlayerId));
 				ok(data.has(playerIdToNumberOfTokensInPot));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.setRequestHeader("Content-type", "application/json");
@@ -239,13 +206,7 @@ test("Recieve the player of the current turn from the server", function(){
 			if (status == 200){
 				data = xhr.response;
 				ok(data.has(playerIdThatHasTurn));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.send();
@@ -275,13 +236,7 @@ test("Send a end game operation to the server", function(){
 				data = xhr.response;
 				ok(data.has(gameOverScores));
 				ok(data.has(gameOverReason));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.setRequestHeader("Content-type", "application/json");
@@ -312,13 +267,7 @@ test("Send a request to end game when tie to the server and receive the game ove
 				data = xhr.response;
 				ok(data.has(gameOverScores));
 				ok(data.has(gameOverReason));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.send();
@@ -347,13 +296,7 @@ test("Send a request to end game when tie to the server and receive the game ove
 			if (status == 200){
 				data = xhr.response;
 				deepEqual(data, {"requestToEndTie" : "false"});
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.send();
@@ -384,13 +327,7 @@ test("Send a request to end game when tie to the server and receive the game ove
 				data = xhr.response;
 				ok(data.has(gameOverScores));
 				ok(data.has(gameOverReason));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.send();
@@ -420,13 +357,7 @@ test("Receive the game over score and reason from the server", function(){
 				data = xhr.response;
 				ok(data.has(gameOverScores));
 				ok(data.has(gameOverReason));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.send();
@@ -459,13 +390,7 @@ test("Get a player's infomation from the server", function(){
 				ok(data.has(nickName));
 				ok(data.has(pic));
 				ok(data.has(tokens));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.send();
@@ -494,13 +419,7 @@ test("Register a new account", function(){
 			if (status == 200){
 				data = xhr.response;
 				ok(data.has(playerId));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.setRequestHeader("Content-type", "application/json");
@@ -530,13 +449,7 @@ test("Register a new account with exists email", function(){
 			if (status == 200){
 				data = xhr.response;
 				deepEqual(data, {"error": "EMAIL_EXISTS"});
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.setRequestHeader("Content-type", "application/json");
@@ -567,13 +480,7 @@ test("Login an account", function(){
 				data = xhr.response;
 				ok(data.has(playerId));
 				ok(data.has(accessSignature));
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.send();
@@ -602,13 +509,7 @@ test("Login an account with a invalid playerId", function(){
 			if (status == 200){
 				data = xhr.response;
 				deepEqual(data, {"error": "WRONG_PLAYER_ID"});
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.send();
@@ -637,13 +538,7 @@ test("Login an account with a invalid password", function(){
 			if (status == 200){
 				data = xhr.response;
 				deepEqual(data, {"error": "WRONG_PASSWORD"});
-			} else {
-				throws(
-						function(){
-							throw "error";
-						}, "xmlhttprequest do not have a right status!"
-				);
-			}
+			} else {}
 		}
 	};
 	xhr.send();
