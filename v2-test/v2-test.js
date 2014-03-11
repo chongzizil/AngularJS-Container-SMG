@@ -19,6 +19,11 @@ var noBetSupport = {"gameId" : gameid, "playerId" : playerId, "betSupport" : fal
 var hasViewerSupport = {"gameId" : gameid, "playerId" : playerId, "viewerSupport" : true};
 var noViewerSupport = {"gameId" : gameid, "playerId" : playerId, "viewerSupport" : false};
 
+var timeoutSupportQuery = {"gameId" : gameid , 'timeoutSupport' : '?'};
+var autoMatchSupportQuery = {"gameId" : gameid, 'autoMatchSupport' : '?'};
+var surrenderSupportQuery = {"gameId" : gameid, 'surrenderSupport' : '?'};
+var betSupportQuery = {"gameId" : gameid, 'betSupport' : '?'};
+
 test("hasTimeOutSupport", function(){
 	var xmlhttp;
 	if(window.XMLHttpRequest){
@@ -35,7 +40,7 @@ test("hasTimeOutSupport", function(){
 	xmlhttp.open("POST",serverUrl,true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
-	xmlhttp.send();	
+	xmlhttp.send(timeoutSupportQuery);	
 });
 
 test("noTimeOutSupport", function(){
@@ -54,7 +59,7 @@ test("noTimeOutSupport", function(){
 	xmlhttp.open("POST",serverUrl,true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
-	xmlhttp.send();	
+	xmlhttp.send(timeoutSupportQuery);	
 });
 
 test("hasInviteFriendSupport", function(){	
@@ -70,7 +75,7 @@ test("hasInviteFriendSupport", function(){
 			deepEqual(data,hasInviteFriendSupport,"We do have Invite Friend Support for you!");
 		}
 	};
-	xmlhttp.open("POST",serverUrl,true);
+	xmlhttp.open("GET",serverUrl + '?gameid=' + gameid + '&inviteSup=?',true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
 	xmlhttp.send();	
@@ -89,7 +94,7 @@ test("noInviteFriendSupport", function(){
 			deepEqual(data,noInviteFriendSupport,"Sorry, we don't have Invite Friend Support for you!");
 		}
 	};
-	xmlhttp.open("POST",serverUrl,true);
+	xmlhttp.open("GET",serverUrl + '?gameid=' + gameid + '&inviteSup=?',true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
 	xmlhttp.send();	
@@ -111,7 +116,7 @@ test("hasAutoMatchSupport", function(){
 	xmlhttp.open("POST",serverUrl,true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
-	xmlhttp.send();	
+	xmlhttp.send(autoMatchSupportQuery);	
 });
 
 test("noAutoMatchSupport", function(){	
@@ -130,7 +135,7 @@ test("noAutoMatchSupport", function(){
 	xmlhttp.open("POST",serverUrl,true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
-	xmlhttp.send();	
+	xmlhttp.send(autoMatchSupportQuery);	
 });
 
 test("hasTieGameSupport", function(){	
@@ -146,7 +151,7 @@ test("hasTieGameSupport", function(){
 			deepEqual(data,hasTieGameSupport,"We do have Tie Game Support for you!");
 		}
 	};
-	xmlhttp.open("POST",serverUrl,true);
+	xmlhttp.open("GET",serverUrl + '?gameId=' + gameid + '&tieSupport=?', true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
 	xmlhttp.send();	
@@ -165,7 +170,7 @@ test("noTieGameSupport", function(){
 			deepEqual(data,noTieGameSupport,"Sorry, we don't have Tie Game Support for you!");
 		}
 	};
-	xmlhttp.open("POST",serverUrl,true);
+	xmlhttp.open("GET",serverUrl + '?gameId=' + gameid + '&tieSupport=?',true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
 	xmlhttp.send();	
@@ -187,7 +192,7 @@ test("hasSurrenderSupport", function(){
 	xmlhttp.open("POST",serverUrl,true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
-	xmlhttp.send();	
+	xmlhttp.send(surrenderSupportQuery);	
 });
 
 test("noSurrenderSupport", function(){	
@@ -206,7 +211,7 @@ test("noSurrenderSupport", function(){
 	xmlhttp.open("POST",serverUrl,true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
-	xmlhttp.send();	
+	xmlhttp.send(surrenderSupportQuery);	
 });
 
 test("hasChatRoomSupport", function(){	
@@ -222,7 +227,7 @@ test("hasChatRoomSupport", function(){
 			deepEqual(data,hasChatRoomSupport,"We do have Chat Room Support for you!");
 		}
 	};
-	xmlhttp.open("POST",serverUrl,true);
+	xmlhttp.open("GET",serverUrl+'?gameId='  + gameid + '&chatRoomSup=?',true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
 	xmlhttp.send();	
@@ -241,7 +246,7 @@ test("noChatRoomSupport", function(){
 			deepEqual(data,noChatRoomSupport,"Sorry, we don't have Chat Room Support for you!");
 		}
 	};
-	xmlhttp.open("POST",serverUrl,true);
+	xmlhttp.open("GET",serverUrl+'?gameId='  + gameid + '&chatRoomSup=?',true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
 	xmlhttp.send();	
@@ -263,7 +268,7 @@ test("hasBetSupport", function(){
 	xmlhttp.open("POST",serverUrl,true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
-	xmlhttp.send();	
+	xmlhttp.send(betSupportQuery);	
 });
 
 test("noBetSupport", function(){	
@@ -282,7 +287,7 @@ test("noBetSupport", function(){
 	xmlhttp.open("POST",serverUrl,true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
-	xmlhttp.send();	
+	xmlhttp.send(betSupportQuery);	
 });
 
 test("hasViewerSupport", function(){	
@@ -298,7 +303,7 @@ test("hasViewerSupport", function(){
 			deepEqual(data,hasViewerSupport,"We do have Viewer Support for you!");
 		}
 	};
-	xmlhttp.open("POST",serverUrl,true);
+	xmlhttp.open("GET",serverUrl+'?gameId='  + gameid + '&viewerSup=?',true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
 	xmlhttp.send();	
@@ -317,7 +322,7 @@ test("noViewerSupport", function(){
 			deepEqual(data,noViewerSupport,"Sorry, we don't have Viewer Support for you!");
 		}
 	};
-	xmlhttp.open("POST",serverUrl,true);
+	xmlhttp.open("GET",serverUrl+'?gameId='  + gameid + '&viewerSup=?',true);
 	xmlhttp.responseType='json';
 	xmlhttp.setRequestHeader('Content-Type','application/json');
 	xmlhttp.send();	
