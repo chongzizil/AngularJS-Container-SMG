@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # angular-seed — the seed for AngularJS apps
 
 This project is an application skeleton for a typical [AngularJS](http://angularjs.org/) web app.
@@ -142,3 +143,11 @@ fetch the changes and merge them into your project with git.
 ## Contact
 
 For more information on AngularJS please check out http://angularjs.org/
+=======
+SMG-AngularJS-Container
+=======================
+Tests url: <br/>
+http://smg-angularjs-container.appspot.com/v1-test.html <br/>
+http://smg-angularjs-container.appspot.com/v2-test.html <br/>
+http://smg-angularjs-container.appspot.com/v3-test.html
+>>>>>>> 1de0885df49895bfe3063eaa312837d45d4fc82e
