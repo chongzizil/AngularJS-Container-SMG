@@ -12,7 +12,7 @@ var validPassword = "1234";
 var invalidPassword = "xxxxxxxxxx";
 var validPlayerId = "100";
 var invalidPlayerId = "101";
-var registerInfo = '{"email": "chongzizil@gmail.com", "password": "123456", "firstName": "Youlong", "lastName": "Li"}';
+var registerInfo = '{"email": "chongzizil@gmail.com", "password": "123456"}';
 
 /* 
  * Start(Insert) a new match

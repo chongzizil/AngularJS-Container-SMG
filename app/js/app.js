@@ -11,13 +11,21 @@ smgContainer.config(['$routeProvider',
 					templateUrl: 'templates/invite.html',
 					controller: 'InviteController'
 				}).
-				when('/match', {
+				when('/match/:matchId', {
 					templateUrl: 'templates/match.html',
 					controller: 'MatchController'
 				}).
 				when('/login', {
 					templateUrl: 'templates/login.html',
 					controller: 'LoginController'
+				}).
+				when('/logout', {
+					templateUrl: 'templates/logout.html',
+					controller: 'LogoutController'
+				}).
+				when('/register', {
+					templateUrl: 'templates/register.html',
+					controller: 'RegisterController'
 				}).
 				otherwise({
 					redirectTo: '/'
