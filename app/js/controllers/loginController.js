@@ -1,9 +1,9 @@
 'use strict';
 
-smgContainer.controller('InviteController',
+smgContainer.controller('LoginController',
 		function ($scope) {
 
 			$scope.invite = function(inviteInfo) {
-				console.log(inviteInfo);
+				containerService.POST
 			}
-});
+		});
