@@ -30,6 +30,7 @@
 					<li class="active"><a href="#">Games</a></li>
 					<li><a href="#/invite">Invite</a></li>
 					<li><a href="#/match/1">Match</a></li>
+					<li><a href="#/uploadGame">Upload Game</a></li>
 				</ul>
 
 				<ul class="nav navbar-nav navbar-right">
@@ -38,15 +39,48 @@
 						<ul class="dropdown-menu">
 							<li><a href="#/login">Login</a></li>
 							<li><a href="#/register">Register</a></li>
-							<li><a href="#">Something else here</a></li>
-							<li class="/logout"></li>
-							<li><a href="#">Log out</a></li>
+							<li class="divider"></li>
+							<li><a href="#/devLogin">Dev Login</a></li>
+							<li><a href="#/devRegister">Dev Register</a></li>
+							<li class="divider"></li>
+							<li><a href="#/logout">Log out</a></li>
 						</ul>
 					</li>
 				</ul>
 			</div>
 		</nav><!-- /.navbar-collapse -->
 	</div><!-- /.container -->
+
+
+
+	<!--
+	<div ng-controller="TestController">
+		<form class="form-horizontal" role="form">
+
+			<div class="form-group">
+				<label for="longUrl" class="col-sm-2 control-label">url</label>
+				<div class="col-sm-8">
+					<input ng-model="url.long" class="form-control" id="longUrl" placeholder="url">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="shortUrl" class="col-sm-2 control-label">result</label>
+				<div class="col-sm-8">
+					<input ng-model="url.short" class="form-control" id="shortUrl" placeholder="result">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-8">
+					<button type="submit" ng-click="submitUrl(url.long)" class="btn btn-default">Register</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	-->
+
+
 
 	<ng-view></ng-view>
 
@@ -65,9 +99,15 @@
 	<script src="js/services/services.js"></script>
 	<script src="js/controllers/inviteController.js"></script>
 	<script src="js/controllers/matchController.js"></script>
-	<script src="js/controllers/loginController.js"></script>
-	<script src="js/controllers/logoutController.js"></script>
+
+	<script src="js/controllers/devRegisterController.js"></script>
 	<script src="js/controllers/registerController.js"></script>
+	<script src="js/controllers/loginController.js"></script>
+	<script src="js/controllers/devLoginController.js"></script>
+	<script src="js/controllers/logoutController.js"></script>
+	<script src="js/controllers/uploadGameController.js"></script>
+
+	<script src="js/controllers/testController.js"></script>
 </body>
 
 </html>

@@ -2,27 +2,45 @@
 
 /* Services */
 
-smgContainer.factory('PlayerService', ['$resource', function($resource){
-	return $resource('/players/:playerId', {playerId: '@playerId', password: '@password'}, {
-		login: {method:'GET', params:{}, isArray:true}
-	});
-
-	return $resource('/players', {}, {
-		register: {method:'POST', params:{}, headers: {'Content-Type': 'application/json'}}
-	});
+smgContainer.factory('PlayerService', ['$resource', function($resource) {
+	return $resource('http://smg-server.appspot.com/players/:playerId',
+		{playerId: '@playerId'}//,
+		//{register: {method:'POST', params:{}, headers:{'Content-Type': 'application/json'},  isArray:false}}
+		);
 }]);
 
-smgContainer.factory('MatchService', ['$resource', function($resource){
+smgContainer.factory('GetGameInfoService', ['$resource', function($resource) {
+	return $resource('http://smg-server.appspot.com/games/:gameId',
+			{gameId: '@gameId'}
+	);
+}]);
 
-	return $resource('/newMatches', {}, {
-		insert: {method:'POST', params:{}, headers: {'Content-Type': 'application/json'}}
-	});
+smgContainer.factory('InsertMatchService', ['$resource', function($resource) {
+	return $resource('http://smg-server.appspot.com/newMatch',
+			{}
+	);
+}]);
 
-	return $resource('/matches/:matchId', {matchId: '@matchId'}, {
-		makeMove: {method:'POST', params:{}, headers: {'Content-Type': 'application/json'}}
-	});
+smgContainer.factory('MatchService', ['$resource', function($resource) {
+	return $resource('http://smg-server.appspot.com/matches/:matchId',
+			{matchId: '@matchId'}
+	);
+}]);
 
-	return $resource('/matches/:matchId', {matchId: '@matchId', accessSignature: '@accessSignature', playerId: '@playerId'}, {
-		login: {method:'GET', params:{}, isArray:true}
-	});
+smgContainer.factory('DevService', ['$resource', function($resource) {
+	return $resource('http://smg-server.appspot.com/matches/developers/:developerId',
+			{developerId: '@developerId'}
+	);
+}]);
+
+smgContainer.factory('UploadGameService', ['$resource', function($resource) {
+	return $resource('http://smg-server.appspot.com/matches/games',
+			{}
+	);
+}]);
+
+smgContainer.factory('TestService', ['$resource', function($resource) {
+	return $resource('https://www.googleapis.com/urlshortener/v1/url',
+			{}
+	);
 }]);

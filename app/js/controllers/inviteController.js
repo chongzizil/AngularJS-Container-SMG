@@ -1,7 +1,7 @@
 'use strict';
 
 smgContainer.controller('InviteController',
-		function ($scope, $rootScope, MatchService) {
+		function ($scope, $rootScope, InsertMatchService) {
 
 			$scope.invite = function(inviteInfo) {
 				console.log(inviteInfo);
@@ -14,7 +14,7 @@ smgContainer.controller('InviteController',
 						gameId: parseInt(inviteInfo.gameId)
 					};
 					console.log(data);
-					var result = MatchService.insert(data);
+					var result = InsertMatchService.save({}, data);
 					var matchId = result.matchId;
 
 					//$location.url('/match/:matchId');

@@ -1,7 +1,7 @@
 'use strict';
 
-smgContainer.controller('RegisterController',
-	function ($scope, $rootScope, $location, PlayerService, $http) {
+smgContainer.controller('DevRegisterController',
+	function ($scope, $rootScope, $location, DevService, $http) {
 		$scope.post = function(player) {
 			$http.post("http://1.smg-server.appspot.com/players/:playerId", {}).success(function(result) {
 				console.log(result);
@@ -17,7 +17,7 @@ smgContainer.controller('RegisterController',
 					password: registerInfo.password
 				};
 			console.log(player);
-			PlayerService.save({}, player);
+			DevService.save({}, player);
 			/*var result = PlayerService.save({}, player);*/
 
 			//$rootScope.playerId = result['playerId'];

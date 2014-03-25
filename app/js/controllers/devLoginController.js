@@ -1,10 +1,10 @@
 'use strict';
 
-smgContainer.controller('LoginController',
-		function ($scope, $rootScope, $location, PlayerService) {
+smgContainer.controller('DEVLoginController',
+		function ($scope, $rootScope, $location, DevService) {
 
 			$scope.login = function(loginInfo) {
-				var playerInfo = PlayerService.login(/*{playerId: loginInfo.playerId, password: loginInfo.password}*/);
+				var playerInfo = DevService.login(/*{playerId: loginInfo.playerId, password: loginInfo.password}*/);
 				$rootScope.playerId = loginInfo.playerId;
 				$rootScope.email = playerInfo.email;
 				$rootScope.accessSignature = playerInfo.accessSignature;
