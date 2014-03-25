@@ -24,7 +24,7 @@ smgContainer.config(['$routeProvider',
 					controller: 'RegisterController'
 				}).
 				when('/devLogin', {
-					templateUrl: 'templates/devLogin.html',
+					templateUrl: 'templates/DevLogin.html',
 					controller: 'DevLoginController'
 				}).
 				when('/devRegister', {

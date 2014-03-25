@@ -4,12 +4,15 @@ smgContainer.controller('LoginController',
 		function ($scope, $rootScope, $location, PlayerService) {
 
 			$scope.login = function(loginInfo) {
-				var playerInfo = PlayerService.login(/*{playerId: loginInfo.playerId, password: loginInfo.password}*/);
 				$rootScope.playerId = loginInfo.playerId;
-				$rootScope.email = playerInfo.email;
-				$rootScope.accessSignature = playerInfo.accessSignature;
-				console.log($rootScope.accessSignature);
 
-				//$location.url('/');
+				console.log(loginInfo);
+
+				DevService.get({playerId: loginInfo.playerId, password: loginInfo.password}).
+						$promise.then(function(data) {
+							$rootScope.accessSignature = data['accessSignature'];
+							$location.url('/');
+						}
+				);
 			}
 		});

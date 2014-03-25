@@ -1,27 +1,28 @@
 'use strict';
 
 smgContainer.controller('RegisterController',
-	function ($scope, $rootScope, $location, PlayerService, $http) {
-		$scope.post = function(player) {
-			$http.post("http://1.smg-server.appspot.com/players/:playerId", {}).success(function(result) {
-				console.log(result);
-				$scope.resultPost = result;
-			}).error(function() {
-						console.log("error");
-					});
-		};
-
+	function ($scope, $rootScope, $location, PlayerService) {
 		$scope.submitRegister = function(registerInfo) {
 			var player = {
-					email: registerInfo.email,
-					password: registerInfo.password
-				};
-			console.log(player);
-			PlayerService.save({}, player);
-			/*var result = PlayerService.save({}, player);*/
+				email: registerInfo.email,
+				password: registerInfo.password
+			};
 
-			//$rootScope.playerId = result['playerId'];
-			//console.log(result);
+			var jsonPlayer = angular.toJson(player);
+			console.log(player);
+			console.log(typeof jsonPlayer);
+
+
+
+			PlayerService.save({}, jsonPlayer).
+					$promise.then(function(data) {
+						console.log(data);
+						$scope.playerId = data['playerId'];
+
+						var $sentAlert = $("#sentAlert");
+						$sentAlert.show();
+					}
+			);
 
 			//$location.url('/');
 		};

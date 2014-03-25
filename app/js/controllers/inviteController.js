@@ -5,8 +5,11 @@ smgContainer.controller('InviteController',
 
 			$scope.invite = function(inviteInfo) {
 				console.log(inviteInfo);
-				$rootScope.playerId = 0;
-				$rootScope.accessSignature = 'abcdefg';
+				// The player's info
+				$rootScope.playerId = 5974892214222848;
+				$rootScope.accessSignature = 'd9e7f9a6d7a2a9c9dddcba550e5743ad';
+
+
 				if ($rootScope.playerId !== undefined) {
 					var data = {
 						accessSignature: $rootScope.accessSignature,
