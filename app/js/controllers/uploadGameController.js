@@ -5,7 +5,7 @@ smgContainer.controller('UploadGameController',
 			$scope.upload = function(gameInfo) {
 				gameInfo.gameName = 'TicTacToe';
 				gameInfo.description = 'None';
-				gameInfo.url = '';
+				gameInfo.url = 'http://chongzizil.github.io/';
 				gameInfo.height = '500px';
 				gameInfo.width = '500px';
 				console.log(gameInfo);
