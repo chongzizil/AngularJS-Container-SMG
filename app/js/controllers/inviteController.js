@@ -7,6 +7,7 @@ smgContainer.controller('InviteController',
 			var playerId = $cookies.playerId;
 			var friendId = inviteInfo.friendId;
 			var gameId = inviteInfo.gameId;
+			$cookies.friendId = friendId;
 			$cookies.gameId = gameId;
 
 			if (playerId !== undefined && accessSignature !== undefined) {
@@ -19,6 +20,8 @@ smgContainer.controller('InviteController',
 
 				InsertMatchService.save({}, jsonInviteData).
 						$promise.then(function(data) {
+							console.log(data);
+							console.log(data['matchId']);
 							$location.url('/match/' + data['matchId']);
 						}
 				);

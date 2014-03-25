@@ -23,7 +23,7 @@ smgContainer.factory('InsertMatchService', ['$resource', function($resource) {
 
 smgContainer.factory('MatchService', ['$resource', function($resource) {
 	return $resource('http://1.smg-server.appspot.com/matches/:matchId',
-			{matchId: '@matchId'}
+			{matchId: '@matchId', accessSignature: '@accessSignature', playerId: '@playerId'}
 	);
 }]);
 
