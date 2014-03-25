@@ -1,18 +1,16 @@
 'use strict';
 
 smgContainer.controller('LoginController',
-		function ($scope, $rootScope, $location, PlayerService) {
+	function ($scope, $rootScope, $location, $cookies, PlayerService) {
+		$scope.login = function(loginInfo) {
+			$cookies.playerId = loginInfo.playerId;
 
-			$scope.login = function(loginInfo) {
-				$rootScope.playerId = loginInfo.playerId;
-
-				console.log(loginInfo);
-
-				DevService.get({playerId: loginInfo.playerId, password: loginInfo.password}).
-						$promise.then(function(data) {
-							$rootScope.accessSignature = data['accessSignature'];
-							$location.url('/');
-						}
-				);
-			}
-		});
+			PlayerService.get({playerId: loginInfo.playerId, password: loginInfo.password}).
+					$promise.then(function(data) {
+						$cookies.accessSignature = data['accessSignature'];
+						$location.url('/');
+					}
+			);
+		}
+	}
+);
