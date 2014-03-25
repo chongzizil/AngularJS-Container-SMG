@@ -11,12 +11,15 @@
 			<div id="gameContainer" class="col-md-10">
 				<div class="panel panel-default">
 					<div class="panel-body">
-						<div align="left">
-							<input type="text" ng-model="game.height" placeholder="Game Display Board Height"/> <br />
-							<input type="text" ng-model="game.width" placeholder="Game Display Board Width"/>
+						<div class="input-group" align="left">
+							<input type="text" ng-model="gameInfo.height" placeholder="Board Height"/> <br />
+							<input type="text" ng-model="gameInfo.width" placeholder="Board Width"/>
 						</div>
 						<div align="middle">
-							<iframe ng-src="{{ game.url }}" ng-attr-height="{{ game.height }}" width="{{ game.width }}"></iframe>
+							<iframe ng-src="{{ gameInfo.url }}" ng-attr-height="{{ gameInfo.height }}" ng-attr-width="{{ gameInfo.width }}"></iframe>
+						</div>
+						<div align="right">
+							<button class="btn btn-success" ng-click="reload()" class="col-md-2">Reload</button>
 						</div>
 					</div>
 				</div>
