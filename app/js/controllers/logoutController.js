@@ -3,7 +3,9 @@
 smgContainer.controller('LogoutController',
 	function ($scope, $rootScope, $location) {
 
-		$rootScope = {};
+		$rootScope.accessSignature = undefined;
+		$rootScope.playerId = undefined;
+		$rootScope.developerId = undefined;
 
 		$location.url('/');
 	});
