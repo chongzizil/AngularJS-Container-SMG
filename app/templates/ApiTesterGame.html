@@ -1,0 +1,39 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>API Tester game</h1>
+    <textarea rows="10" cols="80" id="debug" readonly></textarea><br/>
+    <button onclick='sendData()'>click me</button>
+     
+    <script type="text/javascript">
+
+      var operations = [{'SetTurn' : 41 }, {'type' : 'set' , 'key' : 'W' , 'value' : '0'}];
+      function debug(message) {
+        document.getElementById("debug").value += message + "\n";
+      };
+
+      function listener(event) {
+        debug("Received: " + JSON.stringify(event.data));
+      };
+
+      if(window.addEventListener){
+        addEventListener("message", listener, false);
+      }else{
+        attachEvent("onmessage", listener);
+      };
+
+
+
+      function send(message){
+        debug("Sending: " + JSON.stringify(message));
+        window.parent.postMessage(message,'*');
+      };
+
+      function sendData(){
+        send(operations);
+      };
+
+    </script>
+  </body>
+</html>

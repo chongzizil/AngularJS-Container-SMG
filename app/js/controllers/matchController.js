@@ -1,13 +1,13 @@
 'use strict';
 
 smgContainer.controller('MatchController',
-		function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, MatchService, GetGameInfoService) {
+		function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window, MatchService, GetGameInfoService) {
 
 			// helper function used to get sce trusted url
 			var sceTrustedUrl = function(url){
 				return $sce.trustAsResourceUrl(url);
 			}
-
+		
 			// object used to store all the information of the game and matches.
 			$scope.gameInfo = {};
 			$scope.matchInfo = {};
@@ -52,4 +52,29 @@ smgContainer.controller('MatchController',
 			$scope.reload = function() {
 				$route.reload();
 			}
+			
+			var hardCodeState = {"type" : "StartGame", "state": "gameState", "yourPlayerId" : 1, "playerIds" : [0, 1]};
+
+			$scope.sendMessage = function(){
+				var win = $window.document.getElementById('iframe1').contentWindow;
+				win.postMessage(hardCodeState, "*");
+			};
+
+			if($window.addEventListener){
+				addEventListener("message", listener, false);
+			}else{
+				attachEvent("onmessage", listener);
+			};
+
+      		function listener(event) {
+        		var data = event.data;
+        		if(angular.isUndefined($scope.debug)){
+        			$scope.debug = "Received: " + JSON.stringify(data);
+        		}else{
+        			$scope.operations = data;
+      				$scope.debug += "Received: " + JSON.stringify(data);
+        		}
+      			$scope.$apply();
+       		};
+
 });

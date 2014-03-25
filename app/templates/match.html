@@ -6,6 +6,8 @@
 					<div class="panel-body">
 						player info
 					</div>
+					<textarea rows="5" cols="80" ng-model="debug" readonly>{{debug}}</textarea><br/>
+          <button ng-click="sendMessage()">Send message</button>    
 				</div>
 			</div>
 			<div id="gameContainer" class="col-md-10">
@@ -16,7 +18,7 @@
 							<input type="text" ng-model="gameInfo.width" placeholder="Board Width"/>
 						</div>
 						<div align="middle">
-							<iframe ng-src="{{ gameInfo.url }}" ng-attr-height="{{ gameInfo.height }}" ng-attr-width="{{ gameInfo.width }}"></iframe>
+							<iframe ng-src="{{ gameInfo.url }}" ng-attr-height="{{ gameInfo.height }}" ng-attr-width="{{ gameInfo.width }}" id='iframe1' src="templates/ApiTesterGame.html"></iframe>
 						</div>
 						<div align="right">
 							<button class="btn btn-success" ng-click="reload()" class="col-md-2">Reload</button>
