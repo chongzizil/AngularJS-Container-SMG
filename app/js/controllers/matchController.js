@@ -7,6 +7,14 @@ smgContainer.controller('MatchController',
 			var sceTrustedUrl = function(url){
 				return $sce.trustAsResourceUrl(url);
 			}
+			
+			// method used to send converted moves to server.
+			var sendMoveToServer = function(){
+				MatchService.save({matchId: $routeParams.matchId}, move).
+				$promise.then(function(data) {
+					console.log(data);
+				});
+			}
 		
 			// object used to store all the information of the game and matches.
 			$scope.gameInfo = {};
@@ -42,11 +50,7 @@ smgContainer.controller('MatchController',
 					}
 			);
 
-
-			MatchService.save({matchId: $routeParams.matchId}, move).
-					$promise.then(function(data) {
-						console.log(data);
-					});
+			sendMoveToServer();
 
 			// method used to reload the match page to get the new match information for the server.
 			$scope.reload = function() {
@@ -68,6 +72,12 @@ smgContainer.controller('MatchController',
 
       		function listener(event) {
         		var data = event.data;
+        		move.accessSignature = $cookies.accessSignature;
+				move.playerIds = [parseInt($cookies.playerId), parseInt($cookies.friendId)];
+				move.operations = data;
+				move = angular.toJson(move);
+        		sendMoveToServer();
+				
         		if(angular.isUndefined($scope.debug)){
         			$scope.debug = "Received: " + JSON.stringify(data);
         		}else{
