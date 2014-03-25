@@ -7,21 +7,17 @@ smgContainer.controller('MatchController',
 			var sceTrustedUrl = function(url){
 				return $sce.trustAsResourceUrl(url);
 			}
-			
-			// method used to send converted moves to server.
-			var sendMoveToServer = function(){
-				MatchService.save({matchId: $routeParams.matchId}, move).
-				$promise.then(function(data) {
-					console.log(data);
-				});
-			}
 		
 			// object used to store all the information of the game and matches.
 			$scope.gameInfo = {};
 			$scope.matchInfo = {};
 			$scope.operations = [
-				{"value":"sd", "type":"Set", "visibleToPlayerIds":"ALL", "key":"k"},
-				{"to":54, "from":23, "type":"SetRandomInteger", "key":"xcv"}
+				{
+					"value":"sd",
+					"type":"Set",
+					"visibleToPlayerIds":"ALL",
+					"key":"k"
+				}
 			];
 			var move = {};
 
@@ -40,17 +36,27 @@ smgContainer.controller('MatchController',
 						$scope.matchInfo.gameOverScores = data['gameOverScores'];
 						$scope.matchInfo.gameOverReason = data['gameOverReason'];
 						$scope.matchInfo.history = data['history'];
-
-						move.accessSignature = $cookies.accessSignature;
-						move.playerIds = [parseInt($cookies.playerId), parseInt($cookies.friendId)];
-						move.operations = $scope.operations;
-						move = angular.toJson(move);
-
-						console.log(move);
 					}
 			);
 
-			sendMoveToServer();
+			// method used to send converted moves to server.
+			var sendMoveToServer = function(operations){
+				var move = {};
+				move.accessSignature = $cookies.accessSignature;
+				move.playerIds = [$cookies.playerId, $cookies.friendId];
+				if((typeof operations == "object")){
+					move.operations = [operations];
+				}else{
+					move.operations = operations;
+				}
+				move = angular.toJson(move);
+				console.log(move);
+
+				MatchService.save({matchId: $routeParams.matchId}, move).
+						$promise.then(function(data) {
+							console.log(data);
+						});
+			}
 
 			// method used to reload the match page to get the new match information for the server.
 			$scope.reload = function() {
@@ -70,21 +76,17 @@ smgContainer.controller('MatchController',
 				attachEvent("onmessage", listener);
 			};
 
-      		function listener(event) {
-        		var data = event.data;
-        		move.accessSignature = $cookies.accessSignature;
-				move.playerIds = [parseInt($cookies.playerId), parseInt($cookies.friendId)];
-				move.operations = data;
-				move = angular.toJson(move);
-        		sendMoveToServer();
+      function listener(event) {
+        var data = event.data;
+        sendMoveToServer(data);
 				
-        		if(angular.isUndefined($scope.debug)){
-        			$scope.debug = "Received: " + JSON.stringify(data);
-        		}else{
-        			$scope.operations = data;
-      				$scope.debug += "Received: " + JSON.stringify(data);
-        		}
-      			$scope.$apply();
-       		};
+        if(angular.isUndefined($scope.debug)){
+        	$scope.debug = "Received: " + JSON.stringify(data);
+        }else{
+        	$scope.operations = data;
+      		$scope.debug += "Received: " + JSON.stringify(data);
+        }
+      		$scope.$apply();
+       	};
 
 });
