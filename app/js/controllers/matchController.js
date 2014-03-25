@@ -21,7 +21,7 @@ smgContainer.controller('MatchController',
 			$scope.matchInfo = {};
 			$scope.operations = [
 				{"value":"sd", "type":"Set", "visibleToPlayerIds":"ALL", "key":"k"},
-				{"to":"54", "from":"23", "type":"SetRandomInteger", "key":"xcv"}
+				{"to":54, "from":23, "type":"SetRandomInteger", "key":"xcv"}
 			];
 			var move = {};
 
