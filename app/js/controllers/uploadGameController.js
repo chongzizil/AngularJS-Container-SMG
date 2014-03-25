@@ -30,7 +30,6 @@ smgContainer.controller('UploadGameController',
 
 				UploadGameService.save({}, jsonGameInfo).$promise.then(function(data) {
 							console.log(data);
-
 						}
 				);
 
