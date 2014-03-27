@@ -1,0 +1,41 @@
+<div>
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading">Invite a friend</div>
+		<br/>
+		<div class="alert alert-danger collapse" id="inviteAlert">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			<p>{{inviteInfo.error}}</p>
+		</div>
+
+		<!-- Table -->
+		<table class="table">
+			<div id="search_player" class="col-sm-12">
+
+				<form name="inviteForm" class="form-horizontal" role="form">
+					<div ng-class="{ 'form-group': true, 'col-sm-5': true , 'has-error': friendIdHasError }">
+							<input type="text" required ng-model="inviteInfo.friendId" class="form-control" id="friendId" placeholder="Friend ID">
+					</div>
+					<div ng-class="{ 'form-group': true, 'col-sm-5': true , 'has-error': gameIdHasError }">
+							<input type="text" required ng-model="inviteInfo.gameId" class="form-control" id="gameId" placeholder="GameId">
+					</div>
+					<div class="form-group col-sm-2">
+							<button type="submit" ng-disabled="inviteForm.$invalid"  ng-click="invite(inviteInfo)" class="btn btn-default">Invite</button>
+					</div>
+				</form>
+				<br/><br/>
+			</div> <!-- Invite player bar -->
+		</table>
+	</div>
+
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Lobby</h3>
+		</div>
+		<div class="panel-body">
+			Lobby content
+		</div>
+	</div>
+
+</div>

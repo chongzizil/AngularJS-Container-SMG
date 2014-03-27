@@ -7,33 +7,13 @@ var smgContainer = angular.module('smgContainer', ['ngResource', 'ngRoute', 'ngC
 smgContainer.config(['$routeProvider',
 	function($routeProvider) {
 		$routeProvider.
-				when('/invite', {
-					templateUrl: 'templates/invite.html',
-					controller: 'InviteController'
-				}).
 				when('/match/:matchId', {
 					templateUrl: 'templates/match.html',
 					controller: 'MatchController'
 				}).
-				when('/login', {
-					templateUrl: 'templates/login.html',
-					controller: 'LoginController'
-				}).
-				when('/register', {
-					templateUrl: 'templates/register.html',
-					controller: 'RegisterController'
-				}).
-				when('/devLogin', {
-					templateUrl: 'templates/DevLogin.html',
-					controller: 'DevLoginController'
-				}).
-				when('/devRegister', {
-					templateUrl: 'templates/devRegister.html',
-					controller: 'DevRegisterController'
-				}).
-				when('/uploadGame', {
-					templateUrl: 'templates/uploadGame.html',
-					controller: 'UploadGameController'
+				when('/lobby', {
+					templateUrl: 'templates/lobby.html',
+					controller: 'LobbyController'
 				}).
 				when('/logout', {
 					templateUrl: 'templates/logout.html',
