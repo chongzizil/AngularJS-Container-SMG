@@ -1,11 +1,11 @@
 'use strict';
 
 smgContainer.controller('LogoutController',
-	function ($scope, $rootScope, $location) {
+	function ($scope, $rootScope, $location, $cookies) {
 
-		$cookies.accessSignature = undefined;
-		$cookies.playerId = undefined;
-		$cookies.developerId = undefined;
+		$cookies.accessSignature = null;
+		$cookies.playerId = "Guest";
+		$cookies.developerId = "Guest";
 
 		$location.url('/');
 	});

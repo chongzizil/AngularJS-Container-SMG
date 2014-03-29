@@ -23,6 +23,12 @@ smgContainer.factory('GetPlayerInfoService', ['$resource', function($resource) {
 	);
 }]);
 
+smgContainer.factory('joinQueueService', ['$resource', function($resource) {
+	return $resource(domainUrl + '/queue',
+			{}
+	);
+}]);
+
 smgContainer.factory('InsertMatchService', ['$resource', function($resource) {
 	return $resource(domainUrl + '/newMatch',
 			{}

@@ -2,6 +2,10 @@
 
 smgContainer.controller('MenuController',
 	function ($scope, $cookies) {
+		$scope.refresh = function() {
+			$scope.$apply();
+		}
+
 		$scope.idDisplay = 'Guest';
 		if ($cookies.playerId !== undefined) {
 			$scope.idDisplay =  $cookies.playerId;

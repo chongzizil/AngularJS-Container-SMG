@@ -7,11 +7,14 @@ var smgContainer = angular.module('smgContainer', ['ngResource', 'ngRoute', 'ngC
 smgContainer.config(['$routeProvider',
 	function($routeProvider) {
 		$routeProvider.
-				when('/match/:matchId', {
+				when('/selectGame', {
+					templateUrl: 'templates/selectGame.html',
+				}).
+				when('/:gameId/match/:matchId', {
 					templateUrl: 'templates/match.html',
 					controller: 'MatchController'
 				}).
-				when('/lobby', {
+				when('/lobby/:gameId', {
 					templateUrl: 'templates/lobby.html',
 					controller: 'LobbyController'
 				}).
