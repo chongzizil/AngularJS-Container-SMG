@@ -173,5 +173,162 @@ smgContainer.controller('MatchController',
 			/*
 			 Code for Yuanyi Yang.
 			 */
+			
+			 	var state = null;
+	            var lastState = state;
+
+	            var hardCodeInitialUpdateUI;
+	            var hardCodeVerifyMove;
+	            var hardCodeUpdateUI;
+
+	            var playerIds = $scope.matchInfo.playerIds;
+
+
+	            /*
+	             parameter: message should be : UpdateUI, VerifyMove
+	             */
+	            $scope.sendMessageToIframe = function(message){
+	                var win = $window.document.getElementById('iframe1').contentWindow;
+	                win.postMessage(message, "*");
+	              //console.log('toIframe');
+	            };
+
+	            if($window.addEventListener){
+	                addEventListener("message", listener, false);
+	            }else{
+	                attachEvent("onmessage", listener);
+	            };
+
+	            function listener(event) {
+	                var data = event.data;
+	                console.log(data);
+	                /*
+	                 check whether the data is GameReady(), if it is, send updateUI() to the game.
+	                 format of GameReady: {"type":"GameReady"}
+	                 */
+	                if(data['type']==="GameReady"){
+	                    replyGameReady();
+	                }else if(data['type'] === "MakeMove"){
+	                    //get operations
+	                    operations = data['operations'];
+	                    sendMoveToServer(operations);
+
+	                }else if(data['type'] === "VerifyMoveDone"){
+	                    //deal with verifyMoveDone
+	                    //no hacker detected
+	                }else{
+	                    console.log("In the container listener, can't deal with the message from the game!!")
+	                }
+
+	                if(angular.isUndefined($scope.debug)){
+	                    $scope.debug = "Received: " + JSON.stringify(data);
+	                }else{
+	                    $scope.operations = data;
+	                    $scope.debug += "Received: " + JSON.stringify(data);
+	                }
+	                $scope.$apply();
+	            };
+
+
+
+	            function replyGameReady() {
+	                /*
+	                 The initial updateUI() has this given format
+	                 [
+	                 {'yourPlayerId' : $cookies.playerId},
+	                 {'playersInfo' : [{'playerId' : playerId1},{'playerId' : playerId2}]},   //if your playerId == id1, you should send the initial move
+	                 {'state' : []},
+	                 {'lastState' : []},
+	                 {'lastMove' : []},
+	                 {'lastMovePlayerId' : ''},
+	                 {'playerIdToNumberOfTokensInPot' : ''}
+	                 ]
+	                 */
+	   
+	            	hardCodeInitialUpdateUI = {
+	                    'type': 'UpdateUI',
+	                    'yourPlayerId': '42',
+	                    'playersInfo': [
+	                        {'playerId': '42'},
+	                        {'playerId': '43'}
+	                    ],
+	                    'state': {},
+	                    'lastState': null,
+	                    'lastMove': [],
+	                    'lastMovePlayerId': null,
+	                    'playerIdToNumberOfTokensInPot': {}
+	                };
+
+	                var initialUpdateUI = {
+	                    'type': 'UpdateUI',
+	                    'yourPlayerId': $cookies.playerId,
+	                    'playersInfo': [
+	                        {'playerId': playerIds[0]},
+	                        {'playerId': playerIds[1]}
+	                    ],
+	                    'state': {},
+	                    'lastState': null,
+	                    'lastMove': [],
+	                    'lastMovePlayerId': null,
+	                    'playerIdToNumberOfTokensInPot': {}
+	                };
+
+	                var update = angular.toJson(hardCodeInitialUpdateUI);
+
+	                $scope.sendMessageToIframe(hardCodeInitialUpdateUI);
+	            }
+
+	            
+	            function sendVerifyMoveToGame(newState){
+	                lastState = state;
+	                state = newState;
+	                var verifyMove = {
+	                    "type":"VerifyMove",
+	                    'playersInfo': [
+	                        {'playerId': playerIds[0]},
+	                        {'playerId': playerIds[1]}
+	                    ],
+	                    'state' : newState,
+	                    'lastState' : state,
+	                    'lastMove' : null,
+	                    "lastMovePlayerId": lastMovePlayerId,
+	                    "playerIdToNumberOfTokensInPot":{}
+	                };
+	                $scope.sendMessageToIframe(verifyMove);
+	            };
+
+
+	            function sendUpdateUIToGame(newState){
+	                hardCodeUpdateUI = {
+	                    "type":"UpdateUI",
+	                    'yourPlayerId': 42,
+	                    'playersInfo': [
+	                        {'playerId': '42'},
+	                        {'playerId': '43'}
+	                    ],
+	                    'state': {},
+	                    'lastState': null,
+	                    'lastMove': [],
+	                    'lastMovePlayerId': null,
+	                    'playerIdToNumberOfTokensInPot': {}
+	                };
+	                lastState = state;
+	                state = newState;
+	                var updateUI = {
+	                    "type":"UpdateUI",
+	                    'yourPlayerId': $cookies.playerId,
+	                    'playersInfo': [
+	                        {'playerId': $scope.playerIds[0]},
+	                        {'playerId': $scope.playerIds[1]}
+	                    ],
+	                    'state' : newState,
+	                    'lastState' : state,
+	                    'lastMove' : null,
+	                    "lastMovePlayerId": lastMovePlayerId,
+	                    "playerIdToNumberOfTokensInPot":{}
+	                };
+	                $scope.sendMessageToIframe(updateUI);
+	            }
+			}
 		}
 );
