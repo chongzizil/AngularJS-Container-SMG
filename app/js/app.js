@@ -8,7 +8,7 @@ smgContainer.config(['$routeProvider',
 	function($routeProvider) {
 		$routeProvider.
 				when('/selectGame', {
-					templateUrl: 'templates/selectGame.html',
+					templateUrl: 'templates/selectGame.html'
 				}).
 				when('/:gameId/match/:matchId', {
 					templateUrl: 'templates/match.html',
