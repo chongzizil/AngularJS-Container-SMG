@@ -27,8 +27,10 @@ smgContainer.controller('MatchController',
 							function (event) {
 								console.log(event.data);
 								channelApiPushState = event.data['state'];
-								// We call 'Get' method to server to get the match information.
+								//1. We call 'Get' method to server to get the match information.
 								getMatchInfo();
+								//2. Sent received game history to game
+								sendUpdateUIToGame(matchInfo.history);
 							}
 				};
 
