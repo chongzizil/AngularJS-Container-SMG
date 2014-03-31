@@ -123,7 +123,7 @@ smgContainer.controller('MatchController',
 				}
 				// 1. make up a move.
 				var move = {
-					"accessSignature": $scope.accessSignature,
+					"accessSignature": $cookies.accessSignature,
 					"playerIds": $scope.matchInfo.playerIds,
 					"operations": operations
 				};
