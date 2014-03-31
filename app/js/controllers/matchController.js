@@ -12,18 +12,31 @@ smgContainer.controller('MatchController',
 			var channel;
 			var socket;
 			var handler = {
-				onopen: function () { alert("onopen") },
-				onerror: function () { alert("onerror") },
-				onclose: function () { alert("onclose") },
-				onmessage:
-						function (event) {
-							console.log(event.data);
-							var channelApiPushState = event.data['state'];
-							getMatchInfo();
-							sendUpdateUIToGame(matchInfo.history[0]['gameState']);
-						}
+				onopen: function () {
+					alert("onopen")
+				},
+				onerror: function () {
+					alert("onerror")
+				},
+				onclose: function () {
+					alert("onclose")
+				},
+				onmessage: function (event) {
+					console.log(event.data);
+					var channelApiPushState = event.data['state'];
+					getMatchInfo();
+					sendUpdateUIToGame(matchInfo.history[0]['gameState']);
+				}
 			};
 
+			var state = null;
+			var lastState = state;
+			var hardCodeInitialUpdateUI;
+			var hardCodeVerifyMove;
+			var hardCodeUpdateUI;
+			var playerIds = $scope.matchInfo.playerIds;
+
+			// Formal program starts here.
 			if (!$cookies.accessSignature || !$cookies.playerId) {
 				alert('You have to log in first!');
 				$location.url('/');
@@ -31,6 +44,11 @@ smgContainer.controller('MatchController',
 				alert('You have to start a match by invite a friend or something...')
 				$location.url('/');
 			} else {
+				if ($window.addEventListener) {
+					addEventListener("message", listener, false);
+				} else {
+					attachEvent("onmessage", listener);
+				}
 				// 1. Get game information.
 				getGameInfo();
 				// 2. Get match information.
@@ -43,12 +61,12 @@ smgContainer.controller('MatchController',
 			 * Method used to get all the information for the game,
 			 * and create the changeApi channel to get the match information frequently.
 			 */
-			var getGameInfo = function() {
+			var getGameInfo = function () {
 				GetGameInfoService.get({gameId: $routeParams.gameId}).
-						$promise.then(function(data) {
-							if(data['error'] == 'WRONG_GAME_ID') {
+						$promise.then(function (data) {
+							if (data['error'] == 'WRONG_GAME_ID') {
 								alert('Sorry, Wrong Game ID provided!');
-							}else {
+							} else {
 								console.log(data);
 								// 1. Get game information.
 								gameInfo.url = sceTrustedUrl(data['url']);
@@ -67,15 +85,15 @@ smgContainer.controller('MatchController',
 			/*
 			 Method using "GET" method to get all the match information
 			 */
-			var getMatchInfo = function() {
+			var getMatchInfo = function () {
 				MatchService.get({matchId: $routeParams.matchId,
-					accessSignature : $cookies.accessSignature, playerId : $cookies.playerId}).
-						$promise.then(function(data) {
-							if(data['error'] == "WRONG_ACCESS_SIGNATURE") {
+					accessSignature: $cookies.accessSignature, playerId: $cookies.playerId}).
+						$promise.then(function (data) {
+							if (data['error'] == "WRONG_ACCESS_SIGNATURE") {
 								alert('Sorry, Wrong AccessSignature received!');
-							} else if(data['error'] == 'WRONG_PLAYER_ID') {
+							} else if (data['error'] == 'WRONG_PLAYER_ID') {
 								alert('Sorry, Wrong Player ID received!');
-							} else if(data['error'] == 'JSON_PARSE_ERROR') {
+							} else if (data['error'] == 'JSON_PARSE_ERROR') {
 								alert('Sorry, Wrong JSON string format received!');
 							} else {
 								console.log(data);
@@ -98,30 +116,30 @@ smgContainer.controller('MatchController',
 			/**
 			 * Method used to send converted moves to server.
 			 */
-			var sendMoveToServer = function(operations){
-				if(operations.length == 1 && operations[0]['type'] == 'GameReady') {
+			var sendMoveToServer = function (operations) {
+				if (operations.length == 1 && operations[0]['type'] == 'GameReady') {
 					// If we get "GameReady" operation, no need to send it to the server.
 					return;
 				}
 				// 1. make up a move.
 				var move = {
-					"accessSignature" : $scope.accessSignature,
-					"playerIds" : $scope.matchInfo.playerIds,
-					"operations" : operations
+					"accessSignature": $scope.accessSignature,
+					"playerIds": $scope.matchInfo.playerIds,
+					"operations": operations
 				};
 				console.log(move);
 				var jsonMove = angular.json(move);
 				// 2. send jsonfied data to server.
 				MatchService.save({matchId: $routeParams.matchId}, jsonMove).
-						$promise.then(function(data) {
+						$promise.then(function (data) {
 							console.log(data);
-							if(data['error'] == "WRONG_ACCESS_SIGNATURE") {
+							if (data['error'] == "WRONG_ACCESS_SIGNATURE") {
 								alert('Sorry, Wrong Access Signature received!');
-							} else if(data['error'] == 'WRONG_PLAYER_ID') {
+							} else if (data['error'] == 'WRONG_PLAYER_ID') {
 								alert('Sorry, Wrong Player ID received!');
-							} else if(data['error'] == "JSON_PARSE_ERROR") {
+							} else if (data['error'] == "JSON_PARSE_ERROR") {
 								alert('Sorry, Wrong JSON Format received!');
-							} else if(data['error'] == "MISSING_INFO") {
+							} else if (data['error'] == "MISSING_INFO") {
 								alert('Sorry, Incompleted JSON data received!');
 							} else {
 								var sentMoveReceivedData = data['state'];
@@ -131,10 +149,10 @@ smgContainer.controller('MatchController',
 				);
 			}
 
-			/*
-			 Helper function used to get sce trusted url
+			/**
+			 * Helper function used to get sce trusted url
 			 */
-			var sceTrustedUrl = function(url){
+			var sceTrustedUrl = function (url) {
 				return $sce.trustAsResourceUrl(url);
 			}
 
@@ -143,7 +161,7 @@ smgContainer.controller('MatchController',
 			 * 1. Game has a winner.
 			 * 2. One of the players surrenders.
 			 */
-			var endGame = function() {
+			$scope.endGame = function () {
 				socket = channel.close();
 				$location.url('/');
 			}
@@ -152,15 +170,15 @@ smgContainer.controller('MatchController',
 			 * Method used to get all the players' information.
 			 * @param playerIds
 			 */
-			var getAllPlayersInfo = function(playerIds) {
-				for(playerId in playerIds) {
-					GetPlayerInfoService.get({playerId : $cookies.playerId,
-						targetId : playerId, accessSignature : $cookies.accessSignature}).
-							$promise.then(function(data) {
+			var getAllPlayersInfo = function (playerIds) {
+				for (playerId in playerIds) {
+					GetPlayerInfoService.get({playerId: $cookies.playerId,
+						targetId: playerId, accessSignature: $cookies.accessSignature}).
+							$promise.then(function (data) {
 								console.log(data);
-								if(data['error'] == 'WRONG_ACCESS_SIGNATURE') {
+								if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
 									alert('Sorry, Wrong Access Signature provided!');
-								} else if(data['error'] == 'WRONG_TARGETID') {
+								} else if (data['error'] == 'WRONG_TARGETID') {
 									alert('Sorry, Wrong Target ID provided!');
 								} else {
 									playersInfo.push(data);
@@ -171,164 +189,141 @@ smgContainer.controller('MatchController',
 			}
 
 			/*
-			 Code for Yuanyi Yang.
+			 parameter: message should be : UpdateUI, VerifyMove
 			 */
-			
-			 	var state = null;
-	            var lastState = state;
+			$scope.sendMessageToIframe = function (message) {
+				var win = $window.document.getElementById('iframe1').contentWindow;
+				win.postMessage(message, "*");
+				//console.log('toIframe');
+			};
 
-	            var hardCodeInitialUpdateUI;
-	            var hardCodeVerifyMove;
-	            var hardCodeUpdateUI;
+			function listener(event) {
+				var data = event.data;
+				console.log(data);
+				/*
+				 check whether the data is GameReady(), if it is, send updateUI() to the game.
+				 format of GameReady: {"type":"GameReady"}
+				 */
+				if (data['type'] === "GameReady") {
+					replyGameReady();
+				} else if (data['type'] === "MakeMove") {
+					//get operations
+					operations = data['operations'];
+					sendMoveToServer(operations);
+				} else if (data['type'] === "VerifyMoveDone") {
+					//deal with verifyMoveDone
+					//no hacker detected
+				} else {
+					console.log("In the container listener, can't deal with the message from the game!!")
+				}
 
-	            var playerIds = $scope.matchInfo.playerIds;
-
-
-	            /*
-	             parameter: message should be : UpdateUI, VerifyMove
-	             */
-	            $scope.sendMessageToIframe = function(message){
-	                var win = $window.document.getElementById('iframe1').contentWindow;
-	                win.postMessage(message, "*");
-	              //console.log('toIframe');
-	            };
-
-	            if($window.addEventListener){
-	                addEventListener("message", listener, false);
-	            }else{
-	                attachEvent("onmessage", listener);
-	            };
-
-	            function listener(event) {
-	                var data = event.data;
-	                console.log(data);
-	                /*
-	                 check whether the data is GameReady(), if it is, send updateUI() to the game.
-	                 format of GameReady: {"type":"GameReady"}
-	                 */
-	                if(data['type']==="GameReady"){
-	                    replyGameReady();
-	                }else if(data['type'] === "MakeMove"){
-	                    //get operations
-	                    operations = data['operations'];
-	                    sendMoveToServer(operations);
-
-	                }else if(data['type'] === "VerifyMoveDone"){
-	                    //deal with verifyMoveDone
-	                    //no hacker detected
-	                }else{
-	                    console.log("In the container listener, can't deal with the message from the game!!")
-	                }
-
-	                if(angular.isUndefined($scope.debug)){
-	                    $scope.debug = "Received: " + JSON.stringify(data);
-	                }else{
-	                    $scope.operations = data;
-	                    $scope.debug += "Received: " + JSON.stringify(data);
-	                }
-	                $scope.$apply();
-	            };
+				if (angular.isUndefined($scope.debug)) {
+					$scope.debug = "Received: " + JSON.stringify(data);
+				} else {
+					$scope.operations = data;
+					$scope.debug += "Received: " + JSON.stringify(data);
+				}
+				$scope.$apply();
+			};
 
 
+			function replyGameReady() {
+				/*
+				 The initial updateUI() has this given format
+				 [
+				 {'yourPlayerId' : $cookies.playerId},
+				 {'playersInfo' : [{'playerId' : playerId1},{'playerId' : playerId2}]},   //if your playerId == id1, you should send the initial move
+				 {'state' : []},
+				 {'lastState' : []},
+				 {'lastMove' : []},
+				 {'lastMovePlayerId' : ''},
+				 {'playerIdToNumberOfTokensInPot' : ''}
+				 ]
+				 */
 
-	            function replyGameReady() {
-	                /*
-	                 The initial updateUI() has this given format
-	                 [
-	                 {'yourPlayerId' : $cookies.playerId},
-	                 {'playersInfo' : [{'playerId' : playerId1},{'playerId' : playerId2}]},   //if your playerId == id1, you should send the initial move
-	                 {'state' : []},
-	                 {'lastState' : []},
-	                 {'lastMove' : []},
-	                 {'lastMovePlayerId' : ''},
-	                 {'playerIdToNumberOfTokensInPot' : ''}
-	                 ]
-	                 */
-	   
-	            	hardCodeInitialUpdateUI = {
-	                    'type': 'UpdateUI',
-	                    'yourPlayerId': '42',
-	                    'playersInfo': [
-	                        {'playerId': '42'},
-	                        {'playerId': '43'}
-	                    ],
-	                    'state': {},
-	                    'lastState': null,
-	                    'lastMove': [],
-	                    'lastMovePlayerId': null,
-	                    'playerIdToNumberOfTokensInPot': {}
-	                };
+				hardCodeInitialUpdateUI = {
+					'type': 'UpdateUI',
+					'yourPlayerId': '42',
+					'playersInfo': [
+						{'playerId': '42'},
+						{'playerId': '43'}
+					],
+					'state': {},
+					'lastState': null,
+					'lastMove': [],
+					'lastMovePlayerId': null,
+					'playerIdToNumberOfTokensInPot': {}
+				};
 
-	                var initialUpdateUI = {
-	                    'type': 'UpdateUI',
-	                    'yourPlayerId': $cookies.playerId,
-	                    'playersInfo': [
-	                        {'playerId': playerIds[0]},
-	                        {'playerId': playerIds[1]}
-	                    ],
-	                    'state': {},
-	                    'lastState': null,
-	                    'lastMove': [],
-	                    'lastMovePlayerId': null,
-	                    'playerIdToNumberOfTokensInPot': {}
-	                };
+				var initialUpdateUI = {
+					'type': 'UpdateUI',
+					'yourPlayerId': $cookies.playerId,
+					'playersInfo': [
+						{'playerId': playerIds[0]},
+						{'playerId': playerIds[1]}
+					],
+					'state': {},
+					'lastState': null,
+					'lastMove': [],
+					'lastMovePlayerId': null,
+					'playerIdToNumberOfTokensInPot': {}
+				};
 
-	                var update = angular.toJson(hardCodeInitialUpdateUI);
+				var update = angular.toJson(hardCodeInitialUpdateUI);
 
-	                $scope.sendMessageToIframe(hardCodeInitialUpdateUI);
-	            }
-
-	            
-	            function sendVerifyMoveToGame(newState){
-	                lastState = state;
-	                state = newState;
-	                var verifyMove = {
-	                    "type":"VerifyMove",
-	                    'playersInfo': [
-	                        {'playerId': playerIds[0]},
-	                        {'playerId': playerIds[1]}
-	                    ],
-	                    'state' : newState,
-	                    'lastState' : state,
-	                    'lastMove' : null,
-	                    "lastMovePlayerId": lastMovePlayerId,
-	                    "playerIdToNumberOfTokensInPot":{}
-	                };
-	                $scope.sendMessageToIframe(verifyMove);
-	            };
+				$scope.sendMessageToIframe(hardCodeInitialUpdateUI);
+			}
 
 
-	            function sendUpdateUIToGame(newState){
-	                hardCodeUpdateUI = {
-	                    "type":"UpdateUI",
-	                    'yourPlayerId': 42,
-	                    'playersInfo': [
-	                        {'playerId': '42'},
-	                        {'playerId': '43'}
-	                    ],
-	                    'state': {},
-	                    'lastState': null,
-	                    'lastMove': [],
-	                    'lastMovePlayerId': null,
-	                    'playerIdToNumberOfTokensInPot': {}
-	                };
-	                lastState = state;
-	                state = newState;
-	                var updateUI = {
-	                    "type":"UpdateUI",
-	                    'yourPlayerId': $cookies.playerId,
-	                    'playersInfo': [
-	                        {'playerId': $scope.playerIds[0]},
-	                        {'playerId': $scope.playerIds[1]}
-	                    ],
-	                    'state' : newState,
-	                    'lastState' : state,
-	                    'lastMove' : null,
-	                    "lastMovePlayerId": lastMovePlayerId,
-	                    "playerIdToNumberOfTokensInPot":{}
-	                };
-	                $scope.sendMessageToIframe(updateUI);
-	            }
+			function sendVerifyMoveToGame(newState) {
+				lastState = state;
+				state = newState;
+				var verifyMove = {
+					"type": "VerifyMove",
+					'playersInfo': [
+						{'playerId': playerIds[0]},
+						{'playerId': playerIds[1]}
+					],
+					'state': newState,
+					'lastState': state,
+					'lastMove': null,
+					"lastMovePlayerId": lastMovePlayerId,
+					"playerIdToNumberOfTokensInPot": {}
+				};
+				$scope.sendMessageToIframe(verifyMove);
+			};
+
+
+			function sendUpdateUIToGame(newState) {
+				hardCodeUpdateUI = {
+					"type": "UpdateUI",
+					'yourPlayerId': 42,
+					'playersInfo': [
+						{'playerId': '42'},
+						{'playerId': '43'}
+					],
+					'state': {},
+					'lastState': null,
+					'lastMove': [],
+					'lastMovePlayerId': null,
+					'playerIdToNumberOfTokensInPot': {}
+				};
+				lastState = state;
+				state = newState;
+				var updateUI = {
+					"type": "UpdateUI",
+					'yourPlayerId': $cookies.playerId,
+					'playersInfo': [
+						{'playerId': $scope.playerIds[0]},
+						{'playerId': $scope.playerIds[1]}
+					],
+					'state': newState,
+					'lastState': state,
+					'lastMove': null,
+					"lastMovePlayerId": lastMovePlayerId,
+					"playerIdToNumberOfTokensInPot": {}
+				};
+				$scope.sendMessageToIframe(updateUI);
 			}
 		}
 );
