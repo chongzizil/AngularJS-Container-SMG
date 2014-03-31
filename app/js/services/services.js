@@ -2,7 +2,7 @@
 
 /* Services */
 
-var domainUrl = 'http://1-dot-smg-server.appspot.com';
+var domainUrl = 'http://2-dot-smg-server.appspot.com';
 
 smgContainer.factory('PlayerService', ['$resource', function($resource) {
 	return $resource(domainUrl + '/players/:playerId',

@@ -34,7 +34,6 @@ smgContainer.directive('playerLogin', function() {
 										$cookies.playerId = loginInfo.playerId;
 										$cookies.accessSignature = data['accessSignature'];
 										$('#login').modal('hide');
-										$scope.refresh();
 									}
 								}
 						);
