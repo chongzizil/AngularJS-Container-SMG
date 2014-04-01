@@ -41,6 +41,22 @@ smgContainer.controller('LobbyController',
 				var jsonJoinQueueData = angular.toJson(joinQueueData);
 				console.log(jsonJoinQueueData);
 
+
+				// functions for the socket
+				var onopen = function () { console.log("channel opened..."); };
+				var onerror = function () { };
+				var onclose =function () { };
+				var onmessage = function (event) {
+					var originalData = event.data;
+					var jsonData = JSON.stringify(eval("(" + json + ')'));
+					var data = angular.fromJson(jsonData);
+					console.log(data);
+
+					if (data['matchId']) {
+						$location.url(gameId + '/match/' + event.data['matchId']);
+					}
+				}
+
 				/* Once open the page, post data to the server in order
 				 * to join the queue for auto match.
 				 */
@@ -60,29 +76,15 @@ smgContainer.controller('LobbyController',
 								$cookies.channelToken = data['channelToken'];
 								$rootScope.channel = new goog.appengine.Channel($cookies.channelToken);
 								$rootScope.socket = channel.open(handler);
-								$rootScope.socket.onopen = onopen();
-								$rootScope.socket.onerror = onerror();
-								$rootScope.socket.onclose = onclose();
-								$rootScope.socket.onmessage = onmessage();
+								$rootScope.socket.onopen = onopen;
+								$rootScope.socket.onerror = onerror;
+								$rootScope.socket.onclose = onclose;
+								$rootScope.socket.onmessage = onmessage;
 								insertMatch(data['channelToken']);
 							}
 						}
 				);
 
-				// functions for the socket
-				var onopen = function () { console.log("channel opened..."); };
-				var onerror = function () { };
-				var onclose =function () { };
-				var onmessage = function (event) {
-					var originalData = event.data;
-					var jsonData = JSON.stringify(eval("(" + json + ')'));
-					var data = angular.fromJson(jsonData);
-					console.log(data);
-
-					if (data['matchId']) {
-						$location.url(gameId + '/match/' + event.data['matchId']);
-					}
-				}
 
 				var closeChannel = function() {
 					socket.close();
@@ -120,56 +122,56 @@ smgContainer.controller('LobbyController',
 
 
 			/*
-			$scope.invite = function(inviteInfo) {
-				var accessSignature = $cookies.accessSignature;
+			 $scope.invite = function(inviteInfo) {
+			 var accessSignature = $cookies.accessSignature;
 
-				var friendId = inviteInfo.friendId;
+			 var friendId = inviteInfo.friendId;
 
 
-				// Initiate the alert
-				$scope.friendIdHasError = false;
-				$scope.gameIdHasError = false;
+			 // Initiate the alert
+			 $scope.friendIdHasError = false;
+			 $scope.gameIdHasError = false;
 
-				var inviteAlert = $("#inviteAlert");
-				inviteAlert.on('close.bs.alert', function() {
-					inviteAlert.hide();
-					return false;
-				})
+			 var inviteAlert = $("#inviteAlert");
+			 inviteAlert.on('close.bs.alert', function() {
+			 inviteAlert.hide();
+			 return false;
+			 })
 
-				// ChannelAPI
-				//var channel = goog.appengine.Channel(token);
+			 // ChannelAPI
+			 //var channel = goog.appengine.Channel(token);
 
-				if (playerId !== undefined && accessSignature !== undefined) {
-					var inviteData = {
-						accessSignature: accessSignature,
-						playerIds: [playerId, parseInt(friendId)],
-						gameId: parseInt(gameId)
-					};
-					var jsonInviteData = angular.toJson(inviteData);
+			 if (playerId !== undefined && accessSignature !== undefined) {
+			 var inviteData = {
+			 accessSignature: accessSignature,
+			 playerIds: [playerId, parseInt(friendId)],
+			 gameId: parseInt(gameId)
+			 };
+			 var jsonInviteData = angular.toJson(inviteData);
 
-					InsertMatchService.save({}, jsonInviteData).
-							$promise.then(function(data) {
-								console.log(data);
-								if(!data['matchId']) {
-									if (data['error'] === 'WRONG_PLAYER_ID') {
-										$scope.friendIdHasError = true;
-										$scope.inviteInfo.error = 'Sorry, your friend\'s ID does not exist. Please try again.';
-										inviteAlert.show();
-									} else if (data['error'] === 'WRONG_GAME_ID') {
-										$scope.gameIdHasError = true;
-										$scope.inviteInfo.error = 'Sorry, the game\'s ID does not exist. Please try again.';
-										inviteAlert.show();
-									}
-								} else {
-									console.log(data['matchId']);
-									$cookies.matchId = data['matchId'];
-									$location.url('/match/' + data['matchId']);
-								}
-							}
-					);
-				} else {
-					alert('You have to login first!');
-				}
-			}*/
+			 InsertMatchService.save({}, jsonInviteData).
+			 $promise.then(function(data) {
+			 console.log(data);
+			 if(!data['matchId']) {
+			 if (data['error'] === 'WRONG_PLAYER_ID') {
+			 $scope.friendIdHasError = true;
+			 $scope.inviteInfo.error = 'Sorry, your friend\'s ID does not exist. Please try again.';
+			 inviteAlert.show();
+			 } else if (data['error'] === 'WRONG_GAME_ID') {
+			 $scope.gameIdHasError = true;
+			 $scope.inviteInfo.error = 'Sorry, the game\'s ID does not exist. Please try again.';
+			 inviteAlert.show();
+			 }
+			 } else {
+			 console.log(data['matchId']);
+			 $cookies.matchId = data['matchId'];
+			 $location.url('/match/' + data['matchId']);
+			 }
+			 }
+			 );
+			 } else {
+			 alert('You have to login first!');
+			 }
+			 }*/
 
 		});
