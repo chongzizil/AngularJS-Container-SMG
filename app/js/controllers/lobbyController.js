@@ -30,25 +30,7 @@ smgContainer.controller('LobbyController',
 				var accessSignature = $cookies.accessSignature;
 				var playerId = $cookies.playerId;
 				var gameId = $routeParams.gameId;
-				var channel;
-				var socket;
-				var handler =
-				{
-					onopen: function () { console.log("channel opened..."); },
-					onerror: function () { },
-					onclose: function () { },
-					onmessage:
-							function (event) {
-								var originalData = event.data;
-								var jsonData = JSON.stringify(eval("(" + json + ')'));
-								var data = angular.fromJson(jsonData);
-								console.log(data);
-
-								if (data['matchId']) {
-									$location.url(gameId + '/match/' + event.data['matchId']);
-								}
-							}
-				};
+				//var handler;
 
 				var joinQueueData = {
 					accessSignature: accessSignature,
@@ -76,12 +58,31 @@ smgContainer.controller('LobbyController',
 							} else {
 								console.log(data['channelToken']);
 								$cookies.channelToken = data['channelToken'];
-								channel = new goog.appengine.Channel($cookies.channelToken);
-								socket = channel.open(handler);
+								$rootScope.channel = new goog.appengine.Channel($cookies.channelToken);
+								$rootScope.socket = channel.open(handler);
+								$rootScope.socket.onopen = onopen();
+								$rootScope.socket.onerror = onerror();
+								$rootScope.socket.onclose = onclose();
+								$rootScope.socket.onmessage = onmessage();
 								insertMatch(data['channelToken']);
 							}
 						}
 				);
+
+				// functions for the socket
+				var onopen = function () { console.log("channel opened..."); };
+				var onerror = function () { };
+				var onclose =function () { };
+				var onmessage = function (event) {
+					var originalData = event.data;
+					var jsonData = JSON.stringify(eval("(" + json + ')'));
+					var data = angular.fromJson(jsonData);
+					console.log(data);
+
+					if (data['matchId']) {
+						$location.url(gameId + '/match/' + event.data['matchId']);
+					}
+				}
 
 				var closeChannel = function() {
 					socket.close();
