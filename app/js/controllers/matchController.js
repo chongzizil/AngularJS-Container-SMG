@@ -31,9 +31,12 @@ smgContainer.controller('MatchController',
 								// 1. Change the onMessage method on socket.
 								$rootScope.socket.onmessage = function (event) {
 									console.log(event.data);
-									var channelApiPushState = event.data['state'];
+									var originalData = event.data;
+									var jsonData = JSON.stringify(eval("(" + originalData + ')'));
+									var data = angular.fromJson(jsonData);
+									var channelApiPushState = data['state'];
 									getMatchInfo();
-									sendUpdateUIToGame(matchInfo.history[0]['gameState']);
+									sendUpdateUIToGame(channelApiPushState);
 								}
 								// 2. Get game information.
 								$scope.gameInfo.url = sceTrustedUrl(data['url']);
@@ -63,7 +66,8 @@ smgContainer.controller('MatchController',
 								console.log(data);
 								// 1. Get all the match information into the matchInfo variable.
 								matchInfo.playerIds = data['playerIds'];
-								$scope.playerIds = matchInfo.playerIds;
+								console.log("First time playerIds get " + angular.toJson(matchInfo.playerIds));
+								$scope.playerIds = angular.fromJson(matchInfo.playerIds);
 								matchInfo.playerIdThatHasTurn = data['playerIdThatHasTurn'];
 								matchInfo.gameOverScores = data['gameOverScores'];
 								matchInfo.gameOverReason = data['gameOverReason'];
@@ -71,7 +75,13 @@ smgContainer.controller('MatchController',
 
 								// 2. Set certain information to $scope.
 								$scope.matchInfo.playerIds = matchInfo.playerIds;
-								$scope.playerIds = matchInfo.playerIds;
+//								console.log(typeof matchInfo.playerIds[0]);
+								$scope.playerIds = [];
+								for(var i = 0; i < $matchInfo.playerIds.length; i++) {
+									console.log(typeof matchInfo.playerIds[i]);
+									$scope.playerIds[i] = matchInfo.playerIds[i].toString();
+									console.log(typeof $scope.playerIds[i]);
+								}
 								lastMovePlayerId = $scope.matchInfo.playerIdThatHasTurn;
 								$scope.matchInfo.playerIdThatHasTurn = matchInfo.playerIdThatHasTurn;
 							}
@@ -108,7 +118,7 @@ smgContainer.controller('MatchController',
 							} else if (data['error'] == "MISSING_INFO") {
 								alert('Sorry, Incompleted JSON data received!');
 							} else {
-								var sentMoveReceivedData = data['state'];
+								var sentMoveReceivedData = angular.fromJson(data['state']);
 								sendUpdateUIToGame(sentMoveReceivedData);
 							}
 						}
@@ -175,6 +185,7 @@ smgContainer.controller('MatchController',
 				} else if (data['type'] === "MakeMove") {
 					//get operations
 					operations = data['operations'];
+					console.log("In the container, it sends to the server, operations are " + operations);
 					sendMoveToServer(operations);
 				} else if (data['type'] === "VerifyMoveDone") {
 					//deal with verifyMoveDone
@@ -234,10 +245,8 @@ smgContainer.controller('MatchController',
 					'lastMovePlayerId': null,
 					'playerIdToNumberOfTokensInPot': {}
 				};
-
-				var update = angular.toJson(hardCodeInitialUpdateUI);
-
-				$scope.sendMessageToIframe(hardCodeInitialUpdateUI);
+				console.log("in the container, it sends the initial UpdateUI is " + angular.toJson(initialUpdateUI));
+				$scope.sendMessageToIframe(initialUpdateUI);
 			}
 
 			function sendVerifyMoveToGame(newState) {
