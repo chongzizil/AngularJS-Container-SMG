@@ -17,27 +17,6 @@ smgContainer.controller('MatchController',
 			var hardCodeUpdateUI;
 			var playerIds = $scope.matchInfo.playerIds;
 
-			// Formal program starts here.
-			if (!$cookies.accessSignature || !$cookies.playerId) {
-				alert('You have to log in first!');
-				$location.url('/');
-			} else if (!$cookies.matchId) {
-				alert('You have to start a match by invite a friend or something...')
-				$location.url('/');
-			} else {
-				if ($window.addEventListener) {
-					addEventListener("message", listener, false);
-				} else {
-					attachEvent("onmessage", listener);
-				}
-				// 1. Get game information.
-				getGameInfo();
-				// 2. Get match information.
-				getMatchInfo();
-				// 3. get players information.
-				getAllPlayersInfo($scope.matchInfo.playerIds);
-			}
-
 			/*
 			 * Method used to get all the information for the game,
 			 * and create the changeApi channel to get the match information frequently.
@@ -259,7 +238,6 @@ smgContainer.controller('MatchController',
 				$scope.sendMessageToIframe(hardCodeInitialUpdateUI);
 			}
 
-
 			function sendVerifyMoveToGame(newState) {
 				lastState = state;
 				state = newState;
@@ -277,7 +255,6 @@ smgContainer.controller('MatchController',
 				};
 				$scope.sendMessageToIframe(verifyMove);
 			};
-
 
 			function sendUpdateUIToGame(newState) {
 				hardCodeUpdateUI = {
@@ -310,5 +287,24 @@ smgContainer.controller('MatchController',
 				};
 				$scope.sendMessageToIframe(updateUI);
 			}
+
+			// Formal program starts here.
+			if (!$cookies.accessSignature || !$cookies.playerId) {
+				alert('You have to log in first!');
+				$location.url('/');
+			} else {
+				if ($window.addEventListener) {
+					addEventListener("message", listener, false);
+				} else {
+					attachEvent("onmessage", listener);
+				}
+				// 1. Get game information.
+				getGameInfo();
+				// 2. Get match information.
+				getMatchInfo();
+				// 3. get players information.
+				getAllPlayersInfo($scope.matchInfo.playerIds);
+			}
 		}
+
 );
