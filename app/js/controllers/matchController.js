@@ -3,7 +3,6 @@
 smgContainer.controller('MatchController',
 		function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window,
 		          $location, MatchService, GetGameInfoService, GetPlayerInfoService) {
-			$scope.matchInfo = {};
 			$scope.gameInfo = {};
 			var matchInfo = {};
 			var lastMovePlayerId;
@@ -34,7 +33,7 @@ smgContainer.controller('MatchController',
 									var originalData = event.data;
 									var jsonData = JSON.stringify(eval("(" + originalData + ')'));
 									var data = angular.fromJson(jsonData);
-									var channelApiPushState = data['state'];
+									var channelApiPushState = data['gameState'];
 									getMatchInfo();
 									sendUpdateUIToGame(channelApiPushState);
 								}
@@ -68,18 +67,20 @@ smgContainer.controller('MatchController',
 								matchInfo.playerIds = data['playerIds'];
 								console.log("First time playerIds get " + angular.toJson(matchInfo.playerIds));
 								$scope.playerIds = angular.fromJson(matchInfo.playerIds);
-								matchInfo.playerIdThatHasTurn = data['playerIdThatHasTurn'];
+								console.log(typeof data['playerThatHasTurn']);
+								console.log(data['playerThatHasTurn']);
+								matchInfo.playerThatHasTurn = data['playerThatHasTurn'];
 								matchInfo.gameOverScores = data['gameOverScores'];
 								matchInfo.gameOverReason = data['gameOverReason'];
 								matchInfo.history = data['history'];
 
 								// 2. Set certain information to $scope.
-								$scope.matchInfo.playerIds = matchInfo.playerIds;
+								matchInfo.playerIds = matchInfo.playerIds;
 								for(var i = 0; i < $scope.playerIds.length; i++) {
 									$scope.playerIds[i] = $scope.playerIds[i].toString();
 								}
-								lastMovePlayerId = $scope.matchInfo.playerIdThatHasTurn;
-								$scope.matchInfo.playerIdThatHasTurn = matchInfo.playerIdThatHasTurn;
+								lastMovePlayerId = matchInfo.playerThatHasTurn;
+								matchInfo.playerThatHasTurn = matchInfo.playerThatHasTurn;
 							}
 						}
 				);
@@ -286,13 +287,15 @@ smgContainer.controller('MatchController',
 						{'playerId': $scope.playerIds[1]}
 					],
 					'state': state,
-					'lastState': lastState,
-					'lastMove': null,
-					"lastMovePlayerId": lastMovePlayerId,
+					'lastState': {},
+					'lastMove': [],
+					"lastMovePlayerId": $cookies.playerId.toString(),
+					//"lastMovePlayerId": lastMovePlayerId.toString(),
 					"playerIdToNumberOfTokensInPot": {}
 				};
 				console.log("sendUpdateUIToGame" + updateUI.toString());
 				console.log(angular.toJson(updateUI));
+				console.log(lastMovePlayerId);
 				$scope.sendMessageToIframe(updateUI);
 			}
 
