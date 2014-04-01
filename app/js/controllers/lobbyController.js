@@ -4,6 +4,14 @@ smgContainer.controller('LobbyController',
 		function ($scope, $rootScope, $routeParams, $location, $cookies, $timeout,
 		          joinQueueService, InsertMatchService, GetGameInfoService) {
 
+			console.log($location.search());
+			if ($location.search()) {
+				var urlData = $location.search();
+				$cookies.playerId = urlData['playerId'];
+				$cookies.accessSignature = urlData['accessSignature'];
+				$rootScope.refreshDisplayId();
+			}
+
 			if ($cookies.accessSignature === undefined || $cookies.playerId === 'Guest') {
 				var needLoginAlert = $("#needLoginAlert");
 				needLoginAlert.on('close.bs.alert', function() {
@@ -30,6 +38,11 @@ smgContainer.controller('LobbyController',
 				var accessSignature = $cookies.accessSignature;
 				var playerId = $cookies.playerId;
 				var gameId = $routeParams.gameId;
+
+				console.log($cookies.playerId);
+				console.log($cookies.accessSignature);
+				console.log(gameId);
+
 				//var handler;
 
 				var joinQueueData = {
