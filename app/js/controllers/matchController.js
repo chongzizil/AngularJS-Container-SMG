@@ -50,7 +50,7 @@ smgContainer.controller('MatchController',
 							} else {
 								console.log(data);
 								// 1. Change the onMessage method on socket.
-								$cookies.socket.onmessage = function (event) {
+								$rootScope.socket.onmessage = function (event) {
 									console.log(event.data);
 									var channelApiPushState = event.data['state'];
 									getMatchInfo();
