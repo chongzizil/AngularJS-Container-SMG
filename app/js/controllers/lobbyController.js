@@ -43,7 +43,7 @@ smgContainer.controller('LobbyController',
 
 
 				// functions for the socket
-				var onopen = function () { alert("channel opened..."); };
+				var onopen = function () { console.log("channel opened..."); };
 				var onerror = function () { };
 				var onclose =function () { };
 				var onmessage = function (event) {
@@ -93,7 +93,6 @@ smgContainer.controller('LobbyController',
 									alert(jsonJoinQueueData);
 								}
 							} else {
-								console.log(data);
 								$rootScope.channel = new goog.appengine.Channel(data['channelToken']);
 								$rootScope.socket = $rootScope.channel.open();
 								$rootScope.socket.onopen = onopen;
