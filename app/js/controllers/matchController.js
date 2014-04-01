@@ -9,25 +9,6 @@ smgContainer.controller('MatchController',
 			var lastMovePlayerId;
 			var operations;
 			var playersInfo = [];
-			var channel;
-			var socket;
-			var handler = {
-				onopen: function () {
-					alert("onopen")
-				},
-				onerror: function () {
-					alert("onerror")
-				},
-				onclose: function () {
-					alert("onclose")
-				},
-				onmessage: function (event) {
-					console.log(event.data);
-					var channelApiPushState = event.data['state'];
-					getMatchInfo();
-					sendUpdateUIToGame(matchInfo.history[0]['gameState']);
-				}
-			};
 
 			var state = null;
 			var lastState = state;
@@ -68,15 +49,19 @@ smgContainer.controller('MatchController',
 								alert('Sorry, Wrong Game ID provided!');
 							} else {
 								console.log(data);
-								// 1. Get game information.
+								// 1. Change the onMessage method on socket.
+								$cookies.socket.onmessage = function (event) {
+									console.log(event.data);
+									var channelApiPushState = event.data['state'];
+									getMatchInfo();
+									sendUpdateUIToGame(matchInfo.history[0]['gameState']);
+								}
+								// 2. Get game information.
 								gameInfo.url = sceTrustedUrl(data['url']);
 								gameInfo.height = data['height'];
 								gameInfo.width = data['width'];
 								gameInfo.gameName = data['gameName'];
 								gameInfo.pics = data['pics'];
-								// 2. Create the channel to get match information.
-								channel = goog.appengine.Channel($cookies.channelToken);
-								socket = channel.open(handler);
 							}
 						}
 				);
