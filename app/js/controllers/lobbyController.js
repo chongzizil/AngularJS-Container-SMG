@@ -5,11 +5,13 @@ smgContainer.controller('LobbyController',
 		          joinQueueService, InsertMatchService, GetGameInfoService) {
 
 			console.log($location.search());
-			if ($location.search()) {
+			if ($cookies.playerId === "Guest" || $cookies.accessSignature === null){
 				var urlData = $location.search();
-				$cookies.playerId = urlData['playerId'];
-				$cookies.accessSignature = urlData['accessSignature'];
-				$rootScope.refreshDisplayId();
+				if (urlData['playerId']) {
+					$cookies.playerId = urlData['playerId'];
+					$cookies.accessSignature = urlData['accessSignature'];
+					$rootScope.refreshDisplayId();
+				}
 			}
 
 			if ($cookies.accessSignature === undefined || $cookies.playerId === 'Guest') {
