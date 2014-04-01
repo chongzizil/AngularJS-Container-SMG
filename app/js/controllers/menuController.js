@@ -5,8 +5,8 @@ smgContainer.controller('MenuController',
 		var test = "[111,111]";
 		var jsonData = JSON.stringify(eval("(" + test + ')'));
 		var data = angular.fromJson(jsonData);
-		console.log(typeof data);
-		console.log(data[0]);
+//		console.log(typeof data);
+//		console.log(data[0]);
 		$rootScope.refreshDisplayId = function() {
 			$scope.idDisplay = 'Guest';
 			if ($cookies.playerId !== undefined) {

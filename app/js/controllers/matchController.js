@@ -3,18 +3,17 @@
 smgContainer.controller('MatchController',
 		function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window,
 		          $location, MatchService, GetGameInfoService, GetPlayerInfoService) {
-			$scope.gameInfo = {};
+
+            $scope.gameInfo = {};
+            $scope.playerIds;
+
+            var state = {};
+            var lastState = state;
 			var matchInfo = {};
 			var lastMovePlayerId;
 			var operations;
 			var playersInfo = [];
 
-			var state = null;
-			var lastState = state;
-			var hardCodeInitialUpdateUI;
-			var hardCodeVerifyMove;
-			var hardCodeUpdateUI;
-			$scope.playerIds;
 
 			/*
 			 * Method used to get all the information for the game,
@@ -26,7 +25,7 @@ smgContainer.controller('MatchController',
 							if (data['error'] == 'WRONG_GAME_ID') {
 								alert('Sorry, Wrong Game ID provided!');
 							} else {
-								console.log(data);
+								console.log("GetGameService from server: " + data);
 								// 1. Change the onMessage method on socket.
 								$rootScope.socket.onmessage = function (event) {
 									console.log(event.data);
@@ -62,23 +61,24 @@ smgContainer.controller('MatchController',
 							} else if (data['error'] == 'JSON_PARSE_ERROR') {
 								alert('Sorry, Wrong JSON string format received!');
 							} else {
-								console.log(data);
+								//console.log("Get Match Info : " + data);
 								// 1. Get all the match information into the matchInfo variable.
-								matchInfo.playerIds = data['playerIds'];
-								console.log("First time playerIds get " + angular.toJson(matchInfo.playerIds));
-								$scope.playerIds = angular.fromJson(matchInfo.playerIds);
-								console.log(typeof data['playerThatHasTurn']);
-								console.log(data['playerThatHasTurn']);
+
+                                matchInfo.playerIds = data['playerIds'];
+                                $scope.playerIds = angular.fromJson(matchInfo.playerIds);
+								console.log("First time playerIds get " + $scope.playerIds);
+								console.log("typeOf PlayerThatHasTurn : " + (typeof data['playerThatHasTurn']) + ", and it's " + data['playerThatHasTurn']);
 								matchInfo.playerThatHasTurn = data['playerThatHasTurn'];
 								matchInfo.gameOverScores = data['gameOverScores'];
 								matchInfo.gameOverReason = data['gameOverReason'];
 								matchInfo.history = data['history'];
 
 								// 2. Set certain information to $scope.
-								matchInfo.playerIds = matchInfo.playerIds;
+
 								for(var i = 0; i < $scope.playerIds.length; i++) {
 									$scope.playerIds[i] = $scope.playerIds[i].toString();
-								}
+								};
+
 								lastMovePlayerId = matchInfo.playerThatHasTurn;
 								matchInfo.playerThatHasTurn = matchInfo.playerThatHasTurn;
 							}
@@ -214,7 +214,7 @@ smgContainer.controller('MatchController',
 				 ]
 				 */
 
-				hardCodeInitialUpdateUI = {
+				var hardCodeInitialUpdateUI = {
 					'type': 'UpdateUI',
 					'yourPlayerId': '42',
 					'playersInfo': [
@@ -264,7 +264,7 @@ smgContainer.controller('MatchController',
 			};
 
 			function sendUpdateUIToGame(newState) {
-				hardCodeUpdateUI = {
+				var hardCodeUpdateUI = {
 					"type": "UpdateUI",
 					'yourPlayerId': 42,
 					'playersInfo': [
