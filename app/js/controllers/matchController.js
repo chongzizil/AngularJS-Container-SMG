@@ -4,7 +4,7 @@ smgContainer.controller('MatchController',
 		function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window,
 		          $location, MatchService, GetGameInfoService, GetPlayerInfoService) {
 			$scope.matchInfo = {};
-			var gameInfo = {};
+			$scope.gameInfo = {};
 			var matchInfo = {};
 			var lastMovePlayerId;
 			var operations;
@@ -15,7 +15,7 @@ smgContainer.controller('MatchController',
 			var hardCodeInitialUpdateUI;
 			var hardCodeVerifyMove;
 			var hardCodeUpdateUI;
-			var playerIds = $scope.matchInfo.playerIds;
+			$scope.playerIds;
 
 			/*
 			 * Method used to get all the information for the game,
@@ -36,11 +36,11 @@ smgContainer.controller('MatchController',
 									sendUpdateUIToGame(matchInfo.history[0]['gameState']);
 								}
 								// 2. Get game information.
-								gameInfo.url = sceTrustedUrl(data['url']);
-								gameInfo.height = data['height'];
-								gameInfo.width = data['width'];
-								gameInfo.gameName = data['gameName'];
-								gameInfo.pics = data['pics'];
+								$scope.gameInfo.url = sceTrustedUrl(data['url']);
+								$scope.gameInfo.height = data['height'];
+								$scope.gameInfo.width = data['width'];
+								$scope.gameInfo.gameName = data['gameName'];
+								$scope.gameInfo.pics = data['pics'];
 							}
 						}
 				);
@@ -63,6 +63,7 @@ smgContainer.controller('MatchController',
 								console.log(data);
 								// 1. Get all the match information into the matchInfo variable.
 								matchInfo.playerIds = data['playerIds'];
+								$scope.playerIds = matchInfo.playerIds;
 								matchInfo.playerIdThatHasTurn = data['playerIdThatHasTurn'];
 								matchInfo.gameOverScores = data['gameOverScores'];
 								matchInfo.gameOverReason = data['gameOverReason'];
@@ -70,6 +71,7 @@ smgContainer.controller('MatchController',
 
 								// 2. Set certain information to $scope.
 								$scope.matchInfo.playerIds = matchInfo.playerIds;
+								$scope.playerIds = matchInfo.playerIds;
 								lastMovePlayerId = $scope.matchInfo.playerIdThatHasTurn;
 								$scope.matchInfo.playerIdThatHasTurn = matchInfo.playerIdThatHasTurn;
 							}
@@ -92,7 +94,7 @@ smgContainer.controller('MatchController',
 					"operations": operations
 				};
 				console.log(move);
-				var jsonMove = angular.json(move);
+				var jsonMove = angular.toJson(move);
 				// 2. send jsonfied data to server.
 				MatchService.save({matchId: $routeParams.matchId}, jsonMove).
 						$promise.then(function (data) {
@@ -134,8 +136,8 @@ smgContainer.controller('MatchController',
 			 * Method used to get all the players' information.
 			 * @param playerIds
 			 */
-			var getAllPlayersInfo = function (playerIds) {
-				for (playerId in playerIds) {
+			var getAllPlayersInfo = function (allPlayerIds) {
+				for (playerId in allPlayerIds) {
 					GetPlayerInfoService.get({playerId: $cookies.playerId,
 						targetId: playerId, accessSignature: $cookies.accessSignature}).
 							$promise.then(function (data) {
@@ -223,8 +225,8 @@ smgContainer.controller('MatchController',
 					'type': 'UpdateUI',
 					'yourPlayerId': $cookies.playerId,
 					'playersInfo': [
-						{'playerId': playerIds[0]},
-						{'playerId': playerIds[1]}
+						{'playerId': $scope.playerIds[0]},
+						{'playerId': $scope.playerIds[1]}
 					],
 					'state': {},
 					'lastState': null,
@@ -244,8 +246,8 @@ smgContainer.controller('MatchController',
 				var verifyMove = {
 					"type": "VerifyMove",
 					'playersInfo': [
-						{'playerId': playerIds[0]},
-						{'playerId': playerIds[1]}
+						{'playerId': $scope.playerIds[0]},
+						{'playerId': $scope.playerIds[1]}
 					],
 					'state': newState,
 					'lastState': state,
@@ -303,7 +305,7 @@ smgContainer.controller('MatchController',
 				// 2. Get match information.
 				getMatchInfo();
 				// 3. get players information.
-				getAllPlayersInfo($scope.matchInfo.playerIds);
+				getAllPlayersInfo($scope.playerIds);
 			}
 		}
 
