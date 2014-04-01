@@ -55,14 +55,15 @@ smgContainer.controller('LobbyController',
 						console.log(gameId + '/match/' + data['matchId']);
 
 						/** Option 1*/
-						var url = gameId + '/match/' + data['matchId'];
-						var changeLocation = function(url) {
-							$location.path(url);
+						var matchUrl = gameId + '/match/' + data['matchId'];
+						var changeLocation = function(matchUrl) {
+							$location.path(matchUrl);
 
 							if(!$scope.$$phase) {
 								$scope.$apply();
 							}
 						};
+						changeLocation();
 
 						/** Option 2*/
 						/*
