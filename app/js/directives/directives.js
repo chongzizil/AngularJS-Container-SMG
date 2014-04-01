@@ -91,9 +91,6 @@ smgContainer.directive('playerRegister', function() {
 							$scope.registerInfo.playerId = data['playerId'];
 							registerFailedAlert.hide();
 							registerSuccessAlert.show();
-							$cookies.playerId = data['playerId'];
-							$cookies.accessSignature = data['accessSignature'];
-							$rootScope.refreshDisplayId();
 						}
 					}
 			);
