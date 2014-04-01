@@ -75,12 +75,8 @@ smgContainer.controller('MatchController',
 
 								// 2. Set certain information to $scope.
 								$scope.matchInfo.playerIds = matchInfo.playerIds;
-//								console.log(typeof matchInfo.playerIds[0]);
-								$scope.playerIds = [];
-								for(var i = 0; i < matchInfo.playerIds.length; i++) {
-									console.log(typeof matchInfo.playerIds[i]);
-									$scope.playerIds[i] = matchInfo.playerIds[i].toString();
-									console.log(typeof $scope.playerIds[i]);
+								for(var i = 0; i < $scope.playerIds.length; i++) {
+									$scope.playerIds[i] = $scope.playerIds[i].toString();
 								}
 								lastMovePlayerId = $scope.matchInfo.playerIdThatHasTurn;
 								$scope.matchInfo.playerIdThatHasTurn = matchInfo.playerIdThatHasTurn;
@@ -100,15 +96,13 @@ smgContainer.controller('MatchController',
 				// 1. make up a move.
 				var move = {
 					"accessSignature": $cookies.accessSignature,
-					"playerIds": $scope.matchInfo.playerIds,
+					"playerIds": $scope.playerIds,
 					"operations": operations
 				};
-				console.log(move);
 				var jsonMove = angular.toJson(move);
 				// 2. send jsonfied data to server.
 				MatchService.save({matchId: $routeParams.matchId}, jsonMove).
 						$promise.then(function (data) {
-							console.log(data);
 							if (data['error'] == "WRONG_ACCESS_SIGNATURE") {
 								alert('Sorry, Wrong Access Signature received!');
 							} else if (data['error'] == 'WRONG_PLAYER_ID') {
@@ -118,7 +112,8 @@ smgContainer.controller('MatchController',
 							} else if (data['error'] == "MISSING_INFO") {
 								alert('Sorry, Incompleted JSON data received!');
 							} else {
-								var sentMoveReceivedData = angular.fromJson(data['state']);
+								var sentMoveReceivedData = data['gameState'];
+								console.log("In the container, it receives the data from server " + sentMoveReceivedData);
 								sendUpdateUIToGame(sentMoveReceivedData);
 							}
 						}
@@ -151,7 +146,7 @@ smgContainer.controller('MatchController',
 					GetPlayerInfoService.get({playerId: $cookies.playerId,
 						targetId: playerId, accessSignature: $cookies.accessSignature}).
 							$promise.then(function (data) {
-								console.log(data);
+							//	console.log(data);
 								if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
 									alert('Sorry, Wrong Access Signature provided!');
 								} else if (data['error'] == 'WRONG_TARGETID') {
@@ -175,7 +170,7 @@ smgContainer.controller('MatchController',
 
 			function listener(event) {
 				var data = event.data;
-				console.log(data);
+				console.log("In the container, it receives the data from the game Iframe " + data['type']);
 				/*
 				 check whether the data is GameReady(), if it is, send updateUI() to the game.
 				 format of GameReady: {"type":"GameReady"}
@@ -290,12 +285,14 @@ smgContainer.controller('MatchController',
 						{'playerId': $scope.playerIds[0]},
 						{'playerId': $scope.playerIds[1]}
 					],
-					'state': newState,
-					'lastState': state,
+					'state': state,
+					'lastState': lastState,
 					'lastMove': null,
 					"lastMovePlayerId": lastMovePlayerId,
 					"playerIdToNumberOfTokensInPot": {}
 				};
+				console.log("sendUpdateUIToGame" + updateUI.toString());
+				console.log(angular.toJson(updateUI));
 				$scope.sendMessageToIframe(updateUI);
 			}
 
