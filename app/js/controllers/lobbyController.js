@@ -48,12 +48,29 @@ smgContainer.controller('LobbyController',
 				var onclose =function () { };
 				var onmessage = function (event) {
 					var originalData = event.data;
-					var jsonData = JSON.stringify(eval("(" + json + ')'));
+					var jsonData = JSON.stringify(eval("(" + originalData + ')'));
 					var data = angular.fromJson(jsonData);
-					console.log(data);
 
 					if (data['matchId']) {
-						$location.url(gameId + '/match/' + event.data['matchId']);
+						console.log(gameId + '/match/' + data['matchId']);
+
+						/** Option 1*/
+						var url = gameId + '/match/' + data['matchId'];
+						var changeLocation = function(url) {
+							$location.path(url);
+
+							if(!$scope.$$phase) {
+								$scope.$apply();
+							}
+						};
+
+						/** Option 2*/
+						/*
+						$location.url(gameId + '/match/' + data['matchId']);
+						if(!$scope.$$phase) {
+							$scope.$apply();
+						}
+						*/
 					}
 				}
 

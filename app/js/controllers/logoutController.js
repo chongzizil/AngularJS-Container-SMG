@@ -6,6 +6,6 @@ smgContainer.controller('LogoutController',
 		$cookies.accessSignature = null;
 		$cookies.playerId = "Guest";
 		$cookies.developerId = "Guest";
-
+		$rootScope.refreshDisplayId();
 		$location.url('/');
 	});
