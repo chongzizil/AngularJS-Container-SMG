@@ -26,6 +26,7 @@ smgContainer.controller('LobbyController',
 				var myTimer = $timeout($scope.countDown,1000);
 
 			} else {
+
 				var accessSignature = $cookies.accessSignature;
 				var playerId = $cookies.playerId;
 				var gameId = $routeParams.gameId;
@@ -43,7 +44,7 @@ smgContainer.controller('LobbyController',
 								var data = angular.fromJson(jsonData);
 								console.log(data);
 
-								if (event.data['matchId']) {
+								if (data['matchId']) {
 									$location.url(gameId + '/match/' + event.data['matchId']);
 								}
 							}
@@ -52,9 +53,11 @@ smgContainer.controller('LobbyController',
 				var joinQueueData = {
 					accessSignature: accessSignature,
 					playerId: playerId,
-					gameId: gameId
+					gameId: gameId.toString()
 				};
+
 				var jsonJoinQueueData = angular.toJson(joinQueueData);
+				console.log(jsonJoinQueueData);
 
 				/* Once open the page, post data to the server in order
 				 * to join the queue for auto match.
@@ -73,11 +76,9 @@ smgContainer.controller('LobbyController',
 							} else {
 								console.log(data['channelToken']);
 								$cookies.channelToken = data['channelToken'];
-								channel = goog.appengine.Channel($cookies.channelToken);
+								channel = new goog.appengine.Channel($cookies.channelToken);
 								socket = channel.open(handler);
-								if (data['playerIds']) {
-									insertMatch(event.data['playerIds']);
-								}
+								insertMatch(data['channelToken']);
 							}
 						}
 				);
