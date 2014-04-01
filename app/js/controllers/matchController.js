@@ -77,7 +77,7 @@ smgContainer.controller('MatchController',
 								$scope.matchInfo.playerIds = matchInfo.playerIds;
 //								console.log(typeof matchInfo.playerIds[0]);
 								$scope.playerIds = [];
-								for(var i = 0; i < $matchInfo.playerIds.length; i++) {
+								for(var i = 0; i < matchInfo.playerIds.length; i++) {
 									console.log(typeof matchInfo.playerIds[i]);
 									$scope.playerIds[i] = matchInfo.playerIds[i].toString();
 									console.log(typeof $scope.playerIds[i]);
@@ -138,7 +138,7 @@ smgContainer.controller('MatchController',
 			 * 2. One of the players surrenders.
 			 */
 			$scope.endGame = function () {
-				socket = channel.close();
+				$cookies.socket.close();
 				$location.url('/');
 			}
 
