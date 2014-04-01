@@ -43,7 +43,7 @@ smgContainer.controller('LobbyController',
 
 
 				// functions for the socket
-				var onopen = function () { console.log("channel opened..."); };
+				var onopen = function () { alert("channel opened..."); };
 				var onerror = function () { };
 				var onclose =function () { };
 				var onmessage = function (event) {
@@ -51,10 +51,13 @@ smgContainer.controller('LobbyController',
 					var jsonData = JSON.stringify(eval("(" + originalData + ')'));
 					var data = angular.fromJson(jsonData);
 
+					console.log(event.data);
+					console.log(data);
 					if (data['matchId']) {
 						console.log(gameId + '/match/' + data['matchId']);
 
 						/** Option 1*/
+						/*
 						var matchUrl = gameId + '/match/' + data['matchId'];
 						var changeLocation = function(matchUrl) {
 							$location.path(matchUrl);
@@ -64,14 +67,14 @@ smgContainer.controller('LobbyController',
 							}
 						};
 						changeLocation();
+						*/
 
 						/** Option 2*/
-						/*
+
 						$location.url(gameId + '/match/' + data['matchId']);
 						if(!$scope.$$phase) {
 							$scope.$apply();
 						}
-						*/
 					}
 				}
 
@@ -81,7 +84,7 @@ smgContainer.controller('LobbyController',
 				joinQueueService.save({}, jsonJoinQueueData).
 						$promise.then(function(data) {
 							console.log(data);
-							if(!data['matchId']) {
+							if(!data['channelToken']) {
 								if (data['error'] === 'WRONG_PLAYER_ID') {
 									alert('Sorry, your ID does not exist. Please try again.');
 								} else if (data['error'] === 'WRONG_GAME_ID') {
@@ -90,15 +93,16 @@ smgContainer.controller('LobbyController',
 									alert(jsonJoinQueueData);
 								}
 							} else {
-								console.log(data['channelToken']);
-								$cookies.channelToken = data['channelToken'];
-								$rootScope.channel = new goog.appengine.Channel($cookies.channelToken);
-								$rootScope.socket = channel.open(handler);
+								console.log(data);
+								$rootScope.channel = new goog.appengine.Channel(data['channelToken']);
+								$rootScope.socket = $rootScope.channel.open();
 								$rootScope.socket.onopen = onopen;
 								$rootScope.socket.onerror = onerror;
 								$rootScope.socket.onclose = onclose;
 								$rootScope.socket.onmessage = onmessage;
-								insertMatch(data['channelToken']);
+								if (data['playerIds']) {
+									insertMatch(data['playerIds']);
+								}
 							}
 						}
 				);
