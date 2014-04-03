@@ -79,6 +79,9 @@ smgContainer.controller('MatchController',
 								matchInfo.history = data['history'];
 								// 2. Also expose the {@code matchInfo.playerIds} to HTML who can use it to display statistic info.
                 $scope.playerIds = matchInfo.playerIds;
+                                for(var i=0;i<$scope.playerIds.length;i++){
+                                    $scope.playerIds[i] = $scope.playerIds[i].toString();
+                                }
 							}
 						}
 				);
