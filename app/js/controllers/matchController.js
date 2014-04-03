@@ -3,21 +3,36 @@
 smgContainer.controller('MatchController',
 		function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window,
 		          $location, MatchService, GetGameInfoService, GetPlayerInfoService) {
-
-            $scope.gameInfo = {};
-            $scope.playerIds;
-
-            var state = {};
-            var lastState = state;
+			/*
+			 * Variables for interacting with Server side.
+			 */
+      $scope.gameInfo = {};
+      $scope.playerIds;
 			var matchInfo = {};
-			var lastMovePlayerId;
-			var operations;
-			var playersInfo = [];
-
 
 			/*
-			 * Method used to get all the information for the game,
-			 * and create the changeApi channel to get the match information frequently.
+			 * Variables for interacting with Game side.
+			 */
+      var state = {};
+      var lastState = state;
+			// {@code lastMovePlayerId} has been moved to {@code matchInfo.lastMovePlayerId}
+//			var lastMovePlayerId;
+			var operations;
+
+			/**
+			 * Helper method used to convert an normal url to sce trusted url.
+			 * @param url input non-sceTruested url
+			 * @returns { the sce trusted url }
+			 */
+			var sceTrustedUrl = function (url) {
+				return $sce.trustAsResourceUrl(url);
+			};
+
+			/**
+			 * Method used to retrieve Game Information, mainly the
+			 * {@code $scope.gameInfo.url}
+			 * {@code $scope.gameInfo.height}
+			 * {@code $scope.gameInfo.width}
 			 */
 			var getGameInfo = function () {
 				GetGameInfoService.get({gameId: $routeParams.gameId}).
@@ -25,31 +40,23 @@ smgContainer.controller('MatchController',
 							if (data['error'] == 'WRONG_GAME_ID') {
 								alert('Sorry, Wrong Game ID provided!');
 							} else {
-								console.log("GetGameService from server: " + angular.toJson(data));
-								// 1. Change the onMessage method on socket.
-								$rootScope.socket.onmessage = function (event) {
-									var originalData = event.data;
-									var jsonData = JSON.stringify(eval("(" + originalData + ')'));
-                                    var data = angular.fromJson(jsonData);
-                                    console.log("In the Channel, in the onMessage method " + angular.toJson(data));
-                                    var channelApiPushState = data['gameState'];
-									//getMatchInfo();
-                                    console.log("The APIState passed to send method is " + angular.toJson(channelApiPushState));
-									sendUpdateUIToGame(channelApiPushState);
-								};
-								// 2. Get game information.
+								console.log("GetGameService from Server: " + angular.toJson(data));
+								// 1. Get game information, all the .
 								$scope.gameInfo.url = sceTrustedUrl(data['url']);
 								$scope.gameInfo.height = data['height'];
 								$scope.gameInfo.width = data['width'];
 								$scope.gameInfo.gameName = data['gameName'];
-								$scope.gameInfo.pics = data['pics'];
+								/**
+								 * TODO: still need verification from Server team, comment out temporarily.
+								 */
+//								$scope.gameInfo.pics = data['pics'];
 							}
 						}
 				);
 			};
 
-			/*
-			 Method using "GET" method to get all the match information
+			/**
+			 * Method used to retrieve Match Information
 			 */
 			var getMatchInfo = function () {
 				MatchService.get({matchId: $routeParams.matchId,
@@ -62,49 +69,41 @@ smgContainer.controller('MatchController',
 							} else if (data['error'] == 'JSON_PARSE_ERROR') {
 								alert('Sorry, Wrong JSON string format received!');
 							} else {
-								console.log("Get Match Info : " + angular.toJson(data));
+								console.log("MatchService after get match info from Server : " + angular.toJson(data));
 								// 1. Get all the match information into the matchInfo variable.
-
-                                matchInfo.playerIds = data['playerIds'];
-                                $scope.playerIds = angular.fromJson(matchInfo.playerIds);
-								console.log("First time playerIds get " + $scope.playerIds);
-								console.log("typeOf PlayerThatHasTurn : " + (typeof data['playerThatHasTurn']) + ", and it's " + data['playerThatHasTurn']);
+                matchInfo.playerIds = angular.fromJson(data['playerIds']);
 								matchInfo.playerThatHasTurn = data['playerThatHasTurn'];
+								matchInfo.lastMovePlayerId = matchInfo.playerThatHasTurn;
 								matchInfo.gameOverScores = data['gameOverScores'];
 								matchInfo.gameOverReason = data['gameOverReason'];
 								matchInfo.history = data['history'];
-
-								// 2. Set certain information to $scope.
-
-								for(var i = 0; i < $scope.playerIds.length; i++) {
-									$scope.playerIds[i] = $scope.playerIds[i].toString();
-								}
-
-								lastMovePlayerId = matchInfo.playerThatHasTurn;
-								matchInfo.playerThatHasTurn = matchInfo.playerThatHasTurn;
+								// 2. Also expose the {@code matchInfo.playerIds} to HTML who can use it to display statistic info.
+                $scope.playerIds = matchInfo.playerIds;
 							}
 						}
 				);
 			};
 
 			/**
-			 * Method used to send converted moves to server.
+			 * Method used to send operation from Game to Server, of cause data will be wrapped before sending.
+			 * @param operations operations got from Game.
 			 */
 			var sendMoveToServer = function (operations) {
 				if (operations.length == 1 && operations[0]['type'] == 'GameReady') {
 					// If we get "GameReady" operation, no need to send it to the server.
 					return;
 				}
-				// 1. make up a move.
+				// 1. Wrap up the operations as a move.
 				var move = {
 					"accessSignature": $cookies.accessSignature,
 					"playerIds": $scope.playerIds,
 					"operations": operations
 				};
 				var jsonMove = angular.toJson(move);
-				// 2. send jsonfied data to server.
+				// 2. Send JSON data to server.
 				MatchService.save({matchId: $routeParams.matchId}, jsonMove).
 						$promise.then(function (data) {
+							console.log("MatchService after make move: " + angular.toJson(data));
 							if (data['error'] == "WRONG_ACCESS_SIGNATURE") {
 								alert('Sorry, Wrong Access Signature received!');
 							} else if (data['error'] == 'WRONG_PLAYER_ID') {
@@ -112,21 +111,17 @@ smgContainer.controller('MatchController',
 							} else if (data['error'] == "JSON_PARSE_ERROR") {
 								alert('Sorry, Wrong JSON Format received!');
 							} else if (data['error'] == "MISSING_INFO") {
-								alert('Sorry, Incompleted JSON data received!');
+								alert('Sorry, Incomplete JSON data received!');
 							} else {
-								var sentMoveReceivedData = data['gameState'];//not the same with API
-								console.log("In the container, the player who sent the operations receives from server " + angular.toJson(sentMoveReceivedData));
-								sendUpdateUIToGame(sentMoveReceivedData);
+								// 2.1. Store data inside {@code matchInfo}
+								matchInfo.gameStateAfterMakeMove = data['gameState'];
+								console.log("MatchService after make move: received returned state: " +
+										angular.toJson(matchInfo.gameStateAfterMakeMove));
+								// 2.2. UpdateUI for Game with the received state.
+								sendUpdateUIToGame(matchInfo.gameStateAfterMakeMove);
 							}
 						}
 				);
-			};
-
-			/**
-			 * Helper function used to get sce trusted url
-			 */
-			var sceTrustedUrl = function (url) {
-				return $sce.trustAsResourceUrl(url);
 			};
 
 			/**
@@ -140,21 +135,24 @@ smgContainer.controller('MatchController',
 			};
 
 			/**
-			 * Method used to get all the players' information.
+			 * Method used to get all the players' info.
 			 * @param playerIds
 			 */
-			var getAllPlayersInfo = function (allPlayerIds) {
-				for (playerId in allPlayerIds) {
+			var getAllPlayersInfo = function (playerIds) {
+				matchInfo.playersInfo = [];
+				for (var playerId in playerIds) {
 					GetPlayerInfoService.get({playerId: $cookies.playerId,
 						targetId: playerId, accessSignature: $cookies.accessSignature}).
 							$promise.then(function (data) {
-							//	console.log(data);
-								if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
+								console.log("GetPlayerInfoService: " + angular.toJson(data));
+								if (data['error'] == "WRONG_PLAYER_ID") {
+									alert("Sorry, Wrong Player ID provided!");
+								} else if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
 									alert('Sorry, Wrong Access Signature provided!');
-								} else if (data['error'] == 'WRONG_TARGETID') {
+								} else if (data['error'] == 'WRONG_TARGET_ID') {
 									alert('Sorry, Wrong Target ID provided!');
 								} else {
-									playersInfo.push(data);
+									matchInfo.playersInfo.push(data);
 								}
 							}
 					);
@@ -232,7 +230,7 @@ smgContainer.controller('MatchController',
 					'state': newState,
 					'lastState': state,
 					'lastMove': null,
-					"lastMovePlayerId": lastMovePlayerId,
+					"lastMovePlayerId": matchInfo.lastMovePlayerId,
 					"playerIdToNumberOfTokensInPot": {}
 				};
 				$scope.sendMessageToIframe(verifyMove);
@@ -259,7 +257,10 @@ smgContainer.controller('MatchController',
 				$scope.sendMessageToIframe(updateUI);
 			}
 
-			// Formal program starts here.
+
+			/**
+			 * Formal code starts here.
+			 */
 			if (!$cookies.accessSignature || !$cookies.playerId) {
 				alert('You have to log in first!');
 				$location.url('/');
@@ -269,6 +270,15 @@ smgContainer.controller('MatchController',
 				} else {
 					attachEvent("onmessage", listener);
 				}
+				// 0. Override the onmessage method on socket.
+				$rootScope.socket.onmessage = function (event) {
+					var data = angular.fromJson(event.data);
+					console.log("Data get from the Channel API: " + angular.toJson(data));
+					matchInfo.gameStateFromChannelAPI = data['gameState'];
+					console.log("Game State got from channel API: " + angular.toJson(matchInfo.gameStateFromChannelAPI));
+					sendUpdateUIToGame(matchInfo.gameStateFromChannelAPI);
+				};
+
 				// 1. Get game information.
 				getGameInfo();
 				// 2. Get match information.

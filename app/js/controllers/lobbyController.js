@@ -139,6 +139,13 @@ smgContainer.controller('LobbyController',
 					InsertMatchService.save({}, jsonData).
 							$promise.then(function(data) {
 								console.log(data);
+								/*
+									{@code data} contains following data:
+										matchId:
+										playerIds: should be an array, and we can store this into the $cookies and
+													delete it after all players exit the match.
+								 */
+								// TODO: add playerIds here into $scope.
 								if(!data['matchId']) {
 									if (data['error'] === 'WRONG_PLAYER_ID') {
 										alert('Sorry, your ID does not exist. Please try again.');
