@@ -173,6 +173,9 @@ smgContainer.controller('MatchController',
 			function listener(event) {
 				var data = event.data;
 				console.log("In the container, it receives the data from the game Iframe " + data['type']);
+                if(!data['type']){
+                    console.log("The undefined data is " + angular.toJson(data));
+                }
 				/*
 				 check whether the data is GameReady(), if it is, send updateUI to the game.
 				 format of GameReady: {"type":"GameReady"}
