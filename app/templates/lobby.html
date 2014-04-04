@@ -1,37 +1,61 @@
 <div>
-
-	<button type="button" class="btn btn-primary" ng-click="closeChannel()">clost channel</button>
-
 	<div class="panel panel-default">
-		<!-- Default panel contents -->
-		<div class="panel-heading">Invite a friend</div>
-		<br/>
-		<div class="alert alert-danger collapse" id="inviteAlert">
-			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-			<p>{{inviteInfo.error}}</p>
+		<div class="panel-heading">
+			<h3 class="panel-title">Lobby</h3>
 		</div>
-
-
-		<!-- invite -->
+		<div class="panel-body">
+			<div class="alert alert-danger collapse" id="inviteAlert">
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+				<p>{{inviteInfo.error}}</p>
+			</div>
+			<div class="form-group col-sm-2">
+				<button type="submit" ng-click="autoMatch()" class="btn btn-default" data-toggle="modal" data-target="#autoMatching">Auto Match</button>
+			</div>
+			<form name="inviteForm" class="form-horizontal" role="form">
+				<div ng-class="{ 'form-group': true, 'col-sm-6': true , 'has-error': friendIdHasError }">
+					<input type="text" required ng-model="inviteInfo.friendId" class="form-control" id="friendId" placeholder="Friend ID">
+				</div>
+				<div class="form-group col-sm-2">
+					<button type="submit" ng-disabled="inviteForm.$invalid"  ng-click="invite(inviteInfo)" class="btn btn-default">Invite</button>
+				</div>
+			</form>
+		</div>
 		<table class="table">
-			<div id="search_player" class="col-sm-12">
-
-				<form name="inviteForm" class="form-horizontal" role="form">
-					<div ng-class="{ 'form-group': true, 'col-sm-5': true , 'has-error': friendIdHasError }">
-							<input type="text" required ng-model="inviteInfo.friendId" class="form-control" id="friendId" placeholder="Friend ID">
-					</div>
-					<div ng-class="{ 'form-group': true, 'col-sm-5': true , 'has-error': gameIdHasError }">
-							<input type="text" required ng-model="inviteInfo.gameId" class="form-control" id="gameId" placeholder="GameId">
-					</div>
-					<div class="form-group col-sm-2">
-							<button type="submit" ng-disabled="inviteForm.$invalid"  ng-click="invite(inviteInfo)" class="btn btn-default">Invite</button>
-					</div>
-				</form>
-				<br/><br/>
-			</div> <!-- Invite player bar -->
+			<tbody>
+				<tr>
+					<td>Match1</td>
+					<td>A/B</td>
+				</tr>
+				<tr>
+					<td>Match2</td>
+					<td>C/D</td>
+				</tr>
+			</tbody>
 		</table>
 	</div>
 
+
+	<!-- Modal for login alert -->
+	<div class="modal fade" id="autoMatching">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">Modal title</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						Waiting for another player...
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" ng-click="cancel()" data-dismiss="modal">Cancel</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	<!-- Modal for login alert -->
 	<div class="modal fade" id="needLoginAlert">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -45,22 +69,10 @@
 						<p>Jump to login page in {{timer}} seconds...</p>
 					</div>
 				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary">Save changes</button>
-				</div>
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 
 
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<h3 class="panel-title">Lobby</h3>
-		</div>
-		<div class="panel-body">
-			Lobby content
-		</div>
-	</div>
 
 </div>

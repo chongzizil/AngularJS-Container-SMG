@@ -133,7 +133,7 @@ smgContainer.controller('MatchController',
 			 * 2. One of the players surrenders.
 			 */
 			$scope.endGame = function () {
-				$cookies.socket.close();
+				$rootScope.socket.close();
 				$location.url('/');
 			};
 
