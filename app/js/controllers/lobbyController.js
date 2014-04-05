@@ -67,23 +67,21 @@ smgContainer.controller('LobbyController',
 							 */
 							if(!data['matchId']) {
 								if (data['error'] === 'WRONG_PLAYER_ID') {
-									alert('Sorry, your ID does not exist. Please try again.');
+									$scope.friendIdHasError = true;
+									$scope.inviteInfo.error = 'Sorry, your friend\'s ID does not exist. Please try again.';
+									$("#inviteAlert").show();
 								} else if (data['error'] === 'WRONG_GAME_ID') {
 									alert('Sorry, the game\'s ID does not exist. Please try again.');
 								}
 							} else {
-								$("#autoMatching").modal('hide');
+								$("#autoMatching").hide();
 								// Store the playerIds and matchId in the cookies
 								$cookies.playerIds = data['playerIds'];
 								$cookies.matchId = data['matchId'];
-
-								$scope.pageJump = function(){
-									$location.url(gameId + '/match/' + data['matchId']);
-									if(!$scope.$$phase) {
-										$scope.$apply();
-									}
+								$location.url(gameId + '/match/' + data['matchId']);
+								if(!$scope.$$phase) {
+									$scope.$apply();
 								}
-								$timeout($scope.pageJump, 200);
 							}
 						}
 				);
@@ -93,6 +91,7 @@ smgContainer.controller('LobbyController',
 			 * Close the channel in order to cancel the auto match
 			 */
 			$scope.cancel = function() {
+				$("#autoMatching").hide();
 				$rootScope.socket.close();
 			}
 
@@ -109,24 +108,23 @@ smgContainer.controller('LobbyController',
 				// Change the data to json object
 				var jsonJoinQueueData = angular.toJson(joinQueueData);
 
+				$("#inviteAlert").hide();
+
 				// functions for the socket
 				var onopen = function () { console.log("channel opened..."); };
 				var onerror = function () { };
 				var onclose =function () { console.log("channel closed..."); };
 				var onmessage = function (event) {
+					$("#autoMatching").show();
 					// Receive the data from the channel
 					var data = angular.fromJson(event.data);
 					if (data['matchId']) {
 						$cookies.playerIds = data['playerIds'];
 						// Jump to the game page to start playing :
-						$("#autoMatching").modal('hide');
-						$scope.pageJump = function(){
-							$location.url(gameId + '/match/' + data['matchId']);
-							if(!$scope.$$phase) {
-								$scope.$apply();
-							}
+						$location.url(gameId + '/match/' + data['matchId']);
+						if(!$scope.$$phase) {
+							$scope.$apply();
 						}
-						$timeout($scope.pageJump, 200);
 					}
 				}
 
@@ -146,6 +144,7 @@ smgContainer.controller('LobbyController',
 									alert(jsonJoinQueueData);
 								}
 							} else {
+								$("#autoMatching").hide();
 								$rootScope.channel = new goog.appengine.Channel(data['channelToken']);
 								$rootScope.socket = $rootScope.channel.open();
 								$rootScope.socket.onopen = onopen;
@@ -180,5 +179,6 @@ smgContainer.controller('LobbyController',
 
 				insertMatch(playerIds);
 			 }
+
 
 		});

@@ -6,14 +6,14 @@
 //var domainUrl = 'http://2-dot-smg-server.appspot.com';
 /* Container test domain */
 //var domainUrl = 'http://2-dot-smg-server-rl.appspot.com';
-// Self container test domain 1 */
+// Self container test domain */
 var domainUrl = 'http://2-dot-smg-container-server2.appspot.com/';
 
 smgContainer.factory('PlayerService', ['$resource', function($resource) {
 	return $resource(domainUrl + '/players/:playerId',
-		{playerId: '@playerId', password: '@password'}//,
-		//{register: {method:'POST', params:{}, headers:{'Content-Type': 'application/json'},  isArray:false}}
-		);
+			{playerId: '@playerId', password: '@password'}//,
+			//{register: {method:'POST', params:{}, headers:{'Content-Type': 'application/json'},  isArray:false}}
+	);
 }]);
 
 smgContainer.factory('GetGameInfoService', ['$resource', function($resource) {

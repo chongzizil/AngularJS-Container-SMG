@@ -169,7 +169,7 @@ smgContainer.controller('MatchController',
 			 parameter: message should be : UpdateUI, VerifyMove
 			 */
 			$scope.sendMessageToIframe = function (message) {
-				var win = $window.document.getElementById('iframe1').contentWindow;
+				var win = $window.document.getElementById('gameIFrame').contentWindow;
 				win.postMessage(message, "*");
 			};
 
@@ -288,7 +288,6 @@ smgContainer.controller('MatchController',
 					console.log("Game State got from channel API: " + angular.toJson(matchInfo.gameStateFromChannelAPI));
 					sendUpdateUIToGame(matchInfo.gameStateFromChannelAPI);
 				};
-
 				// 1. Get game information.
 				getGameInfo();
 				// 2. Get match information.
