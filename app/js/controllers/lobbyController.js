@@ -117,6 +117,7 @@ smgContainer.controller('LobbyController',
 					// Receive the data from the channel
 					var data = angular.fromJson(event.data);
 					if (data['matchId']) {
+						$cookies.playerIds = data['playerIds'];
 						// Jump to the game page to start playing :
 						$("#autoMatching").modal('hide');
 						$scope.pageJump = function(){
