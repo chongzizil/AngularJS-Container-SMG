@@ -8,6 +8,7 @@ smgContainer.controller('MatchController',
 			 */
       $scope.gameInfo = {};
       $scope.playerIds;
+			// TODO: delete in v3, no matchInfo service available.
 			var matchInfo = {};
 
 			/*
@@ -17,7 +18,8 @@ smgContainer.controller('MatchController',
       var lastState = state;
 			// {@code lastMovePlayerId} has been moved to {@code matchInfo.lastMovePlayerId}
 //			var lastMovePlayerId;
-			var operations;
+			// TODO: only used inside the {@link #listener} method, comment out.
+//			var operations;
 
 			/**
 			 * Helper method used to convert an normal url to sce trusted url.
@@ -55,6 +57,7 @@ smgContainer.controller('MatchController',
 				);
 			};
 
+			// TODO: delete in v3, no matchInfo service available anymore.
 			/**
 			 * Method used to retrieve Match Information
 			 */
@@ -79,9 +82,9 @@ smgContainer.controller('MatchController',
 								matchInfo.history = data['history'];
 								// 2. Also expose the {@code matchInfo.playerIds} to HTML who can use it to display statistic info.
                 $scope.playerIds = matchInfo.playerIds;
-                                for(var i=0;i<$scope.playerIds.length;i++){
-                                    $scope.playerIds[i] = $scope.playerIds[i].toString();
-                                }
+                for(var i=0;i<$scope.playerIds.length;i++){
+                    $scope.playerIds[i] = $scope.playerIds[i].toString();
+                }
 							}
 						}
 				);
@@ -184,7 +187,7 @@ smgContainer.controller('MatchController',
 					replyGameReady();
 				} else if (data['type'] === "MakeMove") {
 					//get operations
-					operations = data['operations'];
+					var operations = data['operations'];
 					console.log("In the container, it sends to the server, operations are " + angular.toJson(operations));
 					sendMoveToServer(operations);
 				} else if (data['type'] === "VerifyMoveDone") {
@@ -198,7 +201,8 @@ smgContainer.controller('MatchController',
 				if (angular.isUndefined($scope.debug)) {
 					$scope.debug = "Received: " + JSON.stringify(data);
 				} else {
-					$scope.operations = data;
+					// TODO: no need to put in $scope, comment out.
+//					$scope.operations = data;
 					$scope.debug += "Received: " + JSON.stringify(data);
 				}
 				$scope.$apply();
