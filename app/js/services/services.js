@@ -46,6 +46,14 @@ smgContainer.factory('MatchService', ['$resource', function($resource) {
 	);
 }]);
 
+/**
+ * This service will replace the MatchService GET method, and will be used in asynchronized game mode.
+ */
+smgContainer.factory('NewMatchStateService', ['$resource', function($resource) {
+	return $resource(domainUrl + '/state/:matchId',
+			{matchId: '@matchId', accessSignature: '@accessSignature', playerId: '@playerId'});
+}]);
+
 smgContainer.factory('DevService', ['$resource', function($resource) {
 	return $resource(domainUrl + '/developers/:developerId',
 			{developerId: '@developerId', password: '@password'}
