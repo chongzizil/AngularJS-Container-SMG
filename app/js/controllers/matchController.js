@@ -20,7 +20,7 @@
 
 smgContainer.controller('MatchController',
 		function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window,
-		          $location, MatchService, GetGameInfoService, GetPlayerInfoService) {
+		          $location, NewMatchStateService, GetGameInfoService, GetPlayerInfoService) {
 			/*
 			 * Variables for interacting with Server side.
 			 */
