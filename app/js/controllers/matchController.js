@@ -74,7 +74,7 @@ smgContainer.controller('MatchController',
 				// 1. Wrap up the operations as a move.
 				var move = {
 					"accessSignature": $cookies.accessSignature,
-					"playerIds": $cookies.playerIds,
+					"playerIds": $rootScope.playerIds,
 					"operations": operations
 				};
 				var jsonMove = angular.toJson(move);
@@ -188,8 +188,8 @@ smgContainer.controller('MatchController',
 					'type': 'UpdateUI',
 					'yourPlayerId': $cookies.playerId,
 					'playersInfo': [
-						{'playerId': $cookies.playerIds[0]},
-						{'playerId': $cookies.playerIds[1]}
+						{'playerId': $rootScope.playerIds[0]},
+						{'playerId': $rootScope.playerIds[1]}
 					],
 					'state': {},
 					'lastState': null,
@@ -207,8 +207,8 @@ smgContainer.controller('MatchController',
 				var verifyMove = {
 					"type": "VerifyMove",
 					'playersInfo': [
-						{'playerId': $cookies.playerIds[0]},
-						{'playerId': $cookies.playerIds[1]}
+						{'playerId': $rootScope.playerIds[0]},
+						{'playerId': $rootScope.playerIds[1]}
 					],
 					'state': newState,
 					'lastState': state,
@@ -227,8 +227,8 @@ smgContainer.controller('MatchController',
 					"type": "UpdateUI",
 					'yourPlayerId': $cookies.playerId,
 					'playersInfo': [
-						{'playerId': $cookies.playerIds[0]},
-						{'playerId': $cookies.playerIds[1]}
+						{'playerId': $rootScope.playerIds[0]},
+						{'playerId': $rootScope.playerIds[1]}
 					],
 					'state': state,
 					'lastState': lastState,
@@ -253,9 +253,9 @@ smgContainer.controller('MatchController',
 				} else {
 					attachEvent("onmessage", listener);
 				}
-				console.log("****** $cookies.playerIds");
-				console.log(typeof $cookies.playerIds);
-				console.log(angular.toJson($cookies.playerIds));
+				console.log("****** $rootScope.playerIds");
+				console.log(typeof $rootScope.playerIds);
+				console.log(angular.toJson($rootScope.playerIds));
 
 				// 0. Override the onmessage method on socket.
 				$rootScope.socket.onmessage = function (event) {
@@ -269,8 +269,8 @@ smgContainer.controller('MatchController',
 				// 1. Get game information.
 				getGameInfo();
 				// 2. get players information.
-				console.log("Before get playerInfo: " + angular.toJson($cookies.playerIds));
-//				getAllPlayersInfo($scope.playerIds);
+				console.log("Before get playerInfo: " + angular.toJson($rootScope.playerIds));
+//				getAllPlayersInfo($rootScope.playerIds);
 			}
 		}
 

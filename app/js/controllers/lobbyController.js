@@ -91,9 +91,11 @@ smgContainer.controller('LobbyController', function (
 									alert('Sorry, the game\'s ID does not exist. Please try again.');
 								}
 							} else {
+								console.log("insertMatch");
 								$("#autoMatching").hide();
 								// Store the playerIds and matchId in the cookies
-								$cookies.playerIds = data['playerIds'];
+								$rootScope.playerIds = data['playerIds'];
+								console.log($rootScope.playerIds);
 								$cookies.matchId = data['matchId'];
 								$location.url($routeParams.gameId + '/match/' + data['matchId']);
 								if(!$scope.$$phase) {
@@ -144,7 +146,7 @@ smgContainer.controller('LobbyController', function (
 								autoMatching.hide();
 
 								// Store the playerIds and matchId in the cookies
-								$cookies.playerIds = data['playerIds'];
+								$rootScope.playerIds = data['playerIds'];
 								$cookies.matchId = data['matchId'];
 								$location.url($routeParams.gameId + '/match/' + data['matchId']);
 								if(!$scope.$$phase) {
@@ -185,7 +187,7 @@ smgContainer.controller('LobbyController', function (
 					var data = angular.fromJson(event.data);
 
 					if (data['matchId']) {
-						$cookies.playerIds = data['playerIds'];
+						$rootScope.playerIds = data['playerIds'];
 						// Jump to the game page to start playing :
 						$location.url($routeParams.gameId + '/match/' + data['matchId']);
 						if(!$scope.$$phase) {
@@ -245,8 +247,8 @@ smgContainer.controller('LobbyController', function (
 					autoMatching.hide();
 				}
 
-				$cookies.playerIds = [$cookies.playerId, friendId];
+				$rootScope.playerIds = [$cookies.playerId, friendId];
 
-				insertMatch($cookies.playerIds);
+				insertMatch($rootScope.playerIds);
 			 }
 		});
