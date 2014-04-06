@@ -84,12 +84,9 @@ smgContainer.controller('LobbyController', function (
 							 */
 							if(!data['matchId']) {
 								if (data['error'] === 'WRONG_PLAYER_ID') {
-									if ($cookies.isSyncMode === false) {
-										$scope.friendIdHasError = true;
-										$scope.inviteInfo.error = 'Sorry, your friend\'s ID does not exist. Please try again.';
-										$("#inviteAlert").show();
-									}
-									alert('Sorry, your ID does not exist. Please try again.');
+									$scope.friendIdHasError = true;
+									$scope.inviteInfo.error = 'Sorry, your friend\'s ID does not exist. Please try again.';
+									inviteAlert.show();
 								} else if (data['error'] === 'WRONG_GAME_ID') {
 									alert('Sorry, the game\'s ID does not exist. Please try again.');
 								}
@@ -126,6 +123,8 @@ smgContainer.controller('LobbyController', function (
 			$scope.checkHasNewMatch = function() {
 				NewMatchService.get({playerId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
 						$promise.then(function(data) {
+							console.log("Getting new match info.......................");
+							console.log(data);
 							/*
 							 {@code data} contains following data if there's a match:
 							 matchId:
@@ -135,14 +134,15 @@ smgContainer.controller('LobbyController', function (
 							if(!data['matchId']) {
 								if (data['error'] === 'WRONG_ACCESS_SIGNATURE') {
 									alert('Sorry, your ID does not exist. Please try again.');
-									$("#inviteAlert").show();
+									inviteAlert.show();
 								} else if (data['error'] === 'WRONG_PLAYER_ID') {
 									popupLoginPage();
 								} else if (data['error'] === 'NO_MATCH_FOUND') {
 									noNewMatchAlert.show();
 								}
 							} else {
-								$("#autoMatching").hide();
+								autoMatching.hide();
+
 								// Store the playerIds and matchId in the cookies
 								$cookies.playerIds = data['playerIds'];
 								$cookies.matchId = data['matchId'];
@@ -217,6 +217,7 @@ smgContainer.controller('LobbyController', function (
 								$rootScope.socket.onclose = onclose;
 								$rootScope.socket.onmessage = onmessage;
 								if (data['playerIds']) {
+									$cookies.isSyncMode = true;
 									insertMatch(data['playerIds']);
 								}
 							}
