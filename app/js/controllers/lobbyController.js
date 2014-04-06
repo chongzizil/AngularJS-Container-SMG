@@ -4,30 +4,29 @@ smgContainer.controller('LobbyController', function (
 		$scope, $rootScope, $routeParams, $location, $cookies,
 		$timeout, joinQueueService, NewMatchService) {
 
-			// Alerts
+			// Alerts for lobby.html
 			var inviteAlert = $("#inviteAlert");
 			inviteAlert.on('close.bs.alert', function() {
 				inviteAlert.hide();
 				return false;
 			})
-			// Alerts
+
 			var noNewMatchAlert = $("#noNewMatchAlert");
 			noNewMatchAlert.on('close.bs.alert', function() {
 				noNewMatchAlert.hide();
 				return false;
 			})
-			// Alerts
+
 			var needLoginAlert = $("#needLoginAlert");
 			needLoginAlert.on('close.bs.alert', function() {
 				needLoginAlert.hide();
 				return false;
 			})
-			// Alerts
+
 			var autoMatching = $("#autoMatching");
 
 
-
-			// Check the login is woring
+			// Check the login is working
 			console.log("cookies.playerId: " + $cookies.playerId);
 			console.log("cookies.accessSignature: " + $cookies.accessSignature);
 
@@ -42,8 +41,11 @@ smgContainer.controller('LobbyController', function (
 				$rootScope.refreshDisplayId();
 			}
 
-			//If the player is not login yet, a popup will alert him/her to login first
-			if ($cookies.playerId === "Guest" || $cookies.accessSignature === null) {
+
+			/**
+			 * Check if the player has login, if not, pop up the login page for him/her
+			 */
+			var popupLoginPage = function(){
 				// Show the modal to alert the player
 				needLoginAlert.modal('show');
 
@@ -60,11 +62,6 @@ smgContainer.controller('LobbyController', function (
 				}
 
 				var myTimer = $timeout($scope.countDown,1000);
-			} else {
-				// If the player login, then retrieve the login info
-				var accessSignature = $cookies.accessSignature;
-				var playerId = $cookies.playerId;
-				var gameId = $routeParams.gameId;
 			}
 
 			/**
@@ -73,14 +70,14 @@ smgContainer.controller('LobbyController', function (
 			 */
 			var insertMatch = function(playerIds) {
 				var Data = {
-					accessSignature: accessSignature,
-					playerIds: playerIds,
-					gameId: gameId
+					accessSignature: $cookies.accessSignature,
+					playerIds: $cookies.playerId,
+					gameId: $routeParams.gameId
 				};
 				var jsonData = angular.toJson(Data);
 				NewMatchService.save({}, jsonData).
 						$promise.then(function(data) {
-							console.log(data);
+							console.log("From insert Match: " + data);
 							/*
 							 {@code data} contains following data:
 							 matchId:
@@ -109,6 +106,11 @@ smgContainer.controller('LobbyController', function (
 				);
 			}
 
+			//If the player is not login yet, a popup will alert him/her to login first
+			if ($cookies.playerId === "Guest" || $cookies.accessSignature === null) {
+				popupLoginPage();
+			}
+
 			/**
 			 * Close the channel in order to cancel the auto match
 			 */
@@ -120,10 +122,11 @@ smgContainer.controller('LobbyController', function (
 			/**
 			 * Try to retrieve the match info if there is one for the player
 			 */
-			var checkHasNewMatch = function() {
+			$scope.checkHasNewMatch = function() {
+				console.log("test");
 				NewMatchService.get({playerId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
 						$promise.then(function(data) {
-							console.log(data);
+							console.log("From check new match: " + data);
 							/*
 							 {@code data} contains following data if there's a match:
 							 matchId:
@@ -135,7 +138,7 @@ smgContainer.controller('LobbyController', function (
 									alert('Sorry, your ID does not exist. Please try again.');
 									$("#inviteAlert").show();
 								} else if (data['error'] === 'WRONG_PLAYER_ID') {
-									alert('Sorry, your ID does not exist. Please try again.');
+									popupLoginPage();
 								} else if (data['error'] === 'NO_MATCH_FOUND') {
 									noNewMatchAlert.show();
 								}
@@ -153,17 +156,15 @@ smgContainer.controller('LobbyController', function (
 				);
 			}
 
-
-
 			/**
 			 * Start a auto match by using channel API
 			 */
 			$scope.autoMatch = function() {
 				//The data send to the server in order to join a auto match queue
 				var joinQueueData = {
-					accessSignature: accessSignature,
-					playerId: playerId,
-					gameId: gameId.toString()
+					accessSignature: $cookies.accessSignature,
+					playerId: $cookies.playerId,
+					gameId: $routeParams.gameId
 				};
 				// Change the data to json object
 				var jsonJoinQueueData = angular.toJson(joinQueueData);
@@ -200,14 +201,14 @@ smgContainer.controller('LobbyController', function (
 				 */
 				joinQueueService.save({}, jsonJoinQueueData).
 						$promise.then(function(data) {
-							console.log(data);
+							console.log("From join queue: " + data);
 							if(!data['channelToken']) {
 								if (data['error'] === 'WRONG_PLAYER_ID') {
-									alert('Sorry, your ID does not exist. Please try again.');
+									popupLoginPage();
 								} else if (data['error'] === 'WRONG_GAME_ID') {
 									alert('Sorry, the game\'s ID does not exist. Please try again.');
 								}else if (data['error'] === 'MISSING_INFO') {
-									alert(jsonJoinQueueData);
+									alert("Missing info:" + jsonJoinQueueData);
 								}
 							} else {
 								$("#autoMatching").hide();
