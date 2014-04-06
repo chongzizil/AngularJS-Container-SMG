@@ -1,5 +1,23 @@
 //'use strict';
 
+/**
+ * Match Controller contains two parts:
+ * 1. Container interacts with Server side:
+ *  (1). In asynchronous mode, get new state and last move from Server.
+ *  (2). In synchronous mode, receive channel API pushed new state and last move.
+ *  (3). Send new moves to Server.
+ * 2. Container interacts with Game side:
+ *  (1). Get operations made by players
+ *  (2). Send new state to Game for updateUI
+ *  (3). Send new state, last state and last move to Game for verify move.
+ *
+ *  Match Controller contains two modes:
+ *  1. Synchronous Mode: Player A presses "autoMatch" and wait for another player, player B also presses
+ *  the "autoMatch", system pairs player A and B automatically, they communicate through channel API.
+ *  2. Asynchronous Mode: Player A invite Player B with B's playerId, when B presses "check new game",
+ *  player A and B pair, after that, they make moves and check new states manually.
+ */
+
 smgContainer.controller('MatchController',
 		function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window,
 		          $location, MatchService, GetGameInfoService, GetPlayerInfoService) {
@@ -7,13 +25,9 @@ smgContainer.controller('MatchController',
 			 * Variables for interacting with Server side.
 			 */
       $scope.gameInfo = {};
-      $scope.playerIds;
 			var matchInfo = {
 				playerThatHasTurn: Number.MIN_VALUE,
 				lastMovePlayerId: Number.MIN_VALUE,
-				gameOverScores: {},
-				gameStateAfterMakeMove: {},
-				gameStateFromChannelAPI: {},
 				state: {},
 				lastMove: [],
 				history: []
@@ -24,19 +38,6 @@ smgContainer.controller('MatchController',
 			 */
       var state = {};
       var lastState = state;
-			// {@code lastMovePlayerId} has been moved to {@code matchInfo.lastMovePlayerId}
-//			var lastMovePlayerId;
-			// TODO: only used inside the {@link #listener} method, comment out.
-//			var operations;
-
-			/**
-			 * Helper method used to convert an normal url to sce trusted url.
-			 * @param url input non-sceTruested url
-			 * @returns { the sce trusted url }
-			 */
-			var sceTrustedUrl = function (url) {
-				return $sce.trustAsResourceUrl(url);
-			};
 
 			/**
 			 * Method used to retrieve Game Information, mainly the
@@ -52,50 +53,10 @@ smgContainer.controller('MatchController',
 							} else {
 								console.log("GetGameService from Server: " + angular.toJson(data));
 								// 1. Get game information, all the .
-								$scope.gameInfo.url = sceTrustedUrl(data['url']);
+								$scope.gameInfo.url = $sce.trustAsResourceUrl(data['url']);
 								$scope.gameInfo.height = data['height'];
 								$scope.gameInfo.width = data['width'];
 								$scope.gameInfo.gameName = data['gameName'];
-								/**
-								 * TODO: still need verification from Server team, comment out temporarily.
-								 */
-//								$scope.gameInfo.pics = data['pics'];
-							}
-						}
-				);
-			};
-
-			// TODO: delete in v3, no matchInfo service available anymore.
-			// TODO: Discuss this, because it can be alive for the gameOverScores, gameOverReason and history
-			/**
-			 * Method used to retrieve Match Information
-			 */
-			var getMatchInfo = function () {
-				MatchService.get({matchId: $routeParams.matchId,
-					accessSignature: $cookies.accessSignature, playerId: $cookies.playerId}).
-						$promise.then(function (data) {
-							if (data['error'] == "WRONG_ACCESS_SIGNATURE") {
-								alert('Sorry, Wrong AccessSignature received!');
-							} else if (data['error'] == 'WRONG_PLAYER_ID') {
-								alert('Sorry, Wrong Player ID received!');
-							} else if (data['error'] == 'JSON_PARSE_ERROR') {
-								alert('Sorry, Wrong JSON string format received!');
-							} else {
-								console.log("MatchService after get match info from Server : " + angular.toJson(data));
-								// 1. Get all the match information into the matchInfo variable.
-								// TODO: playerIds have been achieved in lobbyController, delete this.
-                matchInfo.playerIds = angular.fromJson(data['playerIds']);
-//								matchInfo.playerThatHasTurn = data['playerThatHasTurn'];
-								matchInfo.lastMovePlayerId = matchInfo.playerThatHasTurn;
-								matchInfo.gameOverScores = data['gameOverScores'];
-								matchInfo.gameOverReason = data['gameOverReason'];
-								matchInfo.history = data['history'];
-								// 2. Also expose the {@code matchInfo.playerIds} to HTML who can use it to display statistic info.
-								// TODO: playerIds have been achieved in lobbyController
-                $scope.playerIds = matchInfo.playerIds;
-                for(var i=0;i<$scope.playerIds.length;i++){
-                    $scope.playerIds[i] = $scope.playerIds[i].toString();
-                }
 							}
 						}
 				);
@@ -113,7 +74,7 @@ smgContainer.controller('MatchController',
 				// 1. Wrap up the operations as a move.
 				var move = {
 					"accessSignature": $cookies.accessSignature,
-					"playerIds": $scope.playerIds,
+					"playerIds": $cookies.playerIds,
 					"operations": operations
 				};
 				var jsonMove = angular.toJson(move);
@@ -131,12 +92,12 @@ smgContainer.controller('MatchController',
 								alert('Sorry, Incomplete JSON data received!');
 							} else {
 								// 2.1. Store data inside {@code matchInfo}
-								matchInfo.gameStateAfterMakeMove = data['gameState'];
+								matchInfo.state = data['state'];
 								matchInfo.lastMove = data['lastMove'];
 								console.log("MatchService after make move: received returned state: " +
-										angular.toJson(matchInfo.gameStateAfterMakeMove));
+										angular.toJson(matchInfo.state));
 								// 2.2. UpdateUI for Game with the received state.
-								sendUpdateUIToGame(matchInfo.gameStateAfterMakeMove);
+								sendUpdateUIToGame(matchInfo.state);
 							}
 						}
 				);
@@ -227,8 +188,8 @@ smgContainer.controller('MatchController',
 					'type': 'UpdateUI',
 					'yourPlayerId': $cookies.playerId,
 					'playersInfo': [
-						{'playerId': $scope.playerIds[0]},
-						{'playerId': $scope.playerIds[1]}
+						{'playerId': $cookies.playerIds[0]},
+						{'playerId': $cookies.playerIds[1]}
 					],
 					'state': {},
 					'lastState': null,
@@ -246,8 +207,8 @@ smgContainer.controller('MatchController',
 				var verifyMove = {
 					"type": "VerifyMove",
 					'playersInfo': [
-						{'playerId': $scope.playerIds[0]},
-						{'playerId': $scope.playerIds[1]}
+						{'playerId': $cookies.playerIds[0]},
+						{'playerId': $cookies.playerIds[1]}
 					],
 					'state': newState,
 					'lastState': state,
@@ -266,8 +227,8 @@ smgContainer.controller('MatchController',
 					"type": "UpdateUI",
 					'yourPlayerId': $cookies.playerId,
 					'playersInfo': [
-						{'playerId': $scope.playerIds[0]},
-						{'playerId': $scope.playerIds[1]}
+						{'playerId': $cookies.playerIds[0]},
+						{'playerId': $cookies.playerIds[1]}
 					],
 					'state': state,
 					'lastState': lastState,
@@ -300,18 +261,16 @@ smgContainer.controller('MatchController',
 				$rootScope.socket.onmessage = function (event) {
 					var data = angular.fromJson(event.data);
 					console.log("Data get from the Channel API: " + angular.toJson(data));
-					matchInfo.gameStateFromChannelAPI = data['gameState'];
-					console.log("Game State got from channel API: " + angular.toJson(matchInfo.gameStateFromChannelAPI));
+					matchInfo.state = data['state'];
+					console.log("Game State got from channel API: " + angular.toJson(matchInfo.state));
 					matchInfo.lastMove = data['lastMove'];
-					sendUpdateUIToGame(matchInfo.gameStateFromChannelAPI);
+					sendUpdateUIToGame(matchInfo.state);
 				};
 				// 1. Get game information.
 				getGameInfo();
-				// 2. Get match information.
-				getMatchInfo();
-				// 3. get players information.
-				console.log("Before get playerInfo: " + angular.toJson($scope.playerIds));
-				getAllPlayersInfo($scope.playerIds);
+				// 2. get players information.
+				console.log("Before get playerInfo: " + angular.toJson($cookies.playerIds));
+//				getAllPlayersInfo($scope.playerIds);
 			}
 		}
 
