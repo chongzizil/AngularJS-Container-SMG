@@ -55,7 +55,7 @@ smgContainer.factory('joinQueueService', ['$resource', function($resource) {
  * To insert a match to the server. Also to get new match info (asynchronous mode)
  */
 smgContainer.factory('NewMatchService', ['$resource', function($resource) {
-	return $resource(domainUrl + '/newMatch:playerId',
+	return $resource(domainUrl + '/newMatch/:playerId',
 			{playerId: '@playerId', accessSignature: '@accessSignature'}
 	);
 }]);
@@ -64,7 +64,7 @@ smgContainer.factory('NewMatchService', ['$resource', function($resource) {
  * To get the new state from the server (asynchronous mode)
  */
 smgContainer.factory('NewMatchStateService', ['$resource', function($resource) {
-	return $resource(domainUrl + '/state:matchId',
+	return $resource(domainUrl + '/state/:matchId',
 			{matchId: '@matchId', playerId: '@playerId', accessSignature: '@accessSignature'}
 	);
 }]);
