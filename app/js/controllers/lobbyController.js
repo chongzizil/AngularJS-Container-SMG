@@ -2,7 +2,7 @@
 
 smgContainer.controller('LobbyController', function (
 		$scope, $rootScope, $routeParams, $location, $cookies,
-		$timeout, joinQueueService, NewMatchService) {
+		$timeout, joinQueueService, NewMatchService, InsertMatchService) {
 
 			// Alerts for lobby.html
 			var inviteAlert = $("#inviteAlert");
@@ -24,11 +24,6 @@ smgContainer.controller('LobbyController', function (
 			})
 
 			var autoMatching = $("#autoMatching");
-
-
-			// Check the login is working
-			console.log("cookies.playerId: " + $cookies.playerId);
-			console.log("cookies.accessSignature: " + $cookies.accessSignature);
 
 			// Initial the mode check
 			$cookies.isSyncMode = false;
@@ -69,15 +64,18 @@ smgContainer.controller('LobbyController', function (
 			 * from the server and change the page to start play.
 			 */
 			var insertMatch = function(playerIds) {
-				var Data = {
+				var data = {
 					accessSignature: $cookies.accessSignature,
-					playerIds: $cookies.playerId,
+					playerIds: playerIds,
 					gameId: $routeParams.gameId
-				};
-				var jsonData = angular.toJson(Data);
-				NewMatchService.save({}, jsonData).
+				}
+				console.log("Inserting a match..........................");
+				console.log(data);
+				var jsonData = angular.toJson(data);
+				InsertMatchService.save({}, jsonData).
 						$promise.then(function(data) {
-							console.log("From insert Match: " + data);
+							console.log("From insertMatch.............................");
+							console.log(data);
 							/*
 							 {@code data} contains following data:
 							 matchId:
@@ -86,9 +84,12 @@ smgContainer.controller('LobbyController', function (
 							 */
 							if(!data['matchId']) {
 								if (data['error'] === 'WRONG_PLAYER_ID') {
-									$scope.friendIdHasError = true;
-									$scope.inviteInfo.error = 'Sorry, your friend\'s ID does not exist. Please try again.';
-									$("#inviteAlert").show();
+									if ($cookies.isSyncMode === false) {
+										$scope.friendIdHasError = true;
+										$scope.inviteInfo.error = 'Sorry, your friend\'s ID does not exist. Please try again.';
+										$("#inviteAlert").show();
+									}
+									alert('Sorry, your ID does not exist. Please try again.');
 								} else if (data['error'] === 'WRONG_GAME_ID') {
 									alert('Sorry, the game\'s ID does not exist. Please try again.');
 								}
@@ -97,7 +98,7 @@ smgContainer.controller('LobbyController', function (
 								// Store the playerIds and matchId in the cookies
 								$cookies.playerIds = data['playerIds'];
 								$cookies.matchId = data['matchId'];
-								$location.url(gameId + '/match/' + data['matchId']);
+								$location.url($routeParams.gameId + '/match/' + data['matchId']);
 								if(!$scope.$$phase) {
 									$scope.$apply();
 								}
@@ -123,10 +124,8 @@ smgContainer.controller('LobbyController', function (
 			 * Try to retrieve the match info if there is one for the player
 			 */
 			$scope.checkHasNewMatch = function() {
-				console.log("test");
 				NewMatchService.get({playerId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
 						$promise.then(function(data) {
-							console.log("From check new match: " + data);
 							/*
 							 {@code data} contains following data if there's a match:
 							 matchId:
@@ -147,7 +146,7 @@ smgContainer.controller('LobbyController', function (
 								// Store the playerIds and matchId in the cookies
 								$cookies.playerIds = data['playerIds'];
 								$cookies.matchId = data['matchId'];
-								$location.url(gameId + '/match/' + data['matchId']);
+								$location.url($routeParams.gameId + '/match/' + data['matchId']);
 								if(!$scope.$$phase) {
 									$scope.$apply();
 								}
@@ -188,7 +187,7 @@ smgContainer.controller('LobbyController', function (
 					if (data['matchId']) {
 						$cookies.playerIds = data['playerIds'];
 						// Jump to the game page to start playing :
-						$location.url(gameId + '/match/' + data['matchId']);
+						$location.url($routeParams.gameId + '/match/' + data['matchId']);
 						if(!$scope.$$phase) {
 							$scope.$apply();
 						}
@@ -201,7 +200,6 @@ smgContainer.controller('LobbyController', function (
 				 */
 				joinQueueService.save({}, jsonJoinQueueData).
 						$promise.then(function(data) {
-							console.log("From join queue: " + data);
 							if(!data['channelToken']) {
 								if (data['error'] === 'WRONG_PLAYER_ID') {
 									popupLoginPage();
@@ -230,6 +228,7 @@ smgContainer.controller('LobbyController', function (
 			 * Start a match by inviting a friend
 			 */
 			$scope.invite = function(inviteInfo) {
+
 				// Retrieve the friend's Id
 				var friendId = inviteInfo.friendId;
 
@@ -240,11 +239,13 @@ smgContainer.controller('LobbyController', function (
 				$scope.friendIdHasError = false;
 
 				// Cancel the auto match
-				$scope.cancel();
-				autoMatching.hide();
+				if ($rootScope.socket) {
+					$scope.cancel();
+					autoMatching.hide();
+				}
 
-				var playerIds = [playerId, friendId];
+				$cookies.playerIds = [$cookies.playerId, friendId];
 
-				insertMatch(playerIds);
+				insertMatch($cookies.playerIds);
 			 }
 		});

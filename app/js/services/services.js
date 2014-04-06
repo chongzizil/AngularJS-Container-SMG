@@ -4,12 +4,12 @@
 
 /* Official domain*/
 //var domainUrl = 'http://2-dot-smg-server.appspot.com';
-//var domainUrl = 'http://3-dot-smg-server.appspot.com';
+var domainUrl = 'http://3-dot-smg-server.appspot.com';
 /* Container test domain */
 //var domainUrl = 'http://2-dot-smg-server-rl.appspot.com';
 // Self container test domain 1 */
 //var domainUrl = 'http://2-dot-smg-container-server2.appspot.com/';
-var domainUrl = 'http://3-dot-smg-container-server2.appspot.com/';
+//var domainUrl = 'http://3-dot-smg-container-server2.appspot.com/';
 // Self container test domain 2 */';
 //var domainUrl = 'http://2-dot-smg-container-server2.appspot.com/';
 //var domainUrl = 'http://3-dot-smg-container-testserver.appspot.com/';
@@ -52,7 +52,16 @@ smgContainer.factory('joinQueueService', ['$resource', function($resource) {
 }]);
 
 /**
- * To insert a match to the server. Also to get new match info (asynchronous mode)
+ * To insert a match to the server.
+ */
+smgContainer.factory('InsertMatchService', ['$resource', function($resource) {
+	return $resource(domainUrl + '/newMatch',
+			{}
+	);
+}]);
+
+/**
+ * To get new match info (asynchronous mode)
  */
 smgContainer.factory('NewMatchService', ['$resource', function($resource) {
 	return $resource(domainUrl + '/newMatch/:playerId',
