@@ -7,7 +7,7 @@ smgContainer.controller('MatchController',
 			 * Variables for interacting with Server side.
 			 */
       $scope.gameInfo = {};
-//      $scope.playerIds;
+      $scope.playerIds;
 			var matchInfo = {
 				playerThatHasTurn: Number.MIN_VALUE,
 				lastMovePlayerId: Number.MIN_VALUE,
@@ -83,7 +83,7 @@ smgContainer.controller('MatchController',
 							} else {
 								console.log("MatchService after get match info from Server : " + angular.toJson(data));
 								// 1. Get all the match information into the matchInfo variable.
-								// TODO: playerIds have been achieved in lobbyController
+								// TODO: playerIds have been achieved in lobbyController, delete this.
                 matchInfo.playerIds = angular.fromJson(data['playerIds']);
 //								matchInfo.playerThatHasTurn = data['playerThatHasTurn'];
 								matchInfo.lastMovePlayerId = matchInfo.playerThatHasTurn;
@@ -92,10 +92,10 @@ smgContainer.controller('MatchController',
 								matchInfo.history = data['history'];
 								// 2. Also expose the {@code matchInfo.playerIds} to HTML who can use it to display statistic info.
 								// TODO: playerIds have been achieved in lobbyController
-//                $scope.playerIds = matchInfo.playerIds;
-//                for(var i=0;i<$scope.playerIds.length;i++){
-//                    $scope.playerIds[i] = $scope.playerIds[i].toString();
-//                }
+                $scope.playerIds = matchInfo.playerIds;
+                for(var i=0;i<$scope.playerIds.length;i++){
+                    $scope.playerIds[i] = $scope.playerIds[i].toString();
+                }
 							}
 						}
 				);
@@ -113,7 +113,7 @@ smgContainer.controller('MatchController',
 				// 1. Wrap up the operations as a move.
 				var move = {
 					"accessSignature": $cookies.accessSignature,
-					"playerIds": $cookies.playerIds,
+					"playerIds": $scope.playerIds,
 					"operations": operations
 				};
 				var jsonMove = angular.toJson(move);
@@ -227,8 +227,8 @@ smgContainer.controller('MatchController',
 					'type': 'UpdateUI',
 					'yourPlayerId': $cookies.playerId,
 					'playersInfo': [
-						{'playerId': $cookies.playerIds[0]},
-						{'playerId': $cookies.playerIds[1]}
+						{'playerId': $scope.playerIds[0]},
+						{'playerId': $scope.playerIds[1]}
 					],
 					'state': {},
 					'lastState': null,
@@ -246,8 +246,8 @@ smgContainer.controller('MatchController',
 				var verifyMove = {
 					"type": "VerifyMove",
 					'playersInfo': [
-						{'playerId': $cookies.playerIds[0]},
-						{'playerId': $cookies.playerIds[1]}
+						{'playerId': $scope.playerIds[0]},
+						{'playerId': $scope.playerIds[1]}
 					],
 					'state': newState,
 					'lastState': state,
@@ -266,8 +266,8 @@ smgContainer.controller('MatchController',
 					"type": "UpdateUI",
 					'yourPlayerId': $cookies.playerId,
 					'playersInfo': [
-						{'playerId': $cookies.playerIds[0]},
-						{'playerId': $cookies.playerIds[1]}
+						{'playerId': $scope.playerIds[0]},
+						{'playerId': $scope.playerIds[1]}
 					],
 					'state': state,
 					'lastState': lastState,
@@ -292,6 +292,10 @@ smgContainer.controller('MatchController',
 				} else {
 					attachEvent("onmessage", listener);
 				}
+				console.log("****** $cookies.playerIds");
+				console.log(typeof $cookies.playerIds);
+				console.log(angular.toJson($cookies.playerIds));
+
 				// 0. Override the onmessage method on socket.
 				$rootScope.socket.onmessage = function (event) {
 					var data = angular.fromJson(event.data);
@@ -306,8 +310,8 @@ smgContainer.controller('MatchController',
 				// 2. Get match information.
 				getMatchInfo();
 				// 3. get players information.
-				console.log("Before get playerInfo: " + angular.toJson($cookies.playerIds));
-				getAllPlayersInfo($cookies.playerIds);
+				console.log("Before get playerInfo: " + angular.toJson($scope.playerIds));
+				getAllPlayersInfo($scope.playerIds);
 			}
 		}
 
