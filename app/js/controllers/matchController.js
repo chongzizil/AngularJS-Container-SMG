@@ -97,7 +97,7 @@ smgContainer.controller('MatchController',
 								console.log("Log: response for making move to server: " + angular.toJson(data));
 								matchInfo.state = data['state'];
 								matchInfo.lastMove = data['lastMove'];
-								sendUpdateUIToGame(matchInfo.state);
+								sendUpdateUIToGame();
 							}
 						}
 				);
@@ -166,7 +166,7 @@ smgContainer.controller('MatchController',
 					matchInfo.state = data['state'];
 					matchInfo.lastMove = data['lastMove'];
 					// 2. UpdateUI for Game with the received state.
-					sendUpdateUIToGame(matchInfo.state);
+					sendUpdateUIToGame();
 				};
 			}
 
@@ -189,7 +189,7 @@ smgContainer.controller('MatchController',
 								matchInfo.state = data['state'];
 								matchInfo.lastMove = data['lastMove'];
 								// 2. UpdateUI for Game with the received state.
-								sendUpdateUIToGame(matchInfo.state);
+								sendUpdateUIToGame();
 							}
 						}
 				);
@@ -302,10 +302,11 @@ smgContainer.controller('MatchController',
 				$scope.sendMessageToIframe(verifyMove);
 			}
 
-			function sendUpdateUIToGame(newState) {
+			function sendUpdateUIToGame() {
 
 				lastState = state;
-				state = newState;
+				state = matchInfo.state;
+                processLastMove();
 				var updateUI = {
 					"type": "UpdateUI",
 					'yourPlayerId': $cookies.playerId,
@@ -316,15 +317,37 @@ smgContainer.controller('MatchController',
 					'state': state,
 					'lastState': lastState,
 					'lastMove': matchInfo.lastMove,
-					"lastMovePlayerId": $cookies.playerId.toString(),
+					"lastMovePlayerId": matchInfo.lastMovePlayerId,
 					"playerIdToNumberOfTokensInPot": {}
 				};
 				console.log("In the container, it sends the following UpdateUI to the game: " + angular.toJson(updateUI));
 				$scope.sendMessageToIframe(updateUI);
 			}
 
-            function isUndedinedOrNull(val){
+            function initiatePlayerTurn(){
+                if(!isUndefinedOrNull($rootScope.playerIds)){
+                    matchInfo.lastMovePlayerId = matchInfo.playerThatHasTurn;
+                    matchInfo.playerThatHasTurn = $rootScope.playerIds[0];
+                }else{
+                    console.log("Exception: playerIds are null");
+                }
+            }
 
+
+            function isUndefinedOrNull(val){
+                return angular.isUndefined(val) || val==null;
+            }
+
+            function processLastMove(){
+                if(!isUndefinedOrNull(matchInfo.lastMove)){
+                    // operationMessage is json object
+                    for(var operationMessage in matchInfo.lastMove){
+                        if(operationMessage['type'] === "SetTurn"){
+                            matchInfo.lastMovePlayerId = matchInfo.playerThatHasTurn;
+                            matchInfo.playerThatHasTurn = operationMessage['playerId'];
+                        }
+                    }
+                }
             }
 
 
@@ -353,6 +376,8 @@ smgContainer.controller('MatchController',
 				getGameInfo();
 				// 2. get players information.
 				getAllPlayersInfo($rootScope.playerIds);
+                //initiate lastMovePlayerId and playerThatHasTurn
+                initiatePlayerTurn();
 			}
 		}
 
