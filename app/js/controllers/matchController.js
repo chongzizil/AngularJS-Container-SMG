@@ -26,7 +26,6 @@ smgContainer.controller('MatchController',
 			 */
       $scope.gameInfo = {};
 			$scope.displayGetNewStateButton = false;
-			$scope.displayEndGameButton = false;
 			var matchInfo = {
 				playerThatHasTurn: Number.MIN_VALUE,
 				lastMovePlayerId: Number.MIN_VALUE,
@@ -79,6 +78,32 @@ smgContainer.controller('MatchController',
 			};
 
 			/**
+			 * Method used to call POST method inside {@code SendMakeMoveService}.
+			 */
+			var sendMakeMoveServicePost = function(jsonMove) {
+				console.log("Log: input data for send make move to server: " + jsonMove);
+				SendMakeMoveService.save({matchId: $routeParams.matchId}, jsonMove).
+						$promise.then(function (data) {
+							console.log("Log: send make move to server: " + angular.toJson(data));
+							if (data['error'] == "WRONG_ACCESS_SIGNATURE") {
+								alert('Sorry, Wrong Access Signature received!');
+							} else if (data['error'] == 'WRONG_PLAYER_ID') {
+								alert('Sorry, Wrong Player ID received!');
+							} else if (data['error'] == "JSON_PARSE_ERROR") {
+								alert('Sorry, Wrong JSON Format received!');
+							} else if (data['error'] == "MISSING_INFO") {
+								alert('Sorry, Incomplete JSON data received!');
+							} else {
+								console.log("Log: response for making move to server: " + angular.toJson(data));
+								matchInfo.state = data['state'];
+								matchInfo.lastMove = data['lastMove'];
+								sendUpdateUIToGame(matchInfo.state);
+							}
+						}
+				);
+			}
+
+			/**
 			 * Method used to send operation from Game to Server, of cause data will be wrapped before sending.
 			 * @param operations operations got from Game.
 			 */
@@ -90,28 +115,7 @@ smgContainer.controller('MatchController',
 					"operations": operations
 				};
 				var jsonMove = angular.toJson(move);
-				// 2. Send JSON data to server.
-				SendMakeMoveService.save({matchId: $routeParams.matchId}, jsonMove).
-						$promise.then(function (data) {
-							console.log("MatchService after make move: " + angular.toJson(data));
-							if (data['error'] == "WRONG_ACCESS_SIGNATURE") {
-								alert('Sorry, Wrong Access Signature received!');
-							} else if (data['error'] == 'WRONG_PLAYER_ID') {
-								alert('Sorry, Wrong Player ID received!');
-							} else if (data['error'] == "JSON_PARSE_ERROR") {
-								alert('Sorry, Wrong JSON Format received!');
-							} else if (data['error'] == "MISSING_INFO") {
-								alert('Sorry, Incomplete JSON data received!');
-							} else {
-								console.log("Log: response for making move to server: " + angular.toJson(data));
-								// 2.1. Store data inside {@code matchInfo}
-								matchInfo.state = data['state'];
-								matchInfo.lastMove = data['lastMove'];
-								// 2.2. UpdateUI for Game with the received state.
-								sendUpdateUIToGame(matchInfo.state);
-							}
-						}
-				);
+				sendMakeMoveServicePost(jsonMove);
 			};
 
 			/**
@@ -120,7 +124,33 @@ smgContainer.controller('MatchController',
 			 * 2. One of the players surrenders.
 			 */
 			$scope.endGame = function () {
-				$rootScope.socket.close();
+				// 1. Make up the EndGame typed move.
+				var move = {
+					"accessSignature": $cookies.accessSignature,
+					"playerIds": $rootScope.playerIds,
+					"operations": [
+						{
+							"type": "EndGame",
+							"playerIdToScore": {}
+						}
+					]
+				};
+				/*
+				 TODO: in later version, we should support more players' situation.
+				 1.1 If one player is pressing the "End Game" button, he is considered to surrender,
+				      but current implementation assumes that only two players take part in the match.
+				  */
+				var forkPlayerIds = $rootScope.playerIds.slice(0);
+				var index = forkPlayerIds.indexOf($cookies.playerId);
+				forkPlayerIds.splice(index, 1);
+				move["operations"][0]['playerIdToScore'][forkPlayerIds[0]] = 1;
+				move["operations"][0]['playerIdToScore'][$cookies.playerId] = 0;
+				var jsonMove = angular.toJson(move);
+				sendMakeMoveServicePost(jsonMove);
+				// 2. If in synchronous mode, also close the channel API.
+				if($cookies.isSyncMode === 'true') {
+					$rootScope.socket.close();
+				}
 				$location.url('/');
 			};
 
@@ -310,10 +340,8 @@ smgContainer.controller('MatchController',
 					// 0. Override the onmessage method on socket.
 					overrideOnMessage();
 					$scope.displayGetNewStateButton = false;
-					$scope.displayEndGameButton = true;
 				} else {
 					$scope.displayGetNewStateButton = true;
-					$scope.displayEndGameButton = false;
 				}
 				// 1. Get game information.
 				getGameInfo();
