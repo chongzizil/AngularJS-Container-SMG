@@ -19,7 +19,8 @@
  */
 
 smgContainer.controller('MatchController',
-    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window, $location, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService) {
+    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window,
+              $location, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService) {
       /*
        * Variables for interacting with Server side.
        */
@@ -238,7 +239,7 @@ smgContainer.controller('MatchController',
               matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
             }
           }
-        }else{
+        } else {
           console.log("Exception: From the server the last move is undefined!");
         }
       }
@@ -320,7 +321,6 @@ smgContainer.controller('MatchController',
         };
         $scope.sendMessageToIframe(verifyMove);
       }
-
 
 
       function sendUpdateUIToGame() {
