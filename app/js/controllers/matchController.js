@@ -26,7 +26,8 @@ smgContainer.controller('MatchController',
        */
       $scope.gameInfo = {};
       $scope.displayGetNewStateButton = false;
-      var matchInfo = {
+	    $scope.playerId = $cookies.playerId;
+      $scope.matchInfo = {
         playerThatHasTurn: Number.MIN_VALUE,
         lastMovePlayerId: Number.MIN_VALUE,
 	      /*
@@ -105,8 +106,8 @@ smgContainer.controller('MatchController',
                 alert('Sorry, Incomplete JSON data received!');
               } else {
                 console.log("Log: response for making move to server: " + angular.toJson(data));
-                matchInfo.state = data['state'];
-                matchInfo.lastMove = data['lastMove'];
+                $scope.matchInfo.state = data['state'];
+	              $scope.matchInfo.lastMove = data['lastMove'];
                 sendUpdateUIToGame();
               }
             }
@@ -173,8 +174,8 @@ smgContainer.controller('MatchController',
           // 1. Get pushed data from channel API and parse it from JSON to object
           var data = angular.fromJson(event.data);
           console.log("Log: data pushed by channel API: " + angular.toJson(data));
-          matchInfo.state = data['state'];
-          matchInfo.lastMove = data['lastMove'];
+	        $scope.matchInfo.state = data['state'];
+	        $scope.matchInfo.lastMove = data['lastMove'];
           // 2. UpdateUI for Game with the received state.
           sendUpdateUIToGame();
         };
@@ -195,9 +196,10 @@ smgContainer.controller('MatchController',
                 alert('Sorry, wrong match ID provided!');
               } else {
                 console.log("Log: get new match state (async mode): " + angular.toJson(data));
+	              console.log("Log: the match info for this game: " + angular.toJson($scope.matchInfo));
                 // 1. Get state and last move
-                matchInfo.state = data['state'];
-                matchInfo.lastMove = data['lastMove'];
+	              $scope.matchInfo.state = data['state'];
+	              $scope.matchInfo.lastMove = data['lastMove'];
                 // 2. UpdateUI for Game with the received state.
                 sendUpdateUIToGame();
               }
@@ -210,12 +212,12 @@ smgContainer.controller('MatchController',
        * @param playerIds
        */
       var getAllPlayersInfo = function (playerIds) {
-        matchInfo.playersInfo = [];
+	      $scope.matchInfo.playersInfo = {};
+	      var playerNum = 0;
         for (var index in playerIds) {
           GetPlayerInfoService.get({playerId: $cookies.playerId,
             targetId: playerIds[index], accessSignature: $cookies.accessSignature}).
               $promise.then(function (data) {
-                console.log("GetPlayerInfoService: " + angular.toJson(data));
                 if (data['error'] == "WRONG_PLAYER_ID") {
                   alert("Sorry, Wrong Player ID provided!");
                 } else if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
@@ -224,7 +226,9 @@ smgContainer.controller('MatchController',
                   alert('Sorry, Wrong Target ID provided!');
                 } else {
                   console.log("Log: get players info: " + angular.toJson(data));
-                  matchInfo.playersInfo.push(data);
+	                $scope.matchInfo.playersInfo[playerIds[playerNum]] = data;
+	                playerNum = playerNum + 1;
+	                console.log("Log: inside getAllPlayersInfo method, matchInfo: " + angular.toJson($scope.matchInfo));
                 }
               }
           );
@@ -242,7 +246,7 @@ smgContainer.controller('MatchController',
 		    forkPlayerIds.splice(currentPlayerIndex, 1);
 		    for(var index in forkPlayerIds) {
 			    var opponentPlayerId = forkPlayerIds[index];
-			    opponentsInfo.push(matchInfo.playersInfo[opponentPlayerId]);
+			    opponentsInfo.push($scope.matchInfo.playersInfo[opponentPlayerId]);
 		    }
 		    return opponentsInfo;
 	    }
@@ -256,13 +260,13 @@ smgContainer.controller('MatchController',
       }
 
       function processLastMove() {
-        if (!isUndefinedOrNull(matchInfo.lastMove)) {
+        if (!isUndefinedOrNull($scope.matchInfo.lastMove)) {
           // operationMessage is json object
-          for (var operationMessage in matchInfo.lastMove) {
-            var setTurnOperation = matchInfo.lastMove[operationMessage];
+          for (var operationMessage in $scope.matchInfo.lastMove) {
+            var setTurnOperation = $scope.matchInfo.lastMove[operationMessage];
             if (setTurnOperation['type'] === "SetTurn") {
-              matchInfo.lastMovePlayerId = matchInfo.playerThatHasTurn;
-              matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
+	            $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
+	            $scope.matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
             }
           }
         } else {
@@ -342,7 +346,7 @@ smgContainer.controller('MatchController',
           'state': newState,
           'lastState': state,
           'lastMove': null,
-          "lastMovePlayerId": matchInfo.lastMovePlayerId,
+          "lastMovePlayerId": $scope.matchInfo.lastMovePlayerId,
           "playerIdToNumberOfTokensInPot": {}
         };
         $scope.sendMessageToIframe(verifyMove);
@@ -352,7 +356,7 @@ smgContainer.controller('MatchController',
       function sendUpdateUIToGame() {
 
         lastState = state;
-        state = matchInfo.state;
+        state = $scope.matchInfo.state;
         processLastMove();
         var updateUI = {
           "type": "UpdateUI",
@@ -363,8 +367,8 @@ smgContainer.controller('MatchController',
           ],
           'state': state,
           'lastState': lastState,
-          'lastMove': matchInfo.lastMove,
-          "lastMovePlayerId": matchInfo.lastMovePlayerId,
+          'lastMove': $scope.matchInfo.lastMove,
+          "lastMovePlayerId": $scope.matchInfo.lastMovePlayerId,
           "playerIdToNumberOfTokensInPot": {}
         };
         console.log("In the container, it sends the following UpdateUI to the game: " + angular.toJson(updateUI));
@@ -373,8 +377,8 @@ smgContainer.controller('MatchController',
 
       function initiatePlayerTurn() {
         if (!isUndefinedOrNull($rootScope.playerIds)) {
-          matchInfo.playerThatHasTurn = $rootScope.playerIds[0];
-          matchInfo.lastMovePlayerId = matchInfo.playerThatHasTurn;
+	        $scope.matchInfo.playerThatHasTurn = $rootScope.playerIds[0];
+	        $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
         } else {
           console.log("Exception: playerIds are null");
         }
