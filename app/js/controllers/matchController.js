@@ -315,13 +315,18 @@ smgContainer.controller('MatchController',
 					],
 					'state': state,
 					'lastState': lastState,
-					'lastMove': [],
+					'lastMove': matchInfo.lastMove,
 					"lastMovePlayerId": $cookies.playerId.toString(),
 					"playerIdToNumberOfTokensInPot": {}
 				};
 				console.log("In the container, it sends the following UpdateUI to the game: " + angular.toJson(updateUI));
 				$scope.sendMessageToIframe(updateUI);
 			}
+
+            function isUndedinedOrNull(val){
+
+            }
+
 
 
 			/**
