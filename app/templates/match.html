@@ -25,10 +25,39 @@
 							<iframe ng-src="{{ gameInfo.url }}" ng-attr-height="{{ gameInfo.height }}" ng-attr-width="{{ gameInfo.width }}" id='gameIFrame'></iframe>
 						</div>
 						<div align="left">
+							<!-- Table used to display the player's information -- >
+							<table>
+								<thead>
+									<th colspan="2">Player Info</th>
+								</thead>
+								<tbody>
+								<tr>
+									<td>Email</td>
+									<td>{{matchInfo.playersInfo[$cookies.playerId]['email']}}}</td>
+								</tr>
+								<tr>
+									<td>First Name</td>
+									<td>{{matchInfo.playersInfo[$cookies.playerId]['firstname']}}}</td>
+								</tr>
+								<tr>
+									<td>Last Name</td>
+									<td>{{matchInfo.playersInfo[$cookies.playerId]['lastname']}}}</td>
+								</tr>
+								<tr>
+									<td>Nick Name</td>
+									<td>{{matchInfo.playersInfo[$cookies.playerId]['nickname']}}}</td>
+								</tr>
+								</tbody>
+							</table>
+
 							<button type="button" class="btn btn-primary" ng-click="endGame()"> End Game </button>
+							<button type="button" class="btn btn-primary" ng-show='displayGetNewStateButton' ng-click="getNewMatchState()"> Get New Match State </button>
 						</div>
 						<div align="right">
-							<button type="button" class="btn btn-primary" ng-show='displayGetNewStateButton' ng-click="getNewMatchState()"> Get New Match State </button>
+							<!-- -->
+							<table ng-repeat="opponent in getOpponentsInfo()">
+
+							</table>
 						</div>
 					</div>
 				</div>
