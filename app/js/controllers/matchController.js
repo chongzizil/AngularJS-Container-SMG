@@ -136,14 +136,15 @@ smgContainer.controller('MatchController',
 					]
 				};
 				/*
-				 TODO: in later version, we should support more players' situation.
 				 1.1 If one player is pressing the "End Game" button, he is considered to surrender,
-				      but current implementation assumes that only two players take part in the match.
+				      and current implementation supports multiple players (>= 2).
 				  */
 				var forkPlayerIds = $rootScope.playerIds.slice(0);
 				var index = forkPlayerIds.indexOf($cookies.playerId);
 				forkPlayerIds.splice(index, 1);
-				move["operations"][0]['playerIdToScore'][forkPlayerIds[0]] = 1;
+				for(var index in forkPlayerIds) {
+					move["operations"][0]['playerIdToScore'][forkPlayerIds[index]] = 1;
+				}
 				move["operations"][0]['playerIdToScore'][$cookies.playerId] = 0;
 				var jsonMove = angular.toJson(move);
 				sendMakeMoveServicePost(jsonMove);
