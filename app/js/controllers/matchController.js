@@ -29,7 +29,17 @@ smgContainer.controller('MatchController',
       var matchInfo = {
         playerThatHasTurn: Number.MIN_VALUE,
         lastMovePlayerId: Number.MIN_VALUE,
-        playersInfo: [],
+	      /*
+	       All players' information:
+	       (1). If this is the current player: email, firstname, lastname, nickname
+	       (2). If other players (opponents): firstname, nickname
+	       e.g.:
+	       {
+	       "playerId1" : {"email": "a@b.com", "firstname": "Long", "lastname": "Yang", "nickname": "Jason"},
+	       "playerId2" : {"firstname" : "Xiao", "nickname" : "Shawn"}
+	       }
+	       */
+	      playersInfo: {},
         /*
          All new match state will be saved here:
          (1). Synchronous: from channel API and response from make move.
@@ -221,6 +231,22 @@ smgContainer.controller('MatchController',
         }
       };
 
+	    /**
+	     * Method used to get all opponents' information
+	     */
+	    $scope.getOpponentsInfo = function () {
+		    var forkPlayerIds = $rootScope.playerIds.slice(0);
+		    var currentPlayerIndex = forkPlayerIds.indexOf($cookies.playerId);
+		    var opponentsInfo = [];
+
+		    forkPlayerIds.splice(currentPlayerIndex, 1);
+		    for(var index in forkPlayerIds) {
+			    var opponentPlayerId = forkPlayerIds[index];
+			    opponentsInfo.push(matchInfo.playersInfo[opponentPlayerId]);
+		    }
+		    return opponentsInfo;
+	    }
+
       /*
        parameter: message should be : UpdateUI, VerifyMove
        */
@@ -375,12 +401,14 @@ smgContainer.controller('MatchController',
         } else {
           $scope.displayGetNewStateButton = true;
         }
-        // 1. Get game information.
-        getGameInfo();
-        // 2. get players information.
-        getAllPlayersInfo($rootScope.playerIds);
-        //initiate lastMovePlayerId and playerThatHasTurn
-        initiatePlayerTurn();
+	      // 1. Get game information.
+	      getGameInfo();
+	      // 2. Update Game UI with new state.
+	      $scope.getNewMatchState();
+	      // 3. Get players information.
+	      getAllPlayersInfo($rootScope.playerIds);
+	      // 4. Initiate lastMovePlayerId and playerThatHasTurn
+	      initiatePlayerTurn();
       }
     }
 );
