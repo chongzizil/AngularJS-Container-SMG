@@ -3,10 +3,10 @@
 /* Services */
 
 /* Official domain*/
-var domainUrl = 'http://3-dot-smg-server.appspot.com';
+//var domainUrl = 'http://3-dot-smg-server.appspot.com';
 
 /* Container test domain */
-//var domainUrl = 'http://3-dot-smg-server-rl.appspot.com';
+var domainUrl = 'http://3-dot-smg-server-rl.appspot.com';
 
 // Self container test domain 1 */
 //var domainUrl = 'http://3-dot-smg-container-server2.appspot.com/';
@@ -79,13 +79,13 @@ smgContainer.factory('NewMatchStateService', ['$resource', function($resource) {
 }]);
 
 /**
- * To get match info
+ * To send make moves to server
  */
-/*smgContainer.factory('GetMatchInfoService', ['$resource', function($resource) {
- return $resource(domainUrl + '/matches/:matchId',
- {matchId: '@matchId', accessSignature: '@accessSignature', playerId: '@playerId'}
- );
- }]);*/
+smgContainer.factory('SendMakeMoveService', ['$resource', function($resource) {
+return $resource(domainUrl + '/matches/:matchId',
+{matchId: '@matchId'}
+);
+}]);
 
 /**
  * To login as a developer

@@ -85,7 +85,9 @@ smgContainer.controller('LobbyController', function (
 							if(!data['matchId']) {
 								if (data['error'] === 'WRONG_PLAYER_ID') {
 									$scope.friendIdHasError = true;
+									$scope.inviteInfo = {};
 									$scope.inviteInfo.error = 'Sorry, your friend\'s ID does not exist. Please try again.';
+									alert('Sorry, please provide the correct player id!');
 									inviteAlert.show();
 								} else if (data['error'] === 'WRONG_GAME_ID') {
 									alert('Sorry, the game\'s ID does not exist. Please try again.');
