@@ -1,5 +1,20 @@
 'use strict';
 
+/**
+ * Lobby Controller has two ways to play a game for noe:
+ * 1. Synchronous:
+ *    The player can play the game synchronously through auto match.
+ *    Once the player click the auto match button, the player will join a queue waiting for another player.
+ *    When other player has join the queue, one of them will get the info from channel and start a match.
+ *    Then both of them will be automatically redirected to the match page.
+ *    The player can also cancel it and exit the queue.
+ * 2. Asynchronous:
+ *    The player can play the game asynchronously through invite.
+ *    Once the player fill out the other player's ID and click the invite button, the player will start a match.
+ *    The player's page will be redirected to the match page but the other player will need to click the
+ *    "check new match" button to check if he/she is invited and if yes, the page will be redirected to match page.
+ */
+
 smgContainer.controller('LobbyController', function (
 		$scope, $rootScope, $routeParams, $location, $cookies,
 		$timeout, joinQueueService, NewMatchService, InsertMatchService) {
