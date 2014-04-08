@@ -97,6 +97,18 @@ smgContainer.controller('MatchController',
       }
 
       /**
+       * Method send UpdateUI/VerifyMove to game. If the two parameters are the same, it send the updateUI,
+       * otherwise send the VerifyMove
+       */
+      var sendMessageToGame = function(IdOne,IdTwo){
+        if(IdOne===IdTwo){
+          sendUpdateUIToGame();
+        }else{
+          sendVerifyMoveToGame();
+        }
+      }
+
+      /**
        * Method used to call POST method inside {@code SendMakeMoveService}.
        */
       var sendMakeMoveServicePost = function (jsonMove) {
@@ -117,7 +129,7 @@ smgContainer.controller('MatchController',
                 $scope.matchInfo.state = data['state'];
 	              $scope.matchInfo.lastMove = data['lastMove'];
                 processLastMoveAndState();
-                sendUpdateUIToGame();
+                sendMessageToGame($scope.playerId,$scope.matchInfo.lastMovePlayerId);
               }
             }
         );
@@ -187,7 +199,7 @@ smgContainer.controller('MatchController',
 	        $scope.matchInfo.lastMove = data['lastMove'];
           // 2. UpdateUI for Game with the received state.
           processLastMoveAndState();
-          sendUpdateUIToGame();
+          sendMessageToGame($scope.playerId,$scope.matchInfo.lastMovePlayerId);
         };
       }
 
@@ -213,7 +225,7 @@ smgContainer.controller('MatchController',
                 // 2. UpdateUI for Game with the received state.
                 if(!isStateSame(state,$scope.matchInfo.state)){
                   processLastMoveAndState();
-                  sendUpdateUIToGame();
+                  sendMessageToGame($scope.playerId,$scope.matchInfo.lastMovePlayerId);
                 }
               }
             }
@@ -327,8 +339,9 @@ smgContainer.controller('MatchController',
           if(isUndefinedOrNull(data['hackerPlayerId'])){
             sendUpdateUIToGame();
           }else{
-            console.log("Hacker Detected!!!");
+            console.log("Hacker Detected!!!" + data['hackerPlayerId']);
           }
+        //  console.log(angular.toJson(data['hackerPlayerId']));
         } else {
           console.log("In the container listener, can't deal with the message from the game!!");
           console.log("It is " + data['type']);
