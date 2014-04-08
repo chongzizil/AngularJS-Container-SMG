@@ -26,6 +26,7 @@ smgContainer.controller('MatchController',
        */
       $scope.gameInfo = {};
       $scope.displayGetNewStateButton = false;
+	    $scope.displayEndGameButton = false;
 	    $scope.playerId = $cookies.playerId;
       $scope.matchInfo = {
         playerThatHasTurn: Number.MIN_VALUE,
@@ -267,6 +268,14 @@ smgContainer.controller('MatchController',
             if (setTurnOperation['type'] === "SetTurn") {
 	            $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
 	            $scope.matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
+	            if($scope.matchInfo.playerThatHasTurn == $cookies.playerId) {
+		            $scope.displayEndGameButton = true;
+	            } else {
+		            $scope.displayEndGameButton = false;
+	            }
+	            if (!$scope.$$phase) {
+		            $scope.$apply();
+	            }
             }
           }
         } else {
@@ -304,14 +313,14 @@ smgContainer.controller('MatchController',
           console.log("It is " + data['type']);
         }
 
-        if (angular.isUndefined($scope.debug)) {
-          $scope.debug = "Received: " + JSON.stringify(data);
-        } else {
-          // TODO: no need to put in $scope, comment out.
-//					$scope.operations = data;
-          $scope.debug += "Received: " + JSON.stringify(data);
-        }
-        $scope.$apply();
+//        if (angular.isUndefined($scope.debug)) {
+//          $scope.debug = "Received: " + JSON.stringify(data);
+//        } else {
+//          // TODO: no need to put in $scope, comment out.
+////					$scope.operations = data;
+//          $scope.debug += "Received: " + JSON.stringify(data);
+//        }
+//        $scope.$apply();
       }
 
 
@@ -405,6 +414,12 @@ smgContainer.controller('MatchController',
         } else {
           $scope.displayGetNewStateButton = true;
         }
+	      // Check whether need to display the "End Game" button
+	      if($scope.matchInfo.playerThatHasTurn == $scope.playerId) {
+		      $scope.displayEndGameButton = true;
+	      } else {
+		      $scope.displayEndGameButton = false;
+	      }
 	      // 1. Get game information.
 	      getGameInfo();
 	      // 2. Update Game UI with new state.
