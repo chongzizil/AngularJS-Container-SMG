@@ -15,7 +15,7 @@
  *    "check new match" button to check if he/she is invited and if yes, the page will be redirected to match page.
  */
 
-smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService) {
+smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService) {
 
 	// Alerts for lobby.html
 	var inviteAlert = $("#inviteAlert");
@@ -64,6 +64,22 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 		);
 	};
 	getGameName();
+
+	GetPlayerInfoService.get({playerId: $cookies.playerId,
+		targetId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
+			$promise.then(function (data) {
+				if (data['error'] == "WRONG_PLAYER_ID") {
+					alert("Sorry, Wrong Player ID provided!");
+				} else if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
+					alert('Sorry, Wrong Access Signature provided!');
+				} else if (data['error'] == 'WRONG_TARGET_ID') {
+					alert('Sorry, Wrong Target ID provided!');
+				} else {
+					$scope.playerEmail = data['email'];
+				}
+			}
+	);
+	GetPlayerInfoService();
 
 	/**
 	 * Check if the player has login, if not, pop up the login page for him/her
