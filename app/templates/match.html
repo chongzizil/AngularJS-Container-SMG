@@ -1,57 +1,6 @@
 <div class="panel panel-default">
 	<div class="panel-body">
 		<div id="main" class="col-md-12">
-			<div id="playerInfo" class="col-md-12">
-				<div class="panel panel-default">
-					<div class="panel-body">
-						<strong>Your Information</strong>
-
-						<!-- Display the current turn player Id. -->
-						<table>
-							<thead>
-							<th>Current Turn Player</th>
-							</thead>
-							<tbody>
-							<tr>
-								<td>{{matchInfo.playerThatHasTurn}}</td>
-							</tr>
-							</tbody>
-						</table>
-
-						<!-- Table used to display the player's information -->
-						<table>
-							<thead>
-							<th colspan="2">Player Info</th>
-							<th></th>
-							</thead>
-							<tbody>
-							<tr>
-								<td>Email</td>
-								<td>{{matchInfo.playersInfo[playerId]['email']}}</td>
-							</tr>
-							<tr>
-								<td>First Name</td>
-								<td>{{matchInfo.playersInfo[playerId]['firstname']}}</td>
-							</tr>
-							<tr>
-								<td>Last Name</td>
-								<td>{{matchInfo.playersInfo[playerId]['lastname']}}</td>
-							</tr>
-							<tr>
-								<td>Nick Name</td>
-								<td>{{matchInfo.playersInfo[playerId]['nickname']}}</td>
-							</tr>
-							</tbody>
-						</table>
-
-						<button type="button" class="btn btn-primary" ng-click="endGame()"> End Game </button>
-						<button type="button" class="btn btn-primary" ng-show='displayGetNewStateButton' ng-click="getNewMatchState()"> Get New Match State </button>
-					</div>
-
-					<!--<textarea rows="5" cols="80" ng-model="debug">{{debug}}</textarea><br/>-->
-					<!--<button ng-click="sendMessage()">Send message</button>-->
-				</div>
-			</div>
 			<div id="gameContainer" class="col-md-10">
 				<div class="panel panel-default">
 					<div class="panel-body">
@@ -74,26 +23,88 @@
 					</div>
 				</div>
 			</div>
-			<div id="playersInfo" class="col-md-2">
-				<div class="panel panel-default">
-					<div class="panel-body">
-						<!-- Table used to display all opponents' info -->
-						<strong>Opponent Information</strong>
-						<table ng-repeat="opponent in getOpponentsInfo()">
-							<thead>
-							<th colspan="2"> Opponent_{{$index}} </th>
-							</thead>
-							<tbody>
-							<tr>
-								<td>First Name</td>
-								<td>{{opponent['firstname']}}</td>
-							</tr>
-							<tr>
-								<td>Nick Name</td>
-								<td>{{opponent['nickname']}}</td>
-							</tr>
-							</tbody>
-						</table>
+			<div>
+				<div id="PlayerInfo" class="col-md-2">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<!-- Table used to display the player's information -->
+							<table>
+								<thead>
+								<th colspan="2">Your Information</th>
+								</thead>
+								<tbody>
+								<tr>
+									<td>Email</td>
+									<td>{{matchInfo.playersInfo[playerId]['email']}}</td>
+								</tr>
+								<tr>
+									<td>First Name</td>
+									<td>{{matchInfo.playersInfo[playerId]['firstname']}}</td>
+								</tr>
+								<tr>
+									<td>Last Name</td>
+									<td>{{matchInfo.playersInfo[playerId]['lastname']}}</td>
+								</tr>
+								<tr>
+									<td>Nick Name</td>
+									<td>{{matchInfo.playersInfo[playerId]['nickname']}}</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div id="currentTurnInfo" class="col-md-2">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<!-- Display the current turn player Id. -->
+							<table>
+								<thead>
+								<th>Current Turn Player</th>
+								</thead>
+								<tbody>
+								<tr>
+									<td>{{matchInfo.playerThatHasTurn}}</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div id="buttons" class="col-md-2">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<button type="button" class="btn btn-primary" ng-click="endGame()"> End Game </button>
+							<br /><br />
+							<button type="button" class="btn btn-primary" ng-show='displayGetNewStateButton' ng-click="getNewMatchState()"> Get New Match State </button>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div id="playersInfo" class="col-md-2">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<!-- Table used to display all opponents' info -->
+							<strong>Opponent Information</strong>
+							<table ng-repeat="opponent in getOpponentsInfo()">
+								<thead>
+								<th colspan="2"> Opponent_{{$index}} </th>
+								</thead>
+								<tbody>
+								<tr>
+									<td>First Name</td>
+									<td>{{opponent['firstname']}}</td>
+								</tr>
+								<tr>
+									<td>Nick Name</td>
+									<td>{{opponent['nickname']}}</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>
