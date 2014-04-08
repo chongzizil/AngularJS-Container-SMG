@@ -1,120 +1,88 @@
-<div class="panel panel-default">
-	<div class="panel-body">
-		<div id="main" class="col-md-12">
-			<div id="gameContainer" class="col-md-10">
-				<div class="panel panel-default">
-					<div class="panel-body">
-						<!-- Board adjust window -->
-						<!--<div class="input-group" align="left">
-							<input type="text" ng-model="gameInfo.height" placeholder="Board Height"/> <br />
-							<input type="text" ng-model="gameInfo.width" placeholder="Board Width"/>
-						</div>-->
+<div class="container-fluid">
+	<row>
+		<div id="playerInfo" class="panel panel-default">
+			<div class="panel-heading">Your Information</div>
+			<div class="panel-body">
 
-						<!-- iFrame of the gmae -->
-						<div align="middle">
-							<iframe ng-src="{{ gameInfo.url }}" ng-attr-height="{{ gameInfo.height }}" ng-attr-width="{{ gameInfo.width }}" id='gameIFrame'></iframe>
-						</div>
-						<div align="left">
-
-						</div>
-						<div align="right">
-
-						</div>
-					</div>
+				<div class="col-sm-3">
+					Email: {{matchInfo.playersInfo[playerId]['email']}}
 				</div>
-			</div>
-			<div>
-				<div id="PlayerInfo" class="col-md-2">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<!-- Table used to display the player's information -->
-							<table>
-								<thead>
-								<th colspan="2">Your Information</th>
-								</thead>
-								<tbody>
-								<tr>
-									<td>Email</td>
-									<td>{{matchInfo.playersInfo[playerId]['email']}}</td>
-								</tr>
-								<tr>
-									<td>First Name</td>
-									<td>{{matchInfo.playersInfo[playerId]['firstname']}}</td>
-								</tr>
-								<tr>
-									<td>Last Name</td>
-									<td>{{matchInfo.playersInfo[playerId]['lastname']}}</td>
-								</tr>
-								<tr>
-									<td>Nick Name</td>
-									<td>{{matchInfo.playersInfo[playerId]['nickname']}}</td>
-								</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
+				<div class="col-sm-3">
+					First Name: {{matchInfo.playersInfo[playerId]['firstname']}}
 				</div>
-
-				<div id="currentTurnInfo" class="col-md-2">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<!-- Display the current turn player Id. -->
-							<table>
-								<thead>
-								<th>Current Turn Player</th>
-								</thead>
-								<tbody>
-								<tr>
-									<td>{{matchInfo.playerThatHasTurn}}</td>
-								</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
+				<div class="col-sm-3">
+					Last Name: {{matchInfo.playersInfo[playerId]['lastname']}}
 				</div>
-
-				<div id="buttons" class="col-md-2">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<button type="button" class="btn btn-primary" ng-show="displayEndGameButton" ng-click="endGame()"> End Game </button>
-							<br /><br />
-							<button type="button" class="btn btn-primary" ng-show='displayGetNewStateButton' ng-click="getNewMatchState()"> Get New Match State </button>
-							</table>
-						</div>
-					</div>
-				</div>
-
-				<div id="playersInfo" class="col-md-2">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<!-- Table used to display all opponents' info -->
-							<strong>Opponent Information</strong>
-							<table ng-repeat="opponent in getOpponentsInfo()">
-								<thead>
-								<th colspan="2"> Opponent_{{$index}} </th>
-								</thead>
-								<tbody>
-								<tr>
-									<td>First Name</td>
-									<td>{{opponent['firstname']}}</td>
-								</tr>
-								<tr>
-									<td>Nick Name</td>
-									<td>{{opponent['nickname']}}</td>
-								</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div id="charArea" class="col-md-12">
-				<div class="panel panel-default">
-					<div class="panel-body">
-						chat area
-					</div>
+				<div class="col-sm-3">
+					Nick Name: {{matchInfo.playersInfo[playerId]['nickname']}}
 				</div>
 			</div>
 		</div>
-	</div>
+	</row>
+
+	<row>
+		<div id="gameContainer" class="panel panel-default">
+			<div class="panel-heading">Game</div>
+			<div class="panel-body">
+				<row>
+					<div id="refreshButton" class="col-sm-3" align="middle">
+						<button type="button" class="btn btn-primary" ng-show='displayGetNewStateButton'
+						        ng-click="getNewMatchState()"> Refresh
+						</button>
+					</div>
+					<div id="currentTurnInfo" class="col-sm-6" align="middle">
+						<td>{{matchInfo.playerThatHasTurn}}</td>
+					</div>
+					<div id="endGameButton" class="col-sm-3" align="middle">
+						<button type="button" class="btn btn-primary" ng-show="displayEndGameButton" ng-click="endGame()"> End
+							Game
+						</button>
+					</div>
+				</row>
+				<br/><br/><br/>
+				<!-- Board adjust window -->
+				<!--<div class="input-group" align="left">
+					<input type="text" ng-model="gameInfo.height" placeholder="Board Height"/> <br />
+					<input type="text" ng-model="gameInfo.width" placeholder="Board Width"/>
+				</div>-->
+				<!-- iFrame of the game -->
+				<row>
+					<div class="col-sm-12" align="middle">
+						<iframe ng-src="{{ gameInfo.url }}" ng-attr-height="{{ gameInfo.height }}"
+						        ng-attr-width="{{ gameInfo.width }}" id='gameIFrame'></iframe>
+					</div>
+				</row>
+			</div>
+		</div>
+	</row>
+
+	<row>
+		<div id="opponentInfo" class="panel panel-default">
+			<div class="panel-heading">Opponent Information</div>
+			<div class="panel-body">
+				<table class="table">
+					<thead>
+					<tr>
+						<th>#</th>
+						<th>First Name</th>
+						<th>Nick Name</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr ng-repeat="opponent in getOpponentsInfo()">
+						<td>
+							Opponent_{{$index}}:
+						</td>
+						<td>
+							First Name: {{opponent['firstname']}}
+						</td>
+						<td>
+							Nick Name: {{opponent['nickname']}}
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</row>
 </div>
