@@ -88,6 +88,15 @@ return $resource(domainUrl + '/matches/:matchId',
 }]);
 
 /**
+ * To get on going match info
+ */
+smgContainer.factory('GetAllMatchInfoService', ['$resource', function($resource) {
+	return $resource(domainUrl + '/gameinfo/stats',
+			{gameId: '@gameId'}
+	);
+}]);
+
+/**
  * To login as a developer
  */
 /*smgContainer.factory('DevService', ['$resource', function($resource) {
