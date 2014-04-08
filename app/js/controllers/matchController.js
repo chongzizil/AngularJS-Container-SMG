@@ -223,7 +223,9 @@ smgContainer.controller('MatchController',
 	              $scope.matchInfo.state = data['state'];
 	              $scope.matchInfo.lastMove = data['lastMove'];
                 // 2. UpdateUI for Game with the received state.
+                console.log("!isStateSame(state,$scope.matchInfo.state) " + !isStateSame(state,$scope.matchInfo.state));
                 if(!isStateSame(state,$scope.matchInfo.state)){
+                  console.log("In the new match service, the state is " + angular.toJson(state));
                   processLastMoveAndState();
                   sendMessageToGame($scope.playerId,$scope.matchInfo.lastMovePlayerId);
                 }
@@ -290,7 +292,10 @@ smgContainer.controller('MatchController',
       function processLastMoveAndState() {
         if (!isUndefinedOrNull($scope.matchInfo.lastMove)) {
           lastState = state;
+          console.log("VerifyMove: lastState " + angular.toJson(lastState));
+
           state = $scope.matchInfo.state;
+          console.log("VerifyMove: state " + angular.toJson(state));
           for (var operationMessage in $scope.matchInfo.lastMove) {
             var setTurnOperation = $scope.matchInfo.lastMove[operationMessage];
             if (setTurnOperation['type'] === "SetTurn") {
