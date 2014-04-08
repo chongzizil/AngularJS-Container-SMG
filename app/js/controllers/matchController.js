@@ -104,8 +104,8 @@ smgContainer.controller('MatchController',
         if(IdOne===IdTwo){
           sendUpdateUIToGame();
         }else{
-          //sendVerifyMoveToGame();
-          sendUpdateUIToGame();
+          sendVerifyMoveToGame();
+          //sendUpdateUIToGame();
         }
       }
 
@@ -116,7 +116,7 @@ smgContainer.controller('MatchController',
         console.log("Log: input data for send make move to server: " + jsonMove);
         SendMakeMoveService.save({matchId: $routeParams.matchId}, jsonMove).
             $promise.then(function (data) {
-              console.log("Log: send make move to server: " + angular.toJson(data));
+              //console.log("Log: send make move to server: " + angular.toJson(data));
               if (data['error'] == "WRONG_ACCESS_SIGNATURE") {
                 alert('Sorry, Wrong Access Signature received!');
               } else if (data['error'] == 'WRONG_PLAYER_ID') {
@@ -292,6 +292,7 @@ smgContainer.controller('MatchController',
        */
       function processLastMoveAndState() {
         if (!isUndefinedOrNull($scope.matchInfo.lastMove)) {
+          console.log("------------------------------In the flip method-------------------------------" )
           lastState = state;
           console.log("VerifyMove: lastState " + angular.toJson(lastState));
 
@@ -337,7 +338,7 @@ smgContainer.controller('MatchController',
         } else if (data['type'] === "MakeMove") {
           //get operations
           var operations = data['operations'];
-          console.log("In the container, it sends to the server, operations are " + angular.toJson(operations));
+          //console.log("In the container, it sends to the server, operations are " + angular.toJson(operations));
           sendMoveToServer(operations);
         } else if (data['type'] === "VerifyMoveDone") {
           //deal with verifyMoveDone
