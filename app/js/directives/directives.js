@@ -18,7 +18,6 @@ smgContainer.directive('playerLogin', function() {
 
 						PlayerService.get({playerId: loginInfo.playerId, password: loginInfo.password}).
 								$promise.then(function(data) {
-									console.log(data);
 									if (!data['accessSignature']) {
 										if (data['error'] === 'WRONG_PLAYER_ID') {
 											$scope.idHasError = true;
@@ -73,7 +72,6 @@ smgContainer.directive('playerRegister', function() {
 
 			PlayerService.save({}, jsonPlayer).
 					$promise.then(function(data) {
-						console.log(data);
 						if (!data['accessSignature']) {
 							if (data['error'] === 'EMAIL_EXISTS') {
 								$scope.emailHasError = true;
@@ -85,7 +83,6 @@ smgContainer.directive('playerRegister', function() {
 							}
 							registerFailedAlert.show();
 						} else {
-							console.log(data);
 							$scope.emailHasError = false;
 							$scope.passwordHasError = false;
 							$scope.registerInfo.playerId = data['playerId'];
