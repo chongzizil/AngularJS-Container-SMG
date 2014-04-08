@@ -15,7 +15,7 @@
  *    "check new match" button to check if he/she is invited and if yes, the page will be redirected to match page.
  */
 
-smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService) {
+smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService, GetAllMatchInfoService) {
 
 	// Alerts for lobby.html
 	var inviteAlert = $("#inviteAlert");
@@ -56,7 +56,6 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 					if (data['error'] == 'WRONG_GAME_ID') {
 						alert('Sorry, Wrong Game ID provided!');
 					} else {
-						console.log("Log: get game info from server: " + angular.toJson(data));
 						$scope.gameName = data['gameName'];
 						$scope.gameDescription = data['description'];
 					}
@@ -65,6 +64,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 	};
 	getGameName();
 
+	// Get the player email from the server
 	GetPlayerInfoService.get({playerId: $cookies.playerId,
 		targetId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
 			$promise.then(function (data) {
@@ -80,6 +80,21 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 			}
 	);
 	GetPlayerInfoService();
+
+	// Get all on ongoing matches from the server
+	var getMatchesInfo = function () {
+		GetAllMatchInfoService.get({gameId: $routeParams.gameId}).
+				$promise.then(function (data) {
+					if (data['error'] == 'WRONG_GAME_ID') {
+						alert('Sorry, Wrong Game ID provided!');
+					} else {
+//						console.log(data)
+//						$scope.allMatches = data['currentGames'];
+					}
+				}
+		);
+	};
+	getMatchesInfo();
 
 	/**
 	 * Check if the player has login, if not, pop up the login page for him/her

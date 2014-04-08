@@ -3,10 +3,10 @@
 /* Services */
 
 /* Official domain*/
-//var domainUrl = 'http://3-dot-smg-server.appspot.com';
+var domainUrl = 'http://3-dot-smg-server.appspot.com';
 
 /* Container test domain */
-var domainUrl = 'http://3-dot-smg-server-rl.appspot.com';
+//var domainUrl = 'http://3-dot-smg-server-rl.appspot.com';
 
 // Self container test domain 1 */
 //var domainUrl = 'http://3-dot-smg-container-server2.appspot.com/';
@@ -85,6 +85,15 @@ smgContainer.factory('SendMakeMoveService', ['$resource', function($resource) {
 return $resource(domainUrl + '/matches/:matchId',
 {matchId: '@matchId'}
 );
+}]);
+
+/**
+ * To get on going match info
+ */
+smgContainer.factory('GetAllMatchInfoService', ['$resource', function($resource) {
+	return $resource(domainUrl + '/gameinfo/stats',
+			{gameId: '@gameId'}
+	);
 }]);
 
 /**
