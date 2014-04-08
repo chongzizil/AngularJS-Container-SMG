@@ -423,6 +423,8 @@ smgContainer.controller('MatchController',
         if (!isUndefinedOrNull($rootScope.playerIds)) {
 	        $scope.matchInfo.playerThatHasTurn = $rootScope.playerIds[0];
 	        $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
+          state = {};
+          lastState = state;
         } else {
           console.log("Exception: playerIds are null");
         }
