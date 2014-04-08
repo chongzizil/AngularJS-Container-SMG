@@ -104,7 +104,8 @@ smgContainer.controller('MatchController',
         if(IdOne===IdTwo){
           sendUpdateUIToGame();
         }else{
-          sendVerifyMoveToGame();
+          //sendVerifyMoveToGame();
+          sendUpdateUIToGame();
         }
       }
 
