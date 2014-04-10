@@ -1,105 +1,109 @@
-<div class="container-fluid">
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<div class="panel-title">
-				Lobby: {{gameName}}
-				<span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#description"></span>
-				<span class="col-sm-offset-6">Welcome: {{playerEmail}}</span>
-			</div>
-		</div>
-		<div class="panel-body">
-			<div class="alert alert-success collapse" id="autoMatching">
-				<button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
-				<strong>Waiting for another player...</strong>
-			</div>
-			<div class="alert alert-danger collapse" id="inviteAlert">
-				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-				<p>{{inviteInfo.error}}</p>
-			</div>
-			<div class="alert alert-danger collapse" id="noNewMatchAlert">
-				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-				<strong>No match found, sorry...</strong>
-			</div>
-
-			<div class="form-group col-sm-2">
-				<button type="submit" ng-click="autoMatch()" class="btn btn-default">Auto Match</button>
-			</div>
-
-			<form name="inviteForm" class="form-horizontal col-sm-8" role="form">
-				<div ng-class="{ 'form-group': true, 'col-sm-10': true , 'has-error': friendIdHasError }">
-					<input type="text" required ng-model="inviteInfo.friendId" class="form-control" id="friendId"
-					       placeholder="Friend ID">
+<div>
+	<div class="container-fluid">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<div class="panel-title">
+					Lobby: {{gameName}}
+					<span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#description"></span>
+					<span class="col-sm-offset-6">Welcome: {{playerEmail}}</span>
 				</div>
+			</div>
+			<div class="panel-body">
+				<div class="alert alert-success collapse" id="autoMatching">
+					<button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+					<strong>Waiting for another player...</strong>
+				</div>
+				<div class="alert alert-danger collapse" id="inviteAlert">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<p>{{inviteInfo.error}}</p>
+				</div>
+				<div class="alert alert-danger collapse" id="noNewMatchAlert">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<strong>No match found, sorry...</strong>
+				</div>
+
 				<div class="form-group col-sm-2">
-					<button type="submit" ng-disabled="inviteForm.$invalid" ng-click="invite(inviteInfo)" class="btn btn-default">
-						Invite
-					</button>
+					<button type="submit" ng-click="autoMatch()" class="btn btn-default">Auto Match</button>
 				</div>
-			</form>
-			<div class="form-group col-sm-2">
-				<button type="submit" ng-click="checkHasNewMatch()" class="btn btn-default">Check new match</button>
-			</div>
-		</div>
-		<table class="table">
-			<thead>
-			<tr>
-				<th>#</th>
-				<th>Players</th>
-			</tr>
-			</thead>
-			<tbody>
-			<tr>
-				<td>Match1</td>
-				<td>A/B</td>
-			</tr>
-			<tr>
-				<td>Match2</td>
-				<td>C/D</td>
-			</tr>
-			</tbody>
-		</table>
-	</div>
 
-	<!-- Modal for game info -->
-	<div class="modal fade" id="description" tabindex="-1" role="dialog" aria-labelledby="descriptionLabel"
-	     aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="myModalLabel">Game Description</h4>
-				</div>
-				<div class="modal-body">
-					{{gameDescription}}
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<form name="inviteForm" class="form-horizontal col-sm-8" role="form">
+					<div ng-class="{ 'form-group': true, 'col-sm-10': true , 'has-error': friendIdHasError }">
+						<input type="text" required ng-model="inviteInfo.friendId" class="form-control" id="friendId"
+						       placeholder="Friend ID">
+					</div>
+					<div class="form-group col-sm-2">
+						<button type="submit" ng-disabled="inviteForm.$invalid" ng-click="invite(inviteInfo)"
+						        class="btn btn-default">
+							Invite
+						</button>
+					</div>
+				</form>
+				<div class="form-group col-sm-2">
+					<button type="submit" ng-click="checkHasNewMatch()" class="btn btn-default">Check new match</button>
 				</div>
 			</div>
+			<table class="table">
+				<thead>
+				<tr>
+					<th>#</th>
+					<th>Players</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>Match1</td>
+					<td>A/B</td>
+				</tr>
+				<tr>
+					<td>Match2</td>
+					<td>C/D</td>
+				</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
-
-	<!-- Modal for login alert -->
-	<div class="modal fade" id="needLoginAlert">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title">Modal title</h4>
-				</div>
-				<div class="alert alert-danger">
+	<div>
+		<!-- Modal for game info -->
+		<div class="modal fade" id="description" tabindex="-1" role="dialog" aria-labelledby="descriptionLabel"
+		     aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">Game Description</h4>
+					</div>
 					<div class="modal-body">
-						<p>You need to login first!</p>
-
-						<p>Jump to login page in {{timer}} seconds...</p>
+						{{gameDescription}}
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
-			<!-- /.modal-content -->
 		</div>
-		<!-- /.modal-dialog -->
+
+		<!-- Modal for login alert -->
+		<div class="modal fade" id="needLoginAlert">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title">Modal title</h4>
+					</div>
+					<div class="alert alert-danger">
+						<div class="modal-body">
+							<p>You need to login first!</p>
+
+							<p>Jump to login page in {{timer}} seconds...</p>
+						</div>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
+		<!-- /.modal -->
+
+
 	</div>
-	<!-- /.modal -->
-
-
 </div>
