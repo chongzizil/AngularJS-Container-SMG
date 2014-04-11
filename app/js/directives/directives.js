@@ -20,7 +20,7 @@ smgContainer.directive('playerLogin', function() {
 								$promise.then(function(data) {
 									if (!data['accessSignature']) {
 										if (data['error'] === 'WRONG_PLAYER_ID') {
-											$scope.idHasError = true;
+											$scope.idHasErrorr = true;
 											$scope.loginInfo.error = 'Sorry, the player ID does not exist. Please try again.';
 										} else if (data['error'] === 'WRONG_PASSWORD') {
 											$scope.idHasError = false;
