@@ -84,6 +84,15 @@ smgContainer.controller('MatchController',
                 $scope.gameInfo.height = data['height'];
                 $scope.gameInfo.width = data['width'];
                 $scope.gameInfo.gameName = data['gameName'];
+	              /** *************************************************/
+//	              var margin = 20;
+	              if (data['width'] >= $(window).width()) {
+		              $scope.gameInfo.width = "90%";
+	              }
+//	              console.log("********************** The windows height is: " + $(window).height());
+//	              console.log("********************** The windows width is: " + $(window).width());
+//	              console.log("********************** The height is: " + $scope.gameInfo.height);
+//	              console.log("********************** The width is: " + $scope.gameInfo.width);
               }
             }
         );
