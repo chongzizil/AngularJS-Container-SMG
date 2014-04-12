@@ -2,7 +2,7 @@
 
 
 // Declare app level module which depends on filters, and services
-var smgContainer = angular.module('smgContainer', ['ngResource', 'ngRoute', 'ngCookies', 'ngSanitize']);
+var smgContainer = angular.module('smgContainer', ['ngResource', 'ngRoute', 'ngCookies', 'ngSanitize','ui.bootstrap']);
 
 smgContainer.config(['$routeProvider',
 	function($routeProvider) {

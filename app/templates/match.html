@@ -30,7 +30,7 @@
 						        ng-click="getNewMatchState()"> Refresh
 						</button>
 					</div>
-					<div id="currentTurnInfo" class="col-sm-6" align="middle">
+					<div id="currentTurnInfo" class="col-sm-3" align="middle"> <!--change 6 to 3-->
 						<td>{{matchInfo.playerThatHasTurn}}</td>
 					</div>
 					<div id="endGameButton" class="col-sm-3" align="middle">
@@ -38,7 +38,17 @@
 							Game
 						</button>
 					</div>
+
+                    <div id="RematchButton" class="col-sm-3" align="middle">
+                        <button type="button" class="btn btn-primary" ng-click="open()"> Rematch
+                            Game
+                        </button>
+                    </div>
 				</row>
+
+                <!-- new modal -->
+
+
 				<br/><br/><br/>
 				<!-- Board adjust window -->
 				<!--<div class="input-group" align="left">

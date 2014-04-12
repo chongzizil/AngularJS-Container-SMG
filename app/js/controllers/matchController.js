@@ -19,7 +19,7 @@
  */
 
 smgContainer.controller('MatchController',
-    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window, $location, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService) {
+    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService) {
       /*
        * Variables for interacting with Server side.
        */
@@ -465,6 +465,19 @@ smgContainer.controller('MatchController',
         }
       }
 
+      $scope.open = function(){
+        showGameOverResult();
+      }
+      /**
+       * This function should be called when the game is over, which is determined by the fact that there is a
+       * EndGame operation in the lastMove response by server
+       */
+      function showGameOverResult(){
+          var modalInstance = $modal.open({
+            templateUrl: 'templates/directives/rematch.html',
+            controller: 'rematchCtrl'
+            })
+      }
 
       /**
        * Formal code starts here.
