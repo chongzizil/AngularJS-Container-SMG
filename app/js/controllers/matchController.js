@@ -65,6 +65,7 @@ smgContainer.controller('MatchController',
        */
       var state = {};
       var lastState = state;
+      var endGameFlag = undefined;
 
       /**
        * Method used to retrieve Game Information, mainly the
@@ -141,6 +142,7 @@ smgContainer.controller('MatchController',
                 $scope.matchInfo.state = data['state'];
                 $scope.matchInfo.lastMove = data['lastMove'];
                 processLastMoveAndState();
+                processLastPlayer(data);
                 sendMessageToGame($scope.playerId, $scope.matchInfo.lastMovePlayerId);
               }
             }
@@ -153,11 +155,27 @@ smgContainer.controller('MatchController',
        */
       var sendMoveToServer = function (operations) {
         // 1. Wrap up the operations as a move.
-        var move = {
-          "accessSignature": $cookies.accessSignature,
-          "playerIds": $rootScope.playerIds,
-          "operations": operations
-        };
+        var move;
+        for (var operationMessage in operations) {
+          var endGameOperation = operations[operationMessage];
+          if (endGameOperation['type'] === 'EndGame') {
+            endGameFlag = 'true'
+          }
+        }
+        if (endGameFlag === 'true') {
+          move = {
+            "accessSignature": $cookies.accessSignature,
+            "playerIds": $rootScope.playerIds,
+            "operations": operations,
+            "gameOverReason": "Over"
+          };
+        } else {
+          move = {
+            "accessSignature": $cookies.accessSignature,
+            "playerIds": $rootScope.playerIds,
+            "operations": operations
+          };
+        }
         var jsonMove = angular.toJson(move);
         sendMakeMoveServicePost(jsonMove);
       };
@@ -166,8 +184,10 @@ smgContainer.controller('MatchController',
        * Method used to end current game in two situation:
        * 1. Game has a winner.
        * 2. One of the players surrenders.
+       *
+       * Add GameOver reason. 'p' stands for quit and 'Time Out' stands for time out
        */
-      $scope.endGame = function () {
+      $scope.endGame = function (reason) {
         // 1. Make up the EndGame typed move.
         var move = {
           "accessSignature": $cookies.accessSignature,
@@ -177,7 +197,8 @@ smgContainer.controller('MatchController',
               "type": "EndGame",
               "playerIdToScore": {}
             }
-          ]
+          ],
+          "gameOverReason": reason
         };
         /*
          1.1 If one player is pressing the "End Game" button, he is considered to surrender,
@@ -196,7 +217,7 @@ smgContainer.controller('MatchController',
         if ($cookies.isSyncMode === 'true') {
           $rootScope.socket.close();
         }
-        $location.url('/');
+        //$location.url('/');
       };
 
       /**
@@ -212,6 +233,7 @@ smgContainer.controller('MatchController',
           $scope.matchInfo.lastMove = data['lastMove'];
           // 2. UpdateUI for Game with the received state.
           processLastMoveAndState();
+          processLastPlayer(data);
           sendMessageToGame($scope.playerId, $scope.matchInfo.lastMovePlayerId);
         };
       }
@@ -243,8 +265,9 @@ smgContainer.controller('MatchController',
                 //console.log("!isStateSame(state,$scope.matchInfo.state) " + !isStateSame(state,$scope.matchInfo.state));
                 if (!isStateSame(state, $scope.matchInfo.state)) {
                   console.log("Log: Get new match state from server(changing local state)!")
-                  console.log("Log: New State is " + angular.toJson(state));
+                  console.log("Log: New State is " + angular.toJson($scope.matchInfo.state));
                   processLastMoveAndState();
+                  processLastPlayer(data);
                   sendMessageToGame($scope.playerId, $scope.matchInfo.lastMovePlayerId);
                 }
               }
@@ -310,10 +333,17 @@ smgContainer.controller('MatchController',
           //console.log("VerifyMove: lastState " + angular.toJson(lastState));
           state = $scope.matchInfo.state;
           //console.log("VerifyMove: state " + angular.toJson(state));
+        } else {
+          console.log("Exception: From the server the last move is undefined!");
+        }
+      }
+
+      function processLastPlayer(data) {
+        if (!isUndefinedOrNull(data)) {
           for (var operationMessage in $scope.matchInfo.lastMove) {
             var setTurnOperation = $scope.matchInfo.lastMove[operationMessage];
             if (setTurnOperation['type'] === "SetTurn") {
-              $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
+              $scope.matchInfo.lastMovePlayerId = data['playerThatHasLastTurn'];
               $scope.matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
               if ($scope.matchInfo.playerThatHasTurn == $cookies.playerId) {
                 $scope.displayEndGameButton = true;
@@ -326,7 +356,7 @@ smgContainer.controller('MatchController',
             }
           }
         } else {
-          console.log("Exception: From the server the last move is undefined!");
+          console.log("Exception: From the server the response data is undefined!");
         }
       }
 
@@ -366,7 +396,6 @@ smgContainer.controller('MatchController',
 
 
       function replyGameReady() {
-
         var initialUpdateUI = {
           'type': 'UpdateUI',
           'yourPlayerId': $cookies.playerId,
@@ -430,6 +459,7 @@ smgContainer.controller('MatchController',
           $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
           state = {};
           lastState = state;
+          endGameFlag = undefined;
         } else {
           console.log("Exception: playerIds are null");
         }
