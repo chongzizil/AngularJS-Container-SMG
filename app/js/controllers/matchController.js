@@ -19,29 +19,28 @@
  */
 
 smgContainer.controller('MatchController',
-    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window,
-              $location, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService) {
+    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window, $location, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService) {
       /*
        * Variables for interacting with Server side.
        */
       $scope.gameInfo = {};
       $scope.displayGetNewStateButton = false;
-	    $scope.displayEndGameButton = false;
-	    $scope.playerId = $cookies.playerId;
+      $scope.displayEndGameButton = false;
+      $scope.playerId = $cookies.playerId;
       $scope.matchInfo = {
         playerThatHasTurn: Number.MIN_VALUE,
         lastMovePlayerId: Number.MIN_VALUE,
-	      /*
-	       All players' information:
-	       (1). If this is the current player: email, firstname, lastname, nickname
-	       (2). If other players (opponents): firstname, nickname
-	       e.g.:
-	       {
-	       "playerId1" : {"email": "a@b.com", "firstname": "Long", "lastname": "Yang", "nickname": "Jason"},
-	       "playerId2" : {"firstname" : "Xiao", "nickname" : "Shawn"}
-	       }
-	       */
-	      playersInfo: {},
+        /*
+         All players' information:
+         (1). If this is the current player: email, firstname, lastname, nickname
+         (2). If other players (opponents): firstname, nickname
+         e.g.:
+         {
+         "playerId1" : {"email": "a@b.com", "firstname": "Long", "lastname": "Yang", "nickname": "Jason"},
+         "playerId2" : {"firstname" : "Xiao", "nickname" : "Shawn"}
+         }
+         */
+        playersInfo: {},
         /*
          All new match state will be saved here:
          (1). Synchronous: from channel API and response from make move.
@@ -61,7 +60,8 @@ smgContainer.controller('MatchController',
       };
 
       /*
-       * Variables for interacting with Game side.
+       * Variables for interacting with Game side. Temporarily store the game state locally.
+       * Initiated empty every time container loads the game
        */
       var state = {};
       var lastState = state;
@@ -84,11 +84,11 @@ smgContainer.controller('MatchController',
                 $scope.gameInfo.height = data['height'];
                 $scope.gameInfo.width = data['width'];
                 $scope.gameInfo.gameName = data['gameName'];
-	              /** *************************************************/
+                /** *************************************************/
 //	              var margin = 20;
-	              if (data['width'] >= $(window).width()) {
-		              $scope.gameInfo.width = "90%";
-	              }
+                if (data['width'] >= $(window).width()) {
+                  $scope.gameInfo.width = "90%";
+                }
 //	              console.log("********************** The windows height is: " + $(window).height());
 //	              console.log("********************** The windows width is: " + $(window).width());
 //	              console.log("********************** The height is: " + $scope.gameInfo.height);
@@ -99,20 +99,21 @@ smgContainer.controller('MatchController',
       };
 
       /**
-       * Method used to check whether the state is updated
+       * Method used to check whether the state is updated. Takes two object as parameters
        */
-      var isStateSame = function(oldState,newState){
-        return angular.toJson(oldState)===angular.toJson(newState);
+      var isStateSame = function (oldState, newState) {
+        return angular.toJson(oldState) === angular.toJson(newState);
       }
 
       /**
-       * Method send UpdateUI/VerifyMove to game. If the two parameters are the same, it send the updateUI,
-       * otherwise send the VerifyMove
+       * Method send UpdateUI/VerifyMove to game. If the two parameters are the same, which means that
+       * it's the same player who mode the last move. No need to verify, so it sends the updateUI,
+       * otherwise send the VerifyMove. Id is a string.
        */
-      var sendMessageToGame = function(IdOne,IdTwo){
-        if(IdOne===IdTwo){
+      var sendMessageToGame = function (IdOne, IdTwo) {
+        if (IdOne === IdTwo) {
           sendUpdateUIToGame();
-        }else{
+        } else {
           //sendVerifyMoveToGame();
           sendUpdateUIToGame();
         }
@@ -126,7 +127,6 @@ smgContainer.controller('MatchController',
         //console.log("Post Request: Make a move in the game.")
         SendMakeMoveService.save({matchId: $routeParams.matchId}, jsonMove).
             $promise.then(function (data) {
-              //console.log("Log: send make move to server: " + angular.toJson(data));
               if (data['error'] == "WRONG_ACCESS_SIGNATURE") {
                 alert('Sorry, Wrong Access Signature received!');
               } else if (data['error'] == 'WRONG_PLAYER_ID') {
@@ -139,9 +139,9 @@ smgContainer.controller('MatchController',
                 console.log("Log: response for making move to server: " + angular.toJson(data));
                 //console.log("Server responds a move with new state and lastMove.")
                 $scope.matchInfo.state = data['state'];
-	              $scope.matchInfo.lastMove = data['lastMove'];
+                $scope.matchInfo.lastMove = data['lastMove'];
                 processLastMoveAndState();
-                sendMessageToGame($scope.playerId,$scope.matchInfo.lastMovePlayerId);
+                sendMessageToGame($scope.playerId, $scope.matchInfo.lastMovePlayerId);
               }
             }
         );
@@ -206,13 +206,13 @@ smgContainer.controller('MatchController',
         $rootScope.socket.onmessage = function (event) {
           // 1. Get pushed data from channel API and parse it from JSON to object
           var data = angular.fromJson(event.data);
-          //console.log("Log: data pushed by channel API: " + angular.toJson(data));
-          console.log("Log: data pushed by channel API:")
-	        $scope.matchInfo.state = data['state'];
-	        $scope.matchInfo.lastMove = data['lastMove'];
+          console.log("Log: data pushed by channel API: " + angular.toJson(data));
+          //console.log("Log: data pushed by channel API:")
+          $scope.matchInfo.state = data['state'];
+          $scope.matchInfo.lastMove = data['lastMove'];
           // 2. UpdateUI for Game with the received state.
           processLastMoveAndState();
-          sendMessageToGame($scope.playerId,$scope.matchInfo.lastMovePlayerId);
+          sendMessageToGame($scope.playerId, $scope.matchInfo.lastMovePlayerId);
         };
       }
 
@@ -231,21 +231,21 @@ smgContainer.controller('MatchController',
                 alert('Sorry, wrong match ID provided!');
               } else {
                 console.log("Log: get new match state (async mode): " + angular.toJson(data));
-	              //console.log("Log: the match info for this game: " + angular.toJson($scope.matchInfo));
-                //console.log("Log: get new match state (async mode): ");
                 //console.log("Log: the match info for this game: " + angular.toJson($scope.matchInfo));
+                //console.log("Log: get new match state (async mode): ");
                 // 1. Get state and last move
-	              $scope.matchInfo.state = data['state'];
-	              $scope.matchInfo.lastMove = data['lastMove'];
+                $scope.matchInfo.state = data['state'];
+                $scope.matchInfo.lastMove = data['lastMove'];
                 // 2. UpdateUI for Game with the received state.
-                if(isStateSame($scope.matchInfo.state,{})){
+                if (isStateSame($scope.matchInfo.state, {})) {
                   replyGameReady();
                 }
                 //console.log("!isStateSame(state,$scope.matchInfo.state) " + !isStateSame(state,$scope.matchInfo.state));
-                if(!isStateSame(state,$scope.matchInfo.state)){
-                  //console.log("In the new match service, the state is " + angular.toJson(state));
+                if (!isStateSame(state, $scope.matchInfo.state)) {
+                  console.log("Log: Get new match state from server(changing local state)!")
+                  console.log("Log: New State is " + angular.toJson(state));
                   processLastMoveAndState();
-                  sendMessageToGame($scope.playerId,$scope.matchInfo.lastMovePlayerId);
+                  sendMessageToGame($scope.playerId, $scope.matchInfo.lastMovePlayerId);
                 }
               }
             }
@@ -257,8 +257,8 @@ smgContainer.controller('MatchController',
        * @param playerIds
        */
       var getAllPlayersInfo = function (playerIds) {
-	      $scope.matchInfo.playersInfo = {};
-	      var playerNum = 0;
+        $scope.matchInfo.playersInfo = {};
+        var playerNum = 0;
         for (var index in playerIds) {
           GetPlayerInfoService.get({playerId: $cookies.playerId,
             targetId: playerIds[index], accessSignature: $cookies.accessSignature}).
@@ -271,34 +271,30 @@ smgContainer.controller('MatchController',
                   alert('Sorry, Wrong Target ID provided!');
                 } else {
                   //console.log("Log: get players info: " + angular.toJson(data));
-	                $scope.matchInfo.playersInfo[playerIds[playerNum]] = data;
-	                playerNum = playerNum + 1;
-	                //console.log("Log: inside getAllPlayersInfo method, matchInfo: " + angular.toJson($scope.matchInfo));
+                  $scope.matchInfo.playersInfo[playerIds[playerNum]] = data;
+                  playerNum = playerNum + 1;
+                  //console.log("Log: inside getAllPlayersInfo method, matchInfo: " + angular.toJson($scope.matchInfo));
                 }
               }
           );
         }
       };
 
-	    /**
-	     * Method used to get all opponents' information
-	     */
-	    $scope.getOpponentsInfo = function () {
-		    var forkPlayerIds = $rootScope.playerIds.slice(0);
-		    var currentPlayerIndex = forkPlayerIds.indexOf($cookies.playerId);
-		    var opponentsInfo = [];
-
-		    forkPlayerIds.splice(currentPlayerIndex, 1);
-		    for(var index in forkPlayerIds) {
-			    var opponentPlayerId = forkPlayerIds[index];
-			    opponentsInfo.push($scope.matchInfo.playersInfo[opponentPlayerId]);
-		    }
-		    return opponentsInfo;
-	    }
-
-      /*
-       parameter: message should be : UpdateUI, VerifyMove
+      /**
+       * Method used to get all opponents' information
        */
+      $scope.getOpponentsInfo = function () {
+        var forkPlayerIds = $rootScope.playerIds.slice(0);
+        var currentPlayerIndex = forkPlayerIds.indexOf($cookies.playerId);
+        var opponentsInfo = [];
+
+        forkPlayerIds.splice(currentPlayerIndex, 1);
+        for (var index in forkPlayerIds) {
+          var opponentPlayerId = forkPlayerIds[index];
+          opponentsInfo.push($scope.matchInfo.playersInfo[opponentPlayerId]);
+        }
+        return opponentsInfo;
+      }
 
       function isUndefinedOrNull(val) {
         return angular.isUndefined(val) || val == null;
@@ -309,25 +305,24 @@ smgContainer.controller('MatchController',
        */
       function processLastMoveAndState() {
         if (!isUndefinedOrNull($scope.matchInfo.lastMove)) {
-          console.log("Here we change the state/laststate and lastPlayerId" );
+          //console.log("Here we change the state/laststate and lastPlayerId" );
           lastState = state;
           //console.log("VerifyMove: lastState " + angular.toJson(lastState));
-
           state = $scope.matchInfo.state;
           //console.log("VerifyMove: state " + angular.toJson(state));
           for (var operationMessage in $scope.matchInfo.lastMove) {
             var setTurnOperation = $scope.matchInfo.lastMove[operationMessage];
             if (setTurnOperation['type'] === "SetTurn") {
-	            $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
-	            $scope.matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
-	            if($scope.matchInfo.playerThatHasTurn == $cookies.playerId) {
-		            $scope.displayEndGameButton = true;
-	            } else {
-		            $scope.displayEndGameButton = false;
-	            }
-	            if (!$scope.$$phase) {
-		            $scope.$apply();
-	            }
+              $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
+              $scope.matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
+              if ($scope.matchInfo.playerThatHasTurn == $cookies.playerId) {
+                $scope.displayEndGameButton = true;
+              } else {
+                $scope.displayEndGameButton = false;
+              }
+              if (!$scope.$$phase) {
+                $scope.$apply();
+              }
             }
           }
         } else {
@@ -343,37 +338,30 @@ smgContainer.controller('MatchController',
       function listener(event) {
         var data = event.data;
         console.log("In the container, it receives the data from the game Iframe " + data['type']);
-        if (!data['type']) {
-          console.log("The undefined data is " + angular.toJson(data));
-        }
+        /*
+         if (!data['type']) {
+         console.log("The undefined data is " + angular.toJson(data));
+         }
+         */
         if (data['type'] === "GameReady") {
           //replyGameReady();
           $scope.getNewMatchState();
         } else if (data['type'] === "MakeMove") {
-          //get operations
           var operations = data['operations'];
           //console.log("In the container, it sends to the server, operations are " + angular.toJson(operations));
           sendMoveToServer(operations);
         } else if (data['type'] === "VerifyMoveDone") {
           //deal with verifyMoveDone
           //no hacker detected
-          if(isUndefinedOrNull(data['hackerPlayerId'])){
+          if (isUndefinedOrNull(data['hackerPlayerId'])) {
             sendUpdateUIToGame();
-          }else{
-            console.log("Hacker Detected!!!" + data['hackerPlayerId']);
+          } else {
+            console.log("Hacker Detected!!! " + data['hackerPlayerId']);
           }
-        //  console.log(angular.toJson(data['hackerPlayerId']));
         } else {
-          console.log("In the container listener, can't deal with the message from the game!!");
-          console.log("It is " + data['type']);
+//          console.log("In the container listener, can't deal with the message from the game!!");
+//          console.log("It is " + data['type']);
         }
-
-//        if (angular.isUndefined($scope.debug)) {
-//          $scope.debug = "Received: " + JSON.stringify(data);
-//        } else {
-//          $scope.debug += "Received: " + JSON.stringify(data);
-//        }
-//        $scope.$apply();
       }
 
 
@@ -438,8 +426,8 @@ smgContainer.controller('MatchController',
 
       function initiatePlayerTurn() {
         if (!isUndefinedOrNull($rootScope.playerIds)) {
-	        $scope.matchInfo.playerThatHasTurn = $rootScope.playerIds[0];
-	        $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
+          $scope.matchInfo.playerThatHasTurn = $rootScope.playerIds[0];
+          $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
           state = {};
           lastState = state;
         } else {
@@ -468,20 +456,20 @@ smgContainer.controller('MatchController',
         } else {
           $scope.displayGetNewStateButton = true;
         }
-	      // Check whether need to display the "End Game" button
-	      if($scope.matchInfo.playerThatHasTurn == $scope.playerId) {
-		      $scope.displayEndGameButton = true;
-	      } else {
-		      $scope.displayEndGameButton = false;
-	      }
-	      // 1. Get game information.
-	      getGameInfo();
-	      // 2. Update Game UI with new state.
-	      //$scope.getNewMatchState();
-	      // 3. Get players information.
-	      getAllPlayersInfo($rootScope.playerIds);
-	      // 4. Initiate lastMovePlayerId and playerThatHasTurn
-	      initiatePlayerTurn();
+        // Check whether need to display the "End Game" button
+        if ($scope.matchInfo.playerThatHasTurn == $scope.playerId) {
+          $scope.displayEndGameButton = true;
+        } else {
+          $scope.displayEndGameButton = false;
+        }
+        // 1. Get game information.
+        getGameInfo();
+        // 2. Update Game UI with new state.
+        //$scope.getNewMatchState();
+        // 3. Get players information.
+        getAllPlayersInfo($rootScope.playerIds);
+        // 4. Initiate lastMovePlayerId and playerThatHasTurn
+        initiatePlayerTurn();
       }
     }
 );
