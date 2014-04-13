@@ -1,15 +1,35 @@
 <div>
-
         <div class="modal-header">
-            <h3>I'm a modal!</h3>
+            <h3>{{matchResultInfo.message}}</h3>
         </div>
-        <div class="modal-body">
+    <div class="modal-body">
+        <div class="container-fluid">
+            <row>
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#postFB" data-toggle="tab">Post To FB!</a>
+                    </li>
+                    <li>
+                        <a href="#newMatch" data-toggle="tab">New Match</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="postFB">
 
+                    </div>
 
+                    <div class="tab-pane" id="newMatch">
+
+                    </div>
+                </div>
+            </row>
         </div>
+    </div>
         <div class="modal-footer">
-
-            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+            <button class="btn btn-warning col-md-3" ng-click="PostFB()">PostFB</button>
+            <button class="btn btn-warning col-md-3" ng-click="rematch()">Rematch</button>
+            <button class="btn btn-warning col-md-3" ng-click="newMatch()">New Match</button>
+            <button class="btn btn-warning col-md-3" ng-click="cancel()">Cancel</button>
         </div>
 
 

@@ -56,7 +56,11 @@ smgContainer.controller('MatchController',
         /*
          Array of match states, will be used for save and load match.
          */
-        history: []
+        history: [],
+        /*
+        The winner of the game. If loading a new game, it should be set to the default value
+         */
+        winner : Number.MIN_VALUE
       };
 
       /*
@@ -333,6 +337,18 @@ smgContainer.controller('MatchController',
           //console.log("VerifyMove: lastState " + angular.toJson(lastState));
           state = $scope.matchInfo.state;
           //console.log("VerifyMove: state " + angular.toJson(state));
+          for(var operationMessage in $scope.matchInfo.lastMove){
+            var endGameOperation = $scope.matchInfo.lastMove[operationMessage];
+            if(endGameOperation['type'] === 'EndGame'){
+              var score = endGameOperation['playerIdToScore'];
+              for(var playerId in score){
+                if(score[playerId]=='1'){
+                  $scope.matchInfo.winner = playerId;
+                  //console.log("We have the winner: " + $scope.matchInfo.winner)
+                }
+              }
+            }
+          }
         } else {
           console.log("Exception: From the server the last move is undefined!");
         }
@@ -340,10 +356,10 @@ smgContainer.controller('MatchController',
 
       function processLastPlayer(data) {
         if (!isUndefinedOrNull(data)) {
+          $scope.matchInfo.lastMovePlayerId = data['playerThatHasLastTurn'];
           for (var operationMessage in $scope.matchInfo.lastMove) {
             var setTurnOperation = $scope.matchInfo.lastMove[operationMessage];
             if (setTurnOperation['type'] === "SetTurn") {
-              $scope.matchInfo.lastMovePlayerId = data['playerThatHasLastTurn'];
               $scope.matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
               if ($scope.matchInfo.playerThatHasTurn == $cookies.playerId) {
                 $scope.displayEndGameButton = true;
@@ -457,6 +473,7 @@ smgContainer.controller('MatchController',
         if (!isUndefinedOrNull($rootScope.playerIds)) {
           $scope.matchInfo.playerThatHasTurn = $rootScope.playerIds[0];
           $scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
+          $scope.matchInfo.winner = Number.MIN_VALUE;
           state = {};
           lastState = state;
           endGameFlag = undefined;
@@ -473,10 +490,18 @@ smgContainer.controller('MatchController',
        * EndGame operation in the lastMove response by server
        */
       function showGameOverResult(){
-          var modalInstance = $modal.open({
+          var resultModal = $modal.open({
             templateUrl: 'templates/directives/rematch.html',
             controller: 'rematchCtrl'
-            })
+            });
+
+        resultModal.result.then(function(){
+          //A promise that is resolved when a modal is closed
+
+        }, function(){
+          //A promise that is resolved when a modal is dismissed
+
+        });
       }
 
       /**
