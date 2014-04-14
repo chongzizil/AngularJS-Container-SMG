@@ -88,8 +88,8 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 					if (data['error'] == 'WRONG_GAME_ID') {
 						alert('Sorry, Wrong Game ID provided!');
 					} else {
-//						console.log(data)
-//						$scope.allMatches = data['currentGames'];
+						console.log(data)
+						$scope.allMatches = data['currentGames'];
 					}
 				}
 		);
@@ -116,6 +116,10 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 		}
 
 		var myTimer = $timeout($scope.countDown, 1000);
+	}
+
+	var isNullOrUndefinedOrEmpty = function (data) {
+		return angular.isUndefined(data) || data === null || data === "";
 	}
 
 	/**
@@ -165,11 +169,6 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 					}
 				}
 		);
-	}
-
-	//If the player is not login yet, a popup will alert him/her to login first
-	if ($cookies.playerId === "Guest" || $cookies.accessSignature === null) {
-		popupLoginPage();
 	}
 
 	/**
@@ -278,6 +277,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 						}
 					} else {
 						$("#autoMatching").hide();
+						$cookies.timeOfEachTurn = 60;
 						$rootScope.channel = new goog.appengine.Channel(data['channelToken']);
 						$rootScope.socket = $rootScope.channel.open();
 						$rootScope.socket.onopen = onopen;
@@ -300,8 +300,9 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 
 		// Retrieve the friend's Id
 		var friendId = inviteInfo.friendId;
+		$cookies.timeOfEachTurn = inviteInfo.timeOfEachTurn;
 
-		// Async mode is choosed
+		// Async mode is chose
 		$cookies.isSyncMode = false;
 
 		// Initiate the alert
