@@ -14,7 +14,7 @@ var domainUrl = 'http://4-dot-smg-server-rl.appspot.com';
 // Self container test domain 2 */';
 //var domainUrl = 'http://4-1.smg-container-testserver.appspot.com';
 
-var facebookGraphApiUrl = "http://graph.facebook.com";
+var facebookGraphApiUrl = "https://graph.facebook.com";
 
 /**
  * For login as a player

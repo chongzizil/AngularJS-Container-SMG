@@ -19,7 +19,8 @@
  */
 
 smgContainer.controller('MatchController',
-    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService) {
+    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window, $location, $modal, NewMatchStateService,
+              GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService) {
       /*
        * Variables for interacting with Server side.
        */
@@ -62,6 +63,11 @@ smgContainer.controller('MatchController',
          */
         winner : Number.MIN_VALUE
       };
+
+	    /**
+	     * Temporary variables for Posting status to Facebook
+	     */
+	    $cookies.FBAccessToken = "CAACEdEose0cBAGB4wwD68rRDxKrTpPFkfZB0lDSFVX57X1MKOzYpKKOYXeZB4pZBxV95rwIJnw3H1PAwKpa3UDoqjRzkExVI0CXUmT4FqGqsQS4Hjae1wcMpEAkEBi7gvpDWwWjt79zTBN4tdTWYZBWxA6BSAWNDXEe5ZA6kM79a53JkfwbgEEUw1ZASXSEZATUM9Y8QGZCeiAZDZD";
 
       /*
        * Variables for interacting with Game side. Temporarily store the game state locally.
@@ -265,6 +271,7 @@ smgContainer.controller('MatchController',
        * Method used to get new game state in asynchronous game mode.
        */
       $scope.getNewMatchState = function () {
+	      console.log("Log: matchController: routeParams.matchId: " + angular.toJson($routeParams.matchId));
         NewMatchStateService.get({matchId: $routeParams.matchId, playerId: $cookies.playerId,
           accessSignature: $cookies.accessSignature})
             .$promise.then(function (data) {
@@ -527,12 +534,55 @@ smgContainer.controller('MatchController',
 
         resultModal.result.then(function(argument){
           //A promise that is resolved when a modal is closed
-
+					if(argument === "PostFB") {
+						postToFB("SMG Test Post: I have win the match!");
+					}
         }, function(){
           //A promise that is resolved when a modal is dismissed
 
         });
       }
+
+	    /**
+	     * Method used to post message on Facebook
+	     */
+			var postToFB = function(messageToFB) {
+				PostMessageToFBService.save({
+					message : messageToFB,
+					access_token : $cookies.FBAccessToken
+				}, "").
+						$promise.then(function(response) {
+							console.log("Log: matchController: response from posting to FB: " + angular.toJson(response));
+						});
+	    }
+
+	    /**
+	     * Method used to get playerIds from server
+	     */
+	    var getPlayerIds = function(){
+		    NewMatchService.get({
+			    playerId : $cookies.playerId,
+			    accessSignature: $cookies.accessSignature
+		    }).
+				    $promise.then(function(data) {
+					    console.log("Log: matchController: response from NewMatchService: " + angular.toJson(data));
+					    if (!data['matchId']) {
+						    if (data['error'] === 'WRONG_ACCESS_SIGNATURE') {
+							    alert('Sorry, your ID does not exist. Please try again.');
+						    } else if (data['error'] === 'WRONG_PLAYER_ID') {
+							    alert("Sorry, please provide correct Player ID!");
+						    } else if (data['error'] === 'NO_MATCH_FOUND') {
+							    alert("Sorry, no match found!")
+						    }
+					    } else {
+						    $rootScope.playerIds = data['playerIds'];
+						    $cookies.matchId = data['matchId'];
+						    if (!$scope.$$phase) {
+							    $scope.$apply();
+						    }
+					    }
+				    });
+	    }
 
       /**
        * Formal code starts here.
@@ -562,8 +612,8 @@ smgContainer.controller('MatchController',
         }
         // 1. Get game information.
         getGameInfo();
-        // 2. Update Game UI with new state.
-        $scope.getNewMatchState();
+	      // 2. Get playerIds from server: this is used for case when user refresh the web browser.
+	      getPlayerIds();
         // 3. Get players information.
         getAllPlayersInfo($rootScope.playerIds);
         // 4. Initiate lastMovePlayerId and playerThatHasTurn
