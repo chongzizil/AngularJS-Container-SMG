@@ -118,8 +118,9 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 		var myTimer = $timeout($scope.countDown, 1000);
 	}
 
-	var isNullOrUndefinedOrEmpty = function (data) {
-		return angular.isUndefined(data) || data === null || data === "";
+	//If the player is not login yet, a popup will alert him/her to login first
+	if ($cookies.playerId === "Guest" || $cookies.accessSignature === null) {
+		popupLoginPage();
 	}
 
 	/**
