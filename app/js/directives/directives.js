@@ -27,12 +27,11 @@ smgContainer.directive('playerLogin', function() {
 											$scope.passwordHasError = true;
 											$scope.loginInfo.error = 'Sorry, the password is invalid. Please try again.';
 										}
-
 										loginAlert.show();
 									} else {
 										$cookies.playerId = loginInfo.playerId;
 										$cookies.accessSignature = data['accessSignature'];
-                    //console.log("data['accessSignature'] " + data['accessSignature'] );
+                    console.log("data['accessSignature'] " + data['accessSignature'] );
 										$rootScope.refreshDisplayId();
 										$('#login').modal('hide');
 									}

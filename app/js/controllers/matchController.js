@@ -240,6 +240,18 @@ smgContainer.controller('MatchController',
           var data = angular.fromJson(event.data);
           console.log("Log: data pushed by channel API: " + angular.toJson(data));
           //console.log("Log: data pushed by channel API:")
+          for(var message in data){
+            var messageObj = data[message];
+            for(var messageKey in messageObj){
+              if(messageKey=='message'&& messageObj[messageKey]=='OPPONENTS_LOST_CONNECTION'){
+                //Opponent is offline
+                var offLineModal = $modal.open({
+                  templateUrl: 'templates/directives/offLine.html'
+
+                })
+              }
+            }
+          }
           $scope.matchInfo.state = data['state'];
           $scope.matchInfo.lastMove = data['lastMove'];
           // 2. UpdateUI for Game with the received state.
@@ -354,6 +366,7 @@ smgContainer.controller('MatchController',
                   //console.log("We have the winner: " + $scope.matchInfo.winner)
                 }
               }
+              showGameOverResult();
             }
           }
         } else {
@@ -504,18 +517,20 @@ smgContainer.controller('MatchController',
         }
           var resultModal = $modal.open({
             templateUrl: 'templates/directives/rematch.html',
-            controller: 'rematchCtrl'
+            controller: 'rematchCtrl',
+            resolve:{
+              resultInfo : function(){
+                return $scope.matchResultInfo;
+              }
+            }
             });
 
         resultModal.result.then(function(argument){
-          console.log('From the modal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-          console.log(argument);
           //A promise that is resolved when a modal is closed
 
         }, function(){
           //A promise that is resolved when a modal is dismissed
-          console.log('From the modal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-          console.log('dismissssss');
+
         });
       }
 

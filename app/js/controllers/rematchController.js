@@ -4,7 +4,9 @@
  * Created by yuanyiyang on 4/12/14.
  */
 
-smgContainer.controller('rematchCtrl', function ($scope, $modalInstance) {
+smgContainer.controller('rematchCtrl', function ($scope, $modalInstance, resultInfo) {
+
+  $scope.resultInfo = resultInfo;
 
   $scope.PostFB = function(){
     $modalInstance.close('PostFB');
