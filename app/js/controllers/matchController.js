@@ -71,6 +71,13 @@ smgContainer.controller('MatchController',
       var lastState = state;
       var endGameFlag = undefined;
 
+
+      /*
+      Currently considering using this variable to communicate with rematchController scope since they are nested
+       */
+      $scope.matchResultInfo = {
+
+      };
       /**
        * Method used to retrieve Game Information, mainly the
        * {@code $scope.gameInfo.url}
@@ -490,6 +497,11 @@ smgContainer.controller('MatchController',
        * EndGame operation in the lastMove response by server
        */
       function showGameOverResult(){
+        if($cookies.playerId == $scope.matchInfo.playerId){
+          $scope.matchResultInfo.message = 'Cong! You have won the game!'
+        }else{
+          $scope.matchResultInfo.message = 'Keep calm and carry on!'
+        }
           var resultModal = $modal.open({
             templateUrl: 'templates/directives/rematch.html',
             controller: 'rematchCtrl'

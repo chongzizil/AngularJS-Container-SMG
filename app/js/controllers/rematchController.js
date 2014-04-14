@@ -4,9 +4,7 @@
 
 smgContainer.controller('rematchCtrl', function ($scope, $modalInstance) {
 
-  $scope.matchResultInfo = {
 
-  };
 
   $scope.cancel = function () {
     $modalInstance.dismiss('cancel');
