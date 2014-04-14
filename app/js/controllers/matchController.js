@@ -156,7 +156,7 @@ smgContainer.controller('MatchController',
                 $scope.matchInfo.lastMove = data['lastMove'];
                 processLastMoveAndState();
                 processLastPlayer(data);
-                sendMessageToGame($scope.playerId, $scope.matchInfo.lastMovePlayerId);
+                sendMessageToGame($cookies.playerId, $scope.matchInfo.lastMovePlayerId);
               }
             }
         );
@@ -258,7 +258,7 @@ smgContainer.controller('MatchController',
           // 2. UpdateUI for Game with the received state.
           processLastMoveAndState();
           processLastPlayer(data);
-          sendMessageToGame($scope.playerId, $scope.matchInfo.lastMovePlayerId);
+          sendMessageToGame($cookies.playerId, $scope.matchInfo.lastMovePlayerId);
         };
       }
 
@@ -293,7 +293,7 @@ smgContainer.controller('MatchController',
                   console.log("Log: New State is " + angular.toJson($scope.matchInfo.state));
                   processLastMoveAndState();
                   processLastPlayer(data);
-                  sendMessageToGame($scope.playerId, $scope.matchInfo.lastMovePlayerId);
+                  sendMessageToGame($cookies.playerId, $scope.matchInfo.lastMovePlayerId);
                 }
               }
             }
@@ -597,7 +597,7 @@ smgContainer.controller('MatchController',
           $scope.displayGetNewStateButton = true;
         }
         // Check whether need to display the "End Game" button
-        if ($scope.matchInfo.playerThatHasTurn == $scope.playerId) {
+        if ($scope.matchInfo.playerThatHasTurn == $cookies.playerId) {
           $scope.displayEndGameButton = true;
         } else {
           $scope.displayEndGameButton = false;
