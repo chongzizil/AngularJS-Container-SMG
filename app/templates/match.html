@@ -22,24 +22,26 @@
 
 	<row>
 		<div id="gameContainer" class="panel panel-default">
-			<div class="panel-heading">Game</div>
+			<div class="panel-heading">
+				<div id="currentTurnInfo" align="middle">
+					<td>Current turn: {{matchInfo.playerThatHasTurn}}</td>
+				</div>
+			</div>
 			<div class="panel-body">
 				<row>
-					<div id="refreshButton" class="col-sm-3" align="middle">
+					<div id="refreshButton" class="col-md-offset-3 col-md-3 col-xs-6" align="middle">
 						<button type="button" class="btn btn-primary" ng-show='displayGetNewStateButton'
 						        ng-click="getNewMatchState()"> Refresh
 						</button>
 					</div>
-					<div id="currentTurnInfo" class="col-sm-3" align="middle"> <!--change 6 to 3-->
-						<td>{{matchInfo.playerThatHasTurn}}</td>
-					</div>
-					<div id="endGameButton" class="col-sm-3" align="middle">
+
+					<div id="endGameButton" class="col-md-3 col-xs-6" align="middle">
 						<button type="button" class="btn btn-primary" ng-show="displayEndGameButton" ng-click="endGame('p')"> End
 							Game
 						</button>
 					</div>
 
-                    <div id="RematchButton" class="col-sm-3" align="middle">
+                    <div id="RematchButton" class="col-md-3" align="middle">
                         <button type="button" class="btn btn-primary" ng-click="open()"> Rematch
                             Game
                         </button>
