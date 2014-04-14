@@ -497,7 +497,7 @@ smgContainer.controller('MatchController',
        * EndGame operation in the lastMove response by server
        */
       function showGameOverResult(){
-        if($cookies.playerId == $scope.matchInfo.playerId){
+        if($cookies.playerId == $scope.matchInfo.winner){
           $scope.matchResultInfo.message = 'Cong! You have won the game!'
         }else{
           $scope.matchResultInfo.message = 'Keep calm and carry on!'
@@ -507,12 +507,15 @@ smgContainer.controller('MatchController',
             controller: 'rematchCtrl'
             });
 
-        resultModal.result.then(function(){
+        resultModal.result.then(function(argument){
+          console.log('From the modal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+          console.log(argument);
           //A promise that is resolved when a modal is closed
 
         }, function(){
           //A promise that is resolved when a modal is dismissed
-
+          console.log('From the modal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+          console.log('dismissssss');
         });
       }
 
