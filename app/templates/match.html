@@ -2,19 +2,18 @@
 	<row>
 		<div id="playerInfo" class="panel panel-default">
 			<div class="panel-heading">Your Information</div>
-			<div class="panel-body">
-
+			<div class="panel-body" ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentPlayer">
 				<div class="col-sm-3">
-					Email: {{matchInfo.playersInfo[playerId]['email']}}
+					Email: {{playerInfo['info']['email']}}
 				</div>
 				<div class="col-sm-3">
-					First Name: {{matchInfo.playersInfo[playerId]['firstname']}}
+					First Name: {{playerInfo['info']['firstname']}}
 				</div>
 				<div class="col-sm-3">
-					Last Name: {{matchInfo.playersInfo[playerId]['lastname']}}
+					Last Name: {{playerInfo['info']['lastname']}}
 				</div>
 				<div class="col-sm-3">
-					Nick Name: {{matchInfo.playersInfo[playerId]['nickname']}}
+					Nick Name: {{playerInfo['info']['nickname']}}
 				</div>
 			</div>
 		</div>
@@ -81,15 +80,15 @@
 					</tr>
 					</thead>
 					<tbody>
-					<tr ng-repeat="opponent in opponentInfos">
+					<tr ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnOpponents"  >
 						<td>
 							Opponent_{{$index + 1}}:
 						</td>
 						<td>
-							First Name: {{opponent['firstname']}}
+							First Name: {{playerInfo['info']['firstname']}}
 						</td>
 						<td>
-							Nick Name: {{opponent['nickname']}}
+							Nick Name: {{playerInfo['info']['nickname']}}
 						</td>
 					</tr>
 					</tbody>

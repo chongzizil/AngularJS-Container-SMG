@@ -28,7 +28,6 @@ smgContainer.controller('MatchController',
       $scope.gameInfo = {};
       $scope.displayGetNewStateButton = false;
       $scope.displayEndGameButton = false;
-      $scope.playerId = $cookies.playerId;
       $scope.matchInfo = {
         playerThatHasTurn: Number.MIN_VALUE,
         lastMovePlayerId: Number.MIN_VALUE,
@@ -42,7 +41,7 @@ smgContainer.controller('MatchController',
          "playerId2" : {"firstname" : "Xiao", "nickname" : "Shawn"}
          }
          */
-        playersInfo: {},
+        playersInfo: [],
         /*
          All new match state will be saved here:
          (1). Synchronous: from channel API and response from make move.
@@ -306,7 +305,7 @@ smgContainer.controller('MatchController',
        * @param playerIds
        */
       var getAllPlayersInfo = function (playerIds) {
-        $scope.matchInfo.playersInfo = {};
+        $scope.matchInfo.playersInfo = [];
         var playerNum = 0;
         for (var index in playerIds) {
           GetPlayerInfoService.get({playerId: $cookies.playerId,
@@ -319,31 +318,20 @@ smgContainer.controller('MatchController',
                 } else if (data['error'] == 'WRONG_TARGET_ID') {
                   alert('Sorry, Wrong Target ID provided!');
                 } else {
-                  //console.log("Log: get players info: " + angular.toJson(data));
-                  $scope.matchInfo.playersInfo[playerIds[playerNum]] = data;
+                  console.log("Log: get players info: " + angular.toJson(data));
+	                $scope.matchInfo.playersInfo.push(
+			                {
+				                playerId : playerIds[playerNum],
+				                info : data
+			                }
+	                );
                   playerNum = playerNum + 1;
-                  //console.log("Log: inside getAllPlayersInfo method, matchInfo: " + angular.toJson($scope.matchInfo));
+                  console.log("Log: inside getAllPlayersInfo method, matchInfo: " + angular.toJson($scope.matchInfo));
                 }
               }
           );
         }
       };
-
-      /**
-       * Method used to get all opponents' information
-       */
-      var getOpponentsInfo = function () {
-        var forkPlayerIds = $rootScope.playerIds.slice(0);
-        var currentPlayerIndex = forkPlayerIds.indexOf($cookies.playerId);
-        var opponentsInfo = [];
-
-        forkPlayerIds.splice(currentPlayerIndex, 1);
-        for (var index in forkPlayerIds) {
-          var opponentPlayerId = forkPlayerIds[index];
-          opponentsInfo.push($scope.matchInfo.playersInfo[opponentPlayerId]);
-        }
-        return opponentsInfo;
-      }
 
       function isUndefinedOrNull(val) {
         return angular.isUndefined(val) || val == null;
@@ -569,9 +557,23 @@ smgContainer.controller('MatchController',
 						    $rootScope.playerIds = data['playerIds'];
 						    $cookies.matchId = data['matchId'];
 						    getAllPlayersInfo($rootScope.playerIds);
-						    $scope.opponentInfos = getOpponentsInfo();
+						    initiatePlayerTurn();
+						    if (!$scope.$$phase) {
+							    $scope.$apply();
+						    }
 					    }
 				    });
+	    }
+
+	    /**
+	     * Filter function used to filter out the current player's infomation from the opponent part.
+	     */
+	    $scope.filterFnOpponents = function(playerInfo) {
+		    return playerInfo.playerId !== $cookies.playerId;
+	    }
+
+	    $scope.filterFnCurrentPlayer = function(playerInfo) {
+		    return playerInfo.playerId === $cookies.playerId;
 	    }
 
       /**
@@ -604,8 +606,6 @@ smgContainer.controller('MatchController',
         getGameInfo();
 	      // 2. Get playerIds from server: this is used for case when user refresh the web browser.
 	      getPlayerIds();
-        // 3. Initiate lastMovePlayerId and playerThatHasTurn
-        initiatePlayerTurn();
       }
     }
 );
