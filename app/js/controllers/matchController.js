@@ -24,6 +24,7 @@ smgContainer.controller('MatchController',
       /*
        * Variables for interacting with Server side.
        */
+	    $scope.opponentInfos = [];
       $scope.gameInfo = {};
       $scope.displayGetNewStateButton = false;
       $scope.displayEndGameButton = false;
@@ -67,7 +68,9 @@ smgContainer.controller('MatchController',
 	    /**
 	     * Temporary variables for Posting status to Facebook
 	     */
-	    $cookies.FBAccessToken = "CAACEdEose0cBAGB4wwD68rRDxKrTpPFkfZB0lDSFVX57X1MKOzYpKKOYXeZB4pZBxV95rwIJnw3H1PAwKpa3UDoqjRzkExVI0CXUmT4FqGqsQS4Hjae1wcMpEAkEBi7gvpDWwWjt79zTBN4tdTWYZBWxA6BSAWNDXEe5ZA6kM79a53JkfwbgEEUw1ZASXSEZATUM9Y8QGZCeiAZDZD";
+	    $cookies.FBAccessToken = "CAACEdEose0cBAGB4wwD68rRDxKrTpPFkfZB0lDSFVX57X1MKOzYpKKOYXeZB4pZBxV95rwIJnw3H1PAwK" +
+			    "pa3UDoqjRzkExVI0CXUmT4FqGqsQS4Hjae1wcMpEAkEBi7gvpDWwWjt79zTBN4tdTWYZBWxA6BSAWNDXEe5ZA6kM79a53" +
+			    "JkfwbgEEUw1ZASXSEZATUM9Y8QGZCeiAZDZD";
 
       /*
        * Variables for interacting with Game side. Temporarily store the game state locally.
@@ -102,15 +105,9 @@ smgContainer.controller('MatchController',
                 $scope.gameInfo.height = data['height'];
                 $scope.gameInfo.width = data['width'];
                 $scope.gameInfo.gameName = data['gameName'];
-                /** *************************************************/
-//	              var margin = 20;
                 if (data['width'] >= $(window).width()) {
                   $scope.gameInfo.width = "90%";
                 }
-//	              console.log("********************** The windows height is: " + $(window).height());
-//	              console.log("********************** The windows width is: " + $(window).width());
-//	              console.log("********************** The height is: " + $scope.gameInfo.height);
-//	              console.log("********************** The width is: " + $scope.gameInfo.width);
               }
             }
         );
@@ -234,7 +231,6 @@ smgContainer.controller('MatchController',
         if ($cookies.isSyncMode === 'true') {
           $rootScope.socket.close();
         }
-        //$location.url('/');
       };
 
       /**
@@ -336,7 +332,7 @@ smgContainer.controller('MatchController',
       /**
        * Method used to get all opponents' information
        */
-      $scope.getOpponentsInfo = function () {
+      var getOpponentsInfo = function () {
         var forkPlayerIds = $rootScope.playerIds.slice(0);
         var currentPlayerIndex = forkPlayerIds.indexOf($cookies.playerId);
         var opponentsInfo = [];
@@ -547,24 +543,19 @@ smgContainer.controller('MatchController',
 	     * Method used to post message on Facebook
 	     */
 			var postToFB = function(messageToFB) {
-				PostMessageToFBService.save({
-					message : messageToFB,
-					access_token : $cookies.FBAccessToken
-				}, "").
-						$promise.then(function(response) {
+				PostMessageToFBService.save({message : messageToFB, access_token : $cookies.FBAccessToken}, "")
+						.$promise.then(function(response) {
 							console.log("Log: matchController: response from posting to FB: " + angular.toJson(response));
-						});
+						}
+				);
 	    }
 
 	    /**
 	     * Method used to get playerIds from server
 	     */
 	    var getPlayerIds = function(){
-		    NewMatchService.get({
-			    playerId : $cookies.playerId,
-			    accessSignature: $cookies.accessSignature
-		    }).
-				    $promise.then(function(data) {
+		    NewMatchService.get({playerId : $cookies.playerId, accessSignature: $cookies.accessSignature})
+				    .$promise.then(function(data) {
 					    console.log("Log: matchController: response from NewMatchService: " + angular.toJson(data));
 					    if (!data['matchId']) {
 						    if (data['error'] === 'WRONG_ACCESS_SIGNATURE') {
@@ -577,9 +568,8 @@ smgContainer.controller('MatchController',
 					    } else {
 						    $rootScope.playerIds = data['playerIds'];
 						    $cookies.matchId = data['matchId'];
-						    if (!$scope.$$phase) {
-							    $scope.$apply();
-						    }
+						    getAllPlayersInfo($rootScope.playerIds);
+						    $scope.opponentInfos = getOpponentsInfo();
 					    }
 				    });
 	    }
@@ -614,9 +604,7 @@ smgContainer.controller('MatchController',
         getGameInfo();
 	      // 2. Get playerIds from server: this is used for case when user refresh the web browser.
 	      getPlayerIds();
-        // 3. Get players information.
-        getAllPlayersInfo($rootScope.playerIds);
-        // 4. Initiate lastMovePlayerId and playerThatHasTurn
+        // 3. Initiate lastMovePlayerId and playerThatHasTurn
         initiatePlayerTurn();
       }
     }
