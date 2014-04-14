@@ -205,7 +205,8 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 						}
 					} else {
 						autoMatching.hide();
-
+						// Initial the time of each turn
+						$cookies.timeOfEachTurn = "";
 						// Store the playerIds and matchId in the cookies
 						$rootScope.playerIds = data['playerIds'];
 						$cookies.matchId = data['matchId'];

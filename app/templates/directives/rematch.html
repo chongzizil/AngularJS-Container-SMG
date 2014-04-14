@@ -1,40 +1,35 @@
 <div>
-        <div class="modal-header">
-            <h3>{{$scope.resultInfo['message']}}</h3>
-        </div>
-    <div class="modal-body">
-        <div class="container-fluid">
-            <row>
-                <!--<ul class="nav nav-tabs">-->
-                    <!--<li class="active">-->
-                        <!--<a href="#postFB" data-toggle="tab">Post To FB!</a>-->
-                    <!--</li>-->
-                    <!--<li>-->
-                        <!--<a href="#newMatch" data-toggle="tab">New Match</a>-->
-                    <!--</li>-->
-                <!--</ul>-->
-                <!--<div class="tab-content">-->
-                    <!--<div class="tab-pane active" id="postFB">-->
+	<div class="modal-header">
+		<h3>{{$scope.resultInfo['message']}}</h3>
+	</div>
+	<div class="modal-body">
+		<div class="container-fluid">
+			<row>
+				<!--<ul class="nav nav-tabs">-->
+				<!--<li class="active">-->
+				<!--<a href="#postFB" data-toggle="tab">Post To FB!</a>-->
+				<!--</li>-->
+				<!--<li>-->
+				<!--<a href="#newMatch" data-toggle="tab">New Match</a>-->
+				<!--</li>-->
+				<!--</ul>-->
+				<!--<div class="tab-content">-->
+				<!--<div class="tab-pane active" id="postFB">-->
 
-                    <!--</div>-->
+				<!--</div>-->
 
-                    <!--<div class="tab-pane" id="newMatch">-->
+				<!--<div class="tab-pane" id="newMatch">-->
 
-                    <!--</div>-->
-                <!--</div>-->
-            </row>
-        </div>
-    </div>
-        <div class="modal-footer">
-            <div class="container-fluid">
-                <row>
-                    <button class="btn btn-warning col-md-3 col-xm-6" ng-click="PostFB()">PostFB</button>
-                    <button class="btn btn-warning col-md-3 col-xm-6" ng-click="rematch()">Rematch</button>
-                    <button class="btn btn-warning col-md-3 col-xm-6" ng-click="newMatch()">New Match</button>
-                    <button class="btn btn-warning col-md-3 col-xm-6" ng-click="cancel()">Cancel</button>
-                </row>
-            </div>
-        </div>
+				<!--</div>-->
+				<!--</div>-->
+			</row>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="PostFB()">Post to FB</button>
+		<button class="btn btn-primary" ng-click="cancel()">Back to lobby</button>
+	</div>
+</div>
 
 
 </div>
