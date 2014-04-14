@@ -300,16 +300,40 @@ smgContainer.controller('MatchController',
         );
       }
 
+	    /**
+	     * Method used to get current user's information
+	     */
+	    var getCurrentPlayerInfo = function() {
+		    $scope.matchInfo.playersInfo = [];
+				GetPlayerInfoService.get({playerId: $cookies.playerId,
+					targetId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
+						$promise.then(function(data){
+							if (data['error'] == "WRONG_PLAYER_ID") {
+								alert("Sorry, Wrong Player ID provided!");
+							} else if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
+								alert('Sorry, Wrong Access Signature provided!');
+							} else if (data['error'] == 'WRONG_TARGET_ID') {
+								alert('Sorry, Wrong Target ID provided!');
+							} else {
+								$scope.matchInfo.playersInfo.push({playerId : $cookies.playerId, info : data});
+								getAllOtherPlayersInfo($rootScope.playerIds);
+							}
+						});
+	    }
+
       /**
-       * Method used to get all the players' info.
+       * Method used to get all the players' info except for current player's.
        * @param playerIds
        */
-      var getAllPlayersInfo = function (playerIds) {
-        $scope.matchInfo.playersInfo = [];
+      var getAllOtherPlayersInfo = function (playerIds) {
+	      console.log("Log: get players info: playerIds: " + angular.toJson(playerIds));
         var playerNum = 0;
-        for (var index in playerIds) {
+	      var forkPlayerIds = playerIds.slice(0);
+	      var index = forkPlayerIds.indexOf($cookies.playerId);
+	      forkPlayerIds.splice(index, 1);
+        for (var index in forkPlayerIds) {
           GetPlayerInfoService.get({playerId: $cookies.playerId,
-            targetId: playerIds[index], accessSignature: $cookies.accessSignature}).
+            targetId: forkPlayerIds[index], accessSignature: $cookies.accessSignature}).
               $promise.then(function (data) {
                 if (data['error'] == "WRONG_PLAYER_ID") {
                   alert("Sorry, Wrong Player ID provided!");
@@ -318,15 +342,16 @@ smgContainer.controller('MatchController',
                 } else if (data['error'] == 'WRONG_TARGET_ID') {
                   alert('Sorry, Wrong Target ID provided!');
                 } else {
-                  console.log("Log: get players info: " + angular.toJson(data));
+	                console.log("Log: get players info: current playerId: " + $cookies.playerId);
+                  console.log("Log: get players info: id: " + forkPlayerIds[playerNum] + " data: " + angular.toJson(data));
 	                $scope.matchInfo.playersInfo.push(
 			                {
-				                playerId : playerIds[playerNum],
+				                playerId : forkPlayerIds[playerNum],
 				                info : data
 			                }
 	                );
                   playerNum = playerNum + 1;
-                  console.log("Log: inside getAllPlayersInfo method, matchInfo: " + angular.toJson($scope.matchInfo));
+                  console.log("Log: inside getAllOtherPlayersInfo method, matchInfo: " + angular.toJson($scope.matchInfo));
                 }
               }
           );
@@ -556,7 +581,7 @@ smgContainer.controller('MatchController',
 					    } else {
 						    $rootScope.playerIds = data['playerIds'];
 						    $cookies.matchId = data['matchId'];
-						    getAllPlayersInfo($rootScope.playerIds);
+						    getCurrentPlayerInfo();
 						    initiatePlayerTurn();
 						    if (!$scope.$$phase) {
 							    $scope.$apply();
