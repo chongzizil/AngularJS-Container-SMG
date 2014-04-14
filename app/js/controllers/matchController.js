@@ -548,7 +548,7 @@ smgContainer.controller('MatchController',
         // 1. Get game information.
         getGameInfo();
         // 2. Update Game UI with new state.
-        //$scope.getNewMatchState();
+        $scope.getNewMatchState();
         // 3. Get players information.
         getAllPlayersInfo($rootScope.playerIds);
         // 4. Initiate lastMovePlayerId and playerThatHasTurn

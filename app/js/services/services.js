@@ -14,6 +14,8 @@ var domainUrl = 'http://4-dot-smg-server-rl.appspot.com';
 // Self container test domain 2 */';
 //var domainUrl = 'http://4-1.smg-container-testserver.appspot.com';
 
+var facebookGraphApiUrl = "http://graph.facebook.com";
+
 /**
  * For login as a player
  */
@@ -93,6 +95,15 @@ return $resource(domainUrl + '/matches/:matchId',
 smgContainer.factory('GetAllMatchInfoService', ['$resource', function($resource) {
 	return $resource(domainUrl + '/gameinfo/stats',
 			{gameId: '@gameId'}
+	);
+}]);
+
+/**
+ * To post status on Facebook page, e.g. "I have won a match of XXX again YYY".
+ */
+smgContainer.factory('PostMessageToFBService', ['$resource', function($resource) {
+	return $resource(facebookGraphApiUrl + '/me/feed',
+			{message: '@message', access_token: '@access_token'}
 	);
 }]);
 
