@@ -23,5 +23,4 @@ smgContainer.controller('rematchCtrl', function ($scope, $modalInstance) {
     $modalInstance.dismiss('cancel');
   };
 
-
 })
