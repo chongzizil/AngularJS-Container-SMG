@@ -3,16 +3,16 @@
 /* Services */
 
 /* Official domain*/
-//var domainUrl = 'http://3-dot-smg-server.appspot.com';
+//var domainUrl = 'http://4-dot-smg-server.appspot.com';
 
 /* Container test domain */
 var domainUrl = 'http://4-dot-smg-server-rl.appspot.com';
 
 // Self container test domain 1 */
-//var domainUrl = 'http://3-dot-smg-container-server2.appspot.com/';
+//var domainUrl = 'http://4-1.smg-container-server2.appspot.com';
 
 // Self container test domain 2 */';
-//var domainUrl = 'http://3-dot-smg-container-testserver.appspot.com/';
+//var domainUrl = 'http://4-1.smg-container-testserver.appspot.com';
 
 /**
  * For login as a player
