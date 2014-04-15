@@ -8,12 +8,11 @@ smgContainer.directive('playerLogin', function () {
 		replace: false,
 		controller: function ($scope, $rootScope, $location, $cookies, $route, PlayerService) {
 			$scope.login = function (loginInfo) {
-
 				var loginAlert = $("#loginAlert");
 				loginAlert.on('close.bs.alert', function () {
 					loginAlert.hide();
 					return false;
-				})
+				});
 
 				PlayerService.get({playerId: loginInfo.playerId, password: loginInfo.password}).
 						$promise.then(function (data) {

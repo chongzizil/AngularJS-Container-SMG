@@ -19,7 +19,7 @@ var facebookGraphApiUrl = "https://graph.facebook.com";
 /**
  * For login as a player
  */
-smgContainer.factory('PlayerService', ['$resource', function($resource) {
+smgContainer.factory('PlayerService', ['$resource', function ($resource) {
 	return $resource(domainUrl + '/players/:playerId',
 			{playerId: '@playerId', password: '@password'}//,
 			//{register: {method:'POST', params:{}, headers:{'Content-Type': 'application/json'},  isArray:false}}
@@ -29,7 +29,7 @@ smgContainer.factory('PlayerService', ['$resource', function($resource) {
 /**
  * To get the game info
  */
-smgContainer.factory('GetGameInfoService', ['$resource', function($resource) {
+smgContainer.factory('GetGameInfoService', ['$resource', function ($resource) {
 	return $resource(domainUrl + '/games/:gameId',
 			{gameId: '@gameId'}
 	);
@@ -38,7 +38,7 @@ smgContainer.factory('GetGameInfoService', ['$resource', function($resource) {
 /**
  * To get a player's info
  */
-smgContainer.factory('GetPlayerInfoService', ['$resource', function($resource) {
+smgContainer.factory('GetPlayerInfoService', ['$resource', function ($resource) {
 	return $resource(domainUrl + '/playerInfo',
 			{playerId: '@playerId', targetId: '@targetId', accessSignature: '@accessSignature'}
 	);
@@ -47,7 +47,7 @@ smgContainer.factory('GetPlayerInfoService', ['$resource', function($resource) {
 /**
  * To join a queue for auto match through Channel API
  */
-smgContainer.factory('joinQueueService', ['$resource', function($resource) {
+smgContainer.factory('joinQueueService', ['$resource', function ($resource) {
 	return $resource(domainUrl + '/queue',
 			{}
 	);
@@ -56,7 +56,7 @@ smgContainer.factory('joinQueueService', ['$resource', function($resource) {
 /**
  * To insert a match to the server.
  */
-smgContainer.factory('InsertMatchService', ['$resource', function($resource) {
+smgContainer.factory('InsertMatchService', ['$resource', function ($resource) {
 	return $resource(domainUrl + '/newMatch',
 			{}
 	);
@@ -65,7 +65,7 @@ smgContainer.factory('InsertMatchService', ['$resource', function($resource) {
 /**
  * To get new match info (asynchronous mode)
  */
-smgContainer.factory('NewMatchService', ['$resource', function($resource) {
+smgContainer.factory('NewMatchService', ['$resource', function ($resource) {
 	return $resource(domainUrl + '/newMatch/:playerId',
 			{playerId: '@playerId', accessSignature: '@accessSignature'}
 	);
@@ -74,7 +74,7 @@ smgContainer.factory('NewMatchService', ['$resource', function($resource) {
 /**
  * To get the new state from the server (asynchronous mode)
  */
-smgContainer.factory('NewMatchStateService', ['$resource', function($resource) {
+smgContainer.factory('NewMatchStateService', ['$resource', function ($resource) {
 	return $resource(domainUrl + '/state/:matchId',
 			{matchId: '@matchId', playerId: '@playerId', accessSignature: '@accessSignature'}
 	);
@@ -83,16 +83,16 @@ smgContainer.factory('NewMatchStateService', ['$resource', function($resource) {
 /**
  * To send make moves to server
  */
-smgContainer.factory('SendMakeMoveService', ['$resource', function($resource) {
-return $resource(domainUrl + '/matches/:matchId',
-{matchId: '@matchId'}
-);
+smgContainer.factory('SendMakeMoveService', ['$resource', function ($resource) {
+	return $resource(domainUrl + '/matches/:matchId',
+			{matchId: '@matchId'}
+	);
 }]);
 
 /**
  * To get on going match info
  */
-smgContainer.factory('GetAllMatchInfoService', ['$resource', function($resource) {
+smgContainer.factory('GetAllMatchInfoService', ['$resource', function ($resource) {
 	return $resource(domainUrl + '/gameinfo/stats',
 			{gameId: '@gameId'}
 	);
@@ -101,7 +101,7 @@ smgContainer.factory('GetAllMatchInfoService', ['$resource', function($resource)
 /**
  * To post status on Facebook page, e.g. "I have won a match of XXX again YYY".
  */
-smgContainer.factory('PostMessageToFBService', ['$resource', function($resource) {
+smgContainer.factory('PostMessageToFBService', ['$resource', function ($resource) {
 	return $resource(facebookGraphApiUrl + '/me/feed',
 			{message: '@message', access_token: '@access_token'}
 	);
@@ -110,7 +110,7 @@ smgContainer.factory('PostMessageToFBService', ['$resource', function($resource)
 /**
  * To get the profile picture of the player if he/she login with FB account
  */
-smgContainer.factory('GetPicFromFBService', ['$resource', function($resource) {
+smgContainer.factory('GetPicFromFBService', ['$resource', function ($resource) {
 	return $resource(facebookGraphApiUrl + '/me/picture',
 			{redirect: '0', height: '50', width: '50', type: 'normal', access_token: '@access_token'}
 	);
@@ -119,11 +119,11 @@ smgContainer.factory('GetPicFromFBService', ['$resource', function($resource) {
 /**
  * To get accessToken
  */
-/*smgContainer.factory('GetTokenFromFBService', ['$resource', function($resource) {
-	return $resource(facebookGraphApiUrl + '/oauth/access_token',
-			{client_id: '227131944153073', redirect_uri: 'http://smg-angularjs-container.appspot.com/', client_secret: '540d2fa6851aa96dc183571874afc110', code: '@code'}
-	);
-}]);*/
+smgContainer.factory('GetTokenFromFBService', ['$resource', function($resource) {
+ return $resource(facebookGraphApiUrl + '/oauth/access_token',
+ {client_id: '227131944153073', redirect_uri: 'http://smg-angularjs-container.appspot.com/', client_secret: '540d2fa6851aa96dc183571874afc110', code: '@code'}
+ );
+ }]);
 
 /**
  * To login as a developer
