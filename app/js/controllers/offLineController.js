@@ -20,7 +20,7 @@ smgContainer.controller('offLineCtrl', function ($scope, $modalInstance,$cookies
     $modalInstance.dismiss('Syn')
   }
 
-  $scope.isASyn = function(){
+  $scope.inASyn = function(){
     $modalInstance.dismiss('ASyn')
   }
 
