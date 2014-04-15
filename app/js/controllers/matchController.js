@@ -19,7 +19,7 @@
  */
 
 smgContainer.controller('MatchController',
-    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService) {
+    function ($scope, $route, $routeParams, $rootScope, $cookies, $timeout, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService) {
       /*
        * Variables for interacting with Server side.
        */
@@ -489,7 +489,7 @@ smgContainer.controller('MatchController',
             for (var operationMessage in operations) {
               var operation = operations[operationMessage];
               if (operation['type'] == 'SetTurn') {
-                operation['numberOfSecondsForTurn'] = $cookies.timeOfEachTurn;
+                operation['numberOfSecondsForTurn'] = parseInt($cookies.timeOfEachTurn);
                 console.log("In the container, it sets the timer in SetTurn to " + $cookies.timeOfEachTurn);
               }
             }
