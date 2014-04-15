@@ -1,35 +1,24 @@
 <div>
     <div class="modal-header">
-        <h3>{{matchResultInfo.message}}</h3>
+        <h3>{{offLineMessage['message']}}</h3>
     </div>
     <div class="modal-body">
         <div class="container-fluid">
             <row>
-                <!--<ul class="nav nav-tabs">-->
-                <!--<li class="active">-->
-                <!--<a href="#postFB" data-toggle="tab">Post To FB!</a>-->
-                <!--</li>-->
-                <!--<li>-->
-                <!--<a href="#newMatch" data-toggle="tab">New Match</a>-->
-                <!--</li>-->
-                <!--</ul>-->
-                <!--<div class="tab-content">-->
-                <!--<div class="tab-pane active" id="postFB">-->
-
-                <!--</div>-->
-
-                <!--<div class="tab-pane" id="newMatch">-->
-
-                <!--</div>-->
-                <!--</div>-->
+                <ul>
+                    <li ng-repeat="option in options">
+                        {{option}}
+                    </li>
+                </ul>
             </row>
         </div>
     </div>
     <div class="modal-footer">
         <div class="container-fluid">
             <row>
-                <button class="btn btn-warning col-md-3 col-xm-6" ng-click="ok()">OK</button>
-                <button class="btn btn-warning col-md-3 col-xm-6" ng-click="cancel()">Cancel</button>
+                <button class="btn btn-warning" ng-click="inSyn()">Continue</button>
+                <button class="btn btn-warning" ng-click="inASyn()">Return</button>
+                <button class="btn btn-warning" ng-click="win()">Win</button>
             </row>
         </div>
     </div>

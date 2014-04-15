@@ -20,9 +20,9 @@ smgContainer.controller('rematchCtrl', function ($scope, $modalInstance, resultI
     $modalInstance.close('NewMatch');
   };
 
-
   $scope.cancel = function () {
     $modalInstance.dismiss('cancel');
   };
+
 
 })

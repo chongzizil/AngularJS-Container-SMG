@@ -84,7 +84,8 @@ smgContainer.controller('MatchController',
       Currently considering using this variable to communicate with rematchController scope since they are nested
        */
       $scope.matchResultInfo = {
-
+         message : '',
+         messagePostToFB:''
       };
       /**
        * Method used to retrieve Game Information, mainly the
@@ -130,6 +131,15 @@ smgContainer.controller('MatchController',
         } else {
           //sendVerifyMoveToGame();
           sendUpdateUIToGame();
+        }
+        if(!isUndefinedOrNull(endGameFlag)&&endGameFlag=='true'){
+          endGameFlag=undefined;
+          if($cookies.isSyncMode=='true'){
+            $cookies.isSyncMode = false;
+            $rootScope.socket.close();
+          }
+
+          showGameOverResult();
         }
       }
 
@@ -200,7 +210,7 @@ smgContainer.controller('MatchController',
        *
        * Add GameOver reason. 'p' stands for quit and 'Time Out' stands for time out
        */
-      $scope.endGame = function (reason) {
+      $scope.endGame = function (reason, passinWinner) {
         // 1. Make up the EndGame typed move.
         var move = {
           "accessSignature": $cookies.accessSignature,
@@ -220,14 +230,23 @@ smgContainer.controller('MatchController',
         var forkPlayerIds = $rootScope.playerIds.slice(0);
         var index = forkPlayerIds.indexOf($cookies.playerId);
         forkPlayerIds.splice(index, 1);
-        for (var index in forkPlayerIds) {
-          move["operations"][0]['playerIdToScore'][forkPlayerIds[index]] = 1;
+        if(passinWinner=='oppo'){
+          for (var index in forkPlayerIds) {
+            move["operations"][0]['playerIdToScore'][forkPlayerIds[index]] = 1;
+          }
+          move["operations"][0]['playerIdToScore'][$cookies.playerId] = 0;
+        }else if(passinWinner=='me'){
+          for (var index in forkPlayerIds) {
+            move["operations"][0]['playerIdToScore'][forkPlayerIds[index]] = 0;
+          }
+          move["operations"][0]['playerIdToScore'][$cookies.playerId] = 1;
         }
-        move["operations"][0]['playerIdToScore'][$cookies.playerId] = 0;
+
         var jsonMove = angular.toJson(move);
         sendMakeMoveServicePost(jsonMove);
         // 2. If in synchronous mode, also close the channel API.
         if ($cookies.isSyncMode === 'true') {
+          $cookies.isSyncMode = false;
           $rootScope.socket.close();
         }
       };
@@ -242,15 +261,22 @@ smgContainer.controller('MatchController',
           console.log("Log: data pushed by channel API: " + angular.toJson(data));
           //console.log("Log: data pushed by channel API:")
           for(var message in data){
-            var messageObj = data[message];
-            for(var messageKey in messageObj){
-              if(messageKey=='message'&& messageObj[messageKey]=='OPPONENTS_LOST_CONNECTION'){
-                //Opponent is offline
-                var offLineModal = $modal.open({
-                  templateUrl: 'templates/directives/offLine.html'
+            if(message=='message'&&data[message]=='OPPONENTS_LOST_CONNECTION'){
+              var offLineModal = $modal.open({
+                templateUrl: 'templates/directives/offLine.html',
+                controller: 'offLineCtrl'
+              });
 
-                })
-              }
+              offLineModal.result.then(function(){
+                $scope.endGame('Time Out','me')
+              }, function(argument){
+                if(!isUndefinedOrNull(argument)){
+                  if(argument=='ASyn'){
+                    $cookies.isSyncMode = false;
+                    $rootScope.socket.close();
+                  }
+                }
+              });
             }
           }
           $scope.matchInfo.state = data['state'];
@@ -382,7 +408,8 @@ smgContainer.controller('MatchController',
                   //console.log("We have the winner: " + $scope.matchInfo.winner)
                 }
               }
-              showGameOverResult();
+              //showGameOverResult();
+              endGameFlag = 'true';
             }
           }
         } else {
@@ -526,6 +553,7 @@ smgContainer.controller('MatchController',
        * EndGame operation in the lastMove response by server
        */
       function showGameOverResult(){
+        $cookies.timeOfEachTurn =null;
         if($cookies.playerId == $scope.matchInfo.winner){
           $scope.matchResultInfo.message = 'Cong! You have won the game!'
         }else{
@@ -544,15 +572,16 @@ smgContainer.controller('MatchController',
         resultModal.result.then(function(argument){
           //A promise that is resolved when a modal is closed
 					if(argument === "PostFB") {
-						postToFB("SMG Test Post: I have win the match!");
+						//postToFB("SMG Test Post: I have win the match!");
+            postToFB($scope.matchResultInfo['messagePostToFB']);
 					}
         }, function(){
           //A promise that is resolved when a modal is dismissed
-
+          $location.url('/lobby/' + $routeParams.gameId);
         });
       }
 
-	    /**
+	     /**
 	     * Method used to post message on Facebook
 	     */
 			var postToFB = function(messageToFB) {
@@ -591,7 +620,7 @@ smgContainer.controller('MatchController',
 	    }
 
 	    /**
-	     * Filter function used to filter out the current player's infomation from the opponent part.
+	     * Filter function used to filter out the current player's information from the opponent part.
 	     */
 	    $scope.filterFnOpponents = function(playerInfo) {
 		    return playerInfo.playerId !== $cookies.playerId;
