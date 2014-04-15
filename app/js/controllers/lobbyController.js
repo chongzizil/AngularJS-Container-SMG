@@ -192,7 +192,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
    */
   $scope.cancel = function () {
     $("#autoMatching").hide();
-    $cookies.timeOfEachTurn = '';
+    $rootScope.timeOfEachTurn = '';
     $rootScope.socket.close();
   }
 
@@ -222,7 +222,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
           } else {
             autoMatching.hide();
             // Initial the time of each turn
-            $cookies.timeOfEachTurn = "";
+            $rootScope.timeOfEachTurn = "";
             // Store the playerIds and matchId in the cookies
             $rootScope.playerIds = data['playerIds'];
             $cookies.matchId = data['matchId'];
@@ -295,7 +295,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
             }
           } else {
             $("#autoMatching").hide();
-            $cookies.timeOfEachTurn = 60;
+            $rootScope.timeOfEachTurn = 60;
             $rootScope.channel = new goog.appengine.Channel(data['channelToken']);
             $rootScope.socket = $rootScope.channel.open();
             $rootScope.socket.onopen = onopen;
@@ -318,7 +318,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 
     // Retrieve the friend's Id
     var friendId = inviteInfo.friendId;
-    $cookies.timeOfEachTurn = inviteInfo.timeOfEachTurn;
+    $rootScope.timeOfEachTurn = inviteInfo.timeOfEachTurn;
 
     // Async mode is chose
     $cookies.isSyncMode = false;
