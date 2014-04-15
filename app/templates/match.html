@@ -6,16 +6,14 @@
 				<div class="container-fluid">
 					<div ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentPlayer">
 						<!--<div class="col-md-1 col-xs-12">-->
-							<!--<div align="middle">-->
-								<!--<img ng-src="img/giraffe.gif" hight="50" width="50"/>-->
-							<!--</div>-->
+						<!--<div align="middle">-->
+						<!--<img ng-src="img/giraffe.gif" hight="50" width="50"/>-->
 						<!--</div>-->
+						<!--</div>-->
+						<div class="col-md-1 col-xs-12">
+							<img ng-src="{{playerImageUrl}}" hight="50" width="50"/>
+						</div>
 						<div class="col-md-11 col-xs-12">
-							<row>
-								<div class="col-md-12">
-									<img ng-src="{{playerImageUrl}}" hight="50" width="50"/>
-								</div>
-							</row>
 							<row>
 								<div class="col-md-12">
 									Email: {{playerInfo['info']['email']}}
@@ -30,6 +28,7 @@
 								</div>
 							</row>
 						</div>
+
 					</div>
 				</div>
 			</div>
