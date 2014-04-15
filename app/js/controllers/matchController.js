@@ -396,7 +396,7 @@ smgContainer.controller('MatchController',
         return angular.isUndefined(val) || val == null;
       }
 
-      function timeCount(time) {
+      var timeCount = function(time) {
         $scope.timer = time;
         $scope.countDown = function () {
           $scope.timer--;
@@ -406,6 +406,7 @@ smgContainer.controller('MatchController',
 
           }
         }
+	      var myTimer = $timeout($scope.countDown, 1000);
       }
 
       /**
