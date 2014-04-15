@@ -73,7 +73,7 @@ smgContainer.controller('MatchController',
       var lastState = state;
       var endGameFlag = undefined;
       var opponentOffLineFlag = undefined;
-
+      var makeMoveFlag = undefined;
 
       /*
        Currently considering using this variable to communicate with rematchController scope since they are nested
@@ -136,12 +136,8 @@ smgContainer.controller('MatchController',
           }
           showGameOverResult();
         } else {
-          console.log('opponentOffLineFlag ' + opponentOffLineFlag);
-          console.log(!isUndefinedOrNull(opponentOffLineFlag));
-          console.log(opponentOffLineFlag == 'true');
           if (!isUndefinedOrNull(opponentOffLineFlag) && opponentOffLineFlag == 'true') {
             opponentOffLineFlag = undefined;
-            console.log("WHATTTTTTTFFKKKKK");
             var offLineModal = $modal.open({
               templateUrl: 'templates/directives/offLine.html',
               controller: 'offLineCtrl'
@@ -283,12 +279,14 @@ smgContainer.controller('MatchController',
               opponentOffLineFlag = 'true';
             }
           }
-          $scope.matchInfo.state = data['state'];
-          $scope.matchInfo.lastMove = data['lastMove'];
-          // 2. UpdateUI for Game with the received state.
-          processLastMoveAndState();
-          processLastPlayer(data);
-          sendMessageToGame($cookies.playerId, $scope.matchInfo.lastMovePlayerId);
+
+            $scope.matchInfo.state = data['state'];
+            $scope.matchInfo.lastMove = data['lastMove'];
+            // 2. UpdateUI for Game with the received state.
+            processLastMoveAndState();
+            processLastPlayer(data);
+            sendMessageToGame($cookies.playerId, $scope.matchInfo.lastMovePlayerId);
+
         };
       }
 
@@ -407,17 +405,19 @@ smgContainer.controller('MatchController',
       };
 
       function isUndefinedOrNull(val) {
-        return angular.isUndefined(val) || val == null;
+        return angular.isUndefined(val) || val == null || val == '';
       }
 
       var timeCount = function(time) {
         $scope.timer = time;
         $scope.countDown = function () {
-          $scope.timer--;
-          if ($scope.timer !== 0) {
-            myTimer = $timeout($scope.countDown, 1000);
-          } else {
-
+          if(makeMoveFlag=='false'){
+            $scope.timer--;
+            if ($scope.timer !== 0) {
+              myTimer = $timeout($scope.countDown, 1000);
+            } else {
+              $scope.endGame('Time Out','oppo');
+            }
           }
         }
 	      var myTimer = $timeout($scope.countDown, 1000);
@@ -459,10 +459,26 @@ smgContainer.controller('MatchController',
             var setTurnOperation = $scope.matchInfo.lastMove[operationMessage];
             if (setTurnOperation['type'] === "SetTurn") {
               $scope.matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
-              if (isUndefinedOrNull($cookies.timeOfEachTurn)) {
-                $cookies.timeOfEachTurn = setTurnOperation['numberOfSecondsForTurn'];
-                console.log('Log: set Time of the game to ' + $cookies.timeOfEachTurn);
+              console.log('!isUndefinedOrNull($rootScope.timeOfEachTurn ' + !isUndefinedOrNull($rootScope.timeOfEachTurn));
+              console.log("$rootScope.timeOfEachTurn " + $rootScope.timeOfEachTurn );
+              if (!isUndefinedOrNull($rootScope.timeOfEachTurn)&&$rootScope.timeOfEachTurn!='0') {
+                if($scope.matchInfo.playerThatHasTurn == $cookies.playerId){
+                  makeMoveFlag = 'false';
+                  timeCount($rootScope.timeOfEachTurn);
+                  console.log('Log1111111: set Time of the game to ' + $rootScope.timeOfEachTurn);
+                }
+              }else{
+                if(!isUndefinedOrNull(setTurnOperation['numberOfSecondsForTurn'])&&setTurnOperation['numberOfSecondsForTurn']!='0') {
+                  if($scope.matchInfo.playerThatHasTurn == $cookies.playerId){
+                    $rootScope.timeOfEachTurn = setTurnOperation['numberOfSecondsForTurn'];
+                    makeMoveFlag = 'false';
+                    timeCount($rootScope.timeOfEachTurn);
+                    console.log('Log22222222: set Time of the game to ' + $rootScope.timeOfEachTurn);
+                    console.log('setTurnOperation[\'numberOfSecondsForTurn\']' + setTurnOperation['numberOfSecondsForTurn']);
+                  }
+                }
               }
+
               if ($scope.matchInfo.playerThatHasTurn == $cookies.playerId) {
                 $scope.displayEndGameButton = true;
               } else {
@@ -500,12 +516,13 @@ smgContainer.controller('MatchController',
           /*
            To check whether the player sets the timer or not
            */
-          if (!isUndefinedOrNull($cookies.timeOfEachTurn)) {
+          if (!isUndefinedOrNull($rootScope.timeOfEachTurn)) {
+            makeMoveFlag='true';
             for (var operationMessage in operations) {
               var operation = operations[operationMessage];
               if (operation['type'] == 'SetTurn') {
-                operation['numberOfSecondsForTurn'] = parseInt($cookies.timeOfEachTurn);
-                console.log("In the container, it sets the timer in SetTurn to " + $cookies.timeOfEachTurn);
+                operation['numberOfSecondsForTurn'] = parseInt($rootScope.timeOfEachTurn);
+                console.log("In the container, it sets the timer in SetTurn to " + $rootScope.timeOfEachTurn);
               }
             }
           }
@@ -592,6 +609,7 @@ smgContainer.controller('MatchController',
           lastState = state;
           endGameFlag = undefined;
           opponentOffLineFlag = undefined;
+          makeMoveFlag = undefined;
         } else {
           console.log("Exception: playerIds are null");
         }
@@ -605,7 +623,7 @@ smgContainer.controller('MatchController',
        * EndGame operation in the lastMove response by server
        */
       function showGameOverResult() {
-        $cookies.timeOfEachTurn = null;
+        $rootScope.timeOfEachTurn = null;
         if ($cookies.playerId == $scope.matchInfo.winner) {
           $scope.matchResultInfo.message = 'Cong! You have won the game!';
 	        $scope.matchResultInfo.messagePostToFB = 'I just won a match! :)';
