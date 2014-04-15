@@ -19,7 +19,7 @@
  */
 
 smgContainer.controller('MatchController',
-    function ($scope, $route, $routeParams, $rootScope, $cookies, $timeout, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService) {
+    function ($scope, $route, $routeParams, $rootScope, $cookies, $timeout, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService, GetPicFromFBService) {
       /*
        * Variables for interacting with Server side.
        */
@@ -27,6 +27,8 @@ smgContainer.controller('MatchController',
       $scope.gameInfo = {};
       $scope.displayGetNewStateButton = false;
       $scope.displayEndGameButton = false;
+	    $scope.FBLogin = false;
+	    $scope.playerImageUrl;
       $scope.matchInfo = {
         playerThatHasTurn: Number.MIN_VALUE,
         lastMovePlayerId: Number.MIN_VALUE,
@@ -62,13 +64,6 @@ smgContainer.controller('MatchController',
          */
         winner: Number.MIN_VALUE
       };
-
-      /**
-       * Temporary variables for Posting status to Facebook
-       */
-      $cookies.FBAccessToken = "CAACEdEose0cBAGB4wwD68rRDxKrTpPFkfZB0lDSFVX57X1MKOzYpKKOYXeZB4pZBxV95rwIJnw3H1PAwK" +
-          "pa3UDoqjRzkExVI0CXUmT4FqGqsQS4Hjae1wcMpEAkEBi7gvpDWwWjt79zTBN4tdTWYZBWxA6BSAWNDXEe5ZA6kM79a53" +
-          "JkfwbgEEUw1ZASXSEZATUM9Y8QGZCeiAZDZD";
 
       /*
        * Variables for interacting with Game side. Temporarily store the game state locally.
@@ -349,11 +344,29 @@ smgContainer.controller('MatchController',
               } else if (data['error'] == 'WRONG_TARGET_ID') {
                 alert('Sorry, Wrong Target ID provided!');
               } else {
+	              getImageUrlFromFB();
                 $scope.matchInfo.playersInfo.push({playerId: $cookies.playerId, info: data});
                 getAllOtherPlayersInfo($rootScope.playerIds);
               }
             });
       }
+
+	    /**
+	     * Method used to get User Image Url from Facebook
+	     * @return User's Image Url
+	     */
+	    var getImageUrlFromFB = function() {
+		    if($scope.FBLogin) {
+			    GetPicFromFBService.get({access_token: $cookies.FBAccessToken}).
+					    $promise.then(function(data) {
+						    console.log("Log: matchController: getImageUrlFromFB: " + angular.toJson(data));
+						    $scope.playerImageUrl = data['data']['url'];
+					    }
+			    )
+		    } else {
+			    $scope.playerImageUrl = "img/giraffe.gif";
+		    }
+	    }
 
       /**
        * Method used to get all the players' info except for current player's.
@@ -694,6 +707,12 @@ smgContainer.controller('MatchController',
         } else {
           $scope.displayEndGameButton = false;
         }
+	      // Check whether the player login with Facebook
+	      if($cookies.FBAccessToken == "undefined") {
+		      $scope.FBLogin = false;
+	      } else {
+		      $scope.FBLogin = true;
+	      }
         // 1. Get game information.
         getGameInfo();
         // 2. Get playerIds from server: this is used for case when user refresh the web browser.
