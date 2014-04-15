@@ -709,7 +709,7 @@ smgContainer.controller('MatchController',
           $scope.displayEndGameButton = false;
         }
 	      // Check whether the player login with Facebook
-	      if($cookies.FBAccessToken == "undefined") {
+	      if($cookies.FBAccessToken == "undefined" || isUndefinedOrNull($cookies.FBAccessToken)) {
 		      $scope.FBLogin = false;
 	      } else {
 		      $scope.FBLogin = true;
