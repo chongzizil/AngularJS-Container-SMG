@@ -3,10 +3,10 @@
  */
 
 
-smgContainer.controller('offLineCtrl', function ($scope, $modalInstance,$cookies,$rootScope) {
+smgContainer.controller('offLineCtrl', function ($scope, $modalInstance, $cookies, $rootScope) {
 
   $scope.offLineMessage = {
-    message : 'Your Opponent has been offline.'
+    message: 'Your Opponent has been offline.'
   };
 
   $scope.options = [
@@ -16,15 +16,15 @@ smgContainer.controller('offLineCtrl', function ($scope, $modalInstance,$cookies
     'Click Anywhere outside the popup you will still automatically receive opponent\' move!'
   ]
 
-  $scope.inSyn = function(){
+  $scope.inSyn = function () {
     $modalInstance.dismiss('Syn')
   }
 
-  $scope.inASyn = function(){
+  $scope.inASyn = function () {
     $modalInstance.dismiss('ASyn')
   }
 
-  $scope.win = function(){
+  $scope.win = function () {
     $modalInstance.close('I win');
   }
 

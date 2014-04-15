@@ -8,15 +8,15 @@ smgContainer.controller('rematchCtrl', function ($scope, $modalInstance, resultI
 
   $scope.resultInfo = resultInfo;
 
-  $scope.PostFB = function(){
+  $scope.PostFB = function () {
     $modalInstance.close('PostFB');
   };
 
-  $scope.rematch = function(){
+  $scope.rematch = function () {
     $modalInstance.close('Rematch');
   };
 
-  $scope.newMatch = function(){
+  $scope.newMatch = function () {
     $modalInstance.close('NewMatch');
   };
 

@@ -19,12 +19,11 @@
  */
 
 smgContainer.controller('MatchController',
-    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window, $location, $modal, NewMatchStateService,
-              GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService) {
+    function ($scope, $route, $routeParams, $rootScope, $cookies, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService) {
       /*
        * Variables for interacting with Server side.
        */
-	    $scope.opponentInfos = [];
+      $scope.opponentInfos = [];
       $scope.gameInfo = {};
       $scope.displayGetNewStateButton = false;
       $scope.displayEndGameButton = false;
@@ -59,17 +58,17 @@ smgContainer.controller('MatchController',
          */
         history: [],
         /*
-        The winner of the game. If loading a new game, it should be set to the default value
+         The winner of the game. If loading a new game, it should be set to the default value
          */
-        winner : Number.MIN_VALUE
+        winner: Number.MIN_VALUE
       };
 
-	    /**
-	     * Temporary variables for Posting status to Facebook
-	     */
-	    $cookies.FBAccessToken = "CAACEdEose0cBAGB4wwD68rRDxKrTpPFkfZB0lDSFVX57X1MKOzYpKKOYXeZB4pZBxV95rwIJnw3H1PAwK" +
-			    "pa3UDoqjRzkExVI0CXUmT4FqGqsQS4Hjae1wcMpEAkEBi7gvpDWwWjt79zTBN4tdTWYZBWxA6BSAWNDXEe5ZA6kM79a53" +
-			    "JkfwbgEEUw1ZASXSEZATUM9Y8QGZCeiAZDZD";
+      /**
+       * Temporary variables for Posting status to Facebook
+       */
+      $cookies.FBAccessToken = "CAACEdEose0cBAGB4wwD68rRDxKrTpPFkfZB0lDSFVX57X1MKOzYpKKOYXeZB4pZBxV95rwIJnw3H1PAwK" +
+          "pa3UDoqjRzkExVI0CXUmT4FqGqsQS4Hjae1wcMpEAkEBi7gvpDWwWjt79zTBN4tdTWYZBWxA6BSAWNDXEe5ZA6kM79a53" +
+          "JkfwbgEEUw1ZASXSEZATUM9Y8QGZCeiAZDZD";
 
       /*
        * Variables for interacting with Game side. Temporarily store the game state locally.
@@ -78,14 +77,15 @@ smgContainer.controller('MatchController',
       var state = {};
       var lastState = state;
       var endGameFlag = undefined;
+      var opponentOffLineFlag = undefined;
 
 
       /*
-      Currently considering using this variable to communicate with rematchController scope since they are nested
+       Currently considering using this variable to communicate with rematchController scope since they are nested
        */
       $scope.matchResultInfo = {
-         message : '',
-         messagePostToFB:''
+        message: '',
+        messagePostToFB: ''
       };
       /**
        * Method used to retrieve Game Information, mainly the
@@ -132,14 +132,36 @@ smgContainer.controller('MatchController',
           //sendVerifyMoveToGame();
           sendUpdateUIToGame();
         }
-        if(!isUndefinedOrNull(endGameFlag)&&endGameFlag=='true'){
-          endGameFlag=undefined;
-          if($cookies.isSyncMode=='true'){
+        if (!isUndefinedOrNull(endGameFlag) && endGameFlag == 'true') {
+          endGameFlag = undefined;
+          if ($cookies.isSyncMode == 'true') {
             $cookies.isSyncMode = false;
             $rootScope.socket.close();
           }
-
           showGameOverResult();
+        } else {
+          console.log('opponentOffLineFlag ' + opponentOffLineFlag);
+          console.log(!isUndefinedOrNull(opponentOffLineFlag));
+          console.log(opponentOffLineFlag == 'true');
+          if (!isUndefinedOrNull(opponentOffLineFlag) && opponentOffLineFlag == 'true') {
+            opponentOffLineFlag = undefined;
+            console.log("WHATTTTTTTFFKKKKK");
+            var offLineModal = $modal.open({
+              templateUrl: 'templates/directives/offLine.html',
+              controller: 'offLineCtrl'
+            });
+
+            offLineModal.result.then(function () {
+              $scope.endGame('Time Out', 'me')
+            }, function (argument) {
+              if (!isUndefinedOrNull(argument)) {
+                if (argument == 'ASyn') {
+                  $cookies.isSyncMode = false;
+                  $rootScope.socket.close();
+                }
+              }
+            });
+          }
         }
       }
 
@@ -230,12 +252,12 @@ smgContainer.controller('MatchController',
         var forkPlayerIds = $rootScope.playerIds.slice(0);
         var index = forkPlayerIds.indexOf($cookies.playerId);
         forkPlayerIds.splice(index, 1);
-        if(passinWinner=='oppo'){
+        if (passinWinner == 'oppo') {
           for (var index in forkPlayerIds) {
             move["operations"][0]['playerIdToScore'][forkPlayerIds[index]] = 1;
           }
           move["operations"][0]['playerIdToScore'][$cookies.playerId] = 0;
-        }else if(passinWinner=='me'){
+        } else if (passinWinner == 'me') {
           for (var index in forkPlayerIds) {
             move["operations"][0]['playerIdToScore'][forkPlayerIds[index]] = 0;
           }
@@ -260,23 +282,9 @@ smgContainer.controller('MatchController',
           var data = angular.fromJson(event.data);
           console.log("Log: data pushed by channel API: " + angular.toJson(data));
           //console.log("Log: data pushed by channel API:")
-          for(var message in data){
-            if(message=='message'&&data[message]=='OPPONENTS_LOST_CONNECTION'){
-              var offLineModal = $modal.open({
-                templateUrl: 'templates/directives/offLine.html',
-                controller: 'offLineCtrl'
-              });
-
-              offLineModal.result.then(function(){
-                $scope.endGame('Time Out','me')
-              }, function(argument){
-                if(!isUndefinedOrNull(argument)){
-                  if(argument=='ASyn'){
-                    $cookies.isSyncMode = false;
-                    $rootScope.socket.close();
-                  }
-                }
-              });
+          for (var message in data) {
+            if (message == 'message' && data[message] == 'OPPONENTS_LOST_CONNECTION') {
+              opponentOffLineFlag = 'true';
             }
           }
           $scope.matchInfo.state = data['state'];
@@ -292,7 +300,7 @@ smgContainer.controller('MatchController',
        * Method used to get new game state in asynchronous game mode.
        */
       $scope.getNewMatchState = function () {
-	      console.log("Log: matchController: routeParams.matchId: " + angular.toJson($routeParams.matchId));
+        console.log("Log: matchController: routeParams.matchId: " + angular.toJson($routeParams.matchId));
         NewMatchStateService.get({matchId: $routeParams.matchId, playerId: $cookies.playerId,
           accessSignature: $cookies.accessSignature})
             .$promise.then(function (data) {
@@ -326,37 +334,37 @@ smgContainer.controller('MatchController',
         );
       }
 
-	    /**
-	     * Method used to get current user's information
-	     */
-	    var getCurrentPlayerInfo = function() {
-		    $scope.matchInfo.playersInfo = [];
-				GetPlayerInfoService.get({playerId: $cookies.playerId,
-					targetId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
-						$promise.then(function(data){
-							if (data['error'] == "WRONG_PLAYER_ID") {
-								alert("Sorry, Wrong Player ID provided!");
-							} else if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
-								alert('Sorry, Wrong Access Signature provided!');
-							} else if (data['error'] == 'WRONG_TARGET_ID') {
-								alert('Sorry, Wrong Target ID provided!');
-							} else {
-								$scope.matchInfo.playersInfo.push({playerId : $cookies.playerId, info : data});
-								getAllOtherPlayersInfo($rootScope.playerIds);
-							}
-						});
-	    }
+      /**
+       * Method used to get current user's information
+       */
+      var getCurrentPlayerInfo = function () {
+        $scope.matchInfo.playersInfo = [];
+        GetPlayerInfoService.get({playerId: $cookies.playerId,
+          targetId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
+            $promise.then(function (data) {
+              if (data['error'] == "WRONG_PLAYER_ID") {
+                alert("Sorry, Wrong Player ID provided!");
+              } else if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
+                alert('Sorry, Wrong Access Signature provided!');
+              } else if (data['error'] == 'WRONG_TARGET_ID') {
+                alert('Sorry, Wrong Target ID provided!');
+              } else {
+                $scope.matchInfo.playersInfo.push({playerId: $cookies.playerId, info: data});
+                getAllOtherPlayersInfo($rootScope.playerIds);
+              }
+            });
+      }
 
       /**
        * Method used to get all the players' info except for current player's.
        * @param playerIds
        */
       var getAllOtherPlayersInfo = function (playerIds) {
-	      console.log("Log: get players info: playerIds: " + angular.toJson(playerIds));
+        console.log("Log: get players info: playerIds: " + angular.toJson(playerIds));
         var playerNum = 0;
-	      var forkPlayerIds = playerIds.slice(0);
-	      var index = forkPlayerIds.indexOf($cookies.playerId);
-	      forkPlayerIds.splice(index, 1);
+        var forkPlayerIds = playerIds.slice(0);
+        var index = forkPlayerIds.indexOf($cookies.playerId);
+        forkPlayerIds.splice(index, 1);
         for (var index in forkPlayerIds) {
           GetPlayerInfoService.get({playerId: $cookies.playerId,
             targetId: forkPlayerIds[index], accessSignature: $cookies.accessSignature}).
@@ -368,14 +376,14 @@ smgContainer.controller('MatchController',
                 } else if (data['error'] == 'WRONG_TARGET_ID') {
                   alert('Sorry, Wrong Target ID provided!');
                 } else {
-	                console.log("Log: get players info: current playerId: " + $cookies.playerId);
+                  console.log("Log: get players info: current playerId: " + $cookies.playerId);
                   console.log("Log: get players info: id: " + forkPlayerIds[playerNum] + " data: " + angular.toJson(data));
-	                $scope.matchInfo.playersInfo.push(
-			                {
-				                playerId : forkPlayerIds[playerNum],
-				                info : data
-			                }
-	                );
+                  $scope.matchInfo.playersInfo.push(
+                      {
+                        playerId: forkPlayerIds[playerNum],
+                        info: data
+                      }
+                  );
                   playerNum = playerNum + 1;
                   console.log("Log: inside getAllOtherPlayersInfo method, matchInfo: " + angular.toJson($scope.matchInfo));
                 }
@@ -398,12 +406,12 @@ smgContainer.controller('MatchController',
           //console.log("VerifyMove: lastState " + angular.toJson(lastState));
           state = $scope.matchInfo.state;
           //console.log("VerifyMove: state " + angular.toJson(state));
-          for(var operationMessage in $scope.matchInfo.lastMove){
+          for (var operationMessage in $scope.matchInfo.lastMove) {
             var endGameOperation = $scope.matchInfo.lastMove[operationMessage];
-            if(endGameOperation['type'] === 'EndGame'){
+            if (endGameOperation['type'] === 'EndGame') {
               var score = endGameOperation['playerIdToScore'];
-              for(var playerId in score){
-                if(score[playerId]=='1'){
+              for (var playerId in score) {
+                if (score[playerId] == '1') {
                   $scope.matchInfo.winner = playerId;
                   //console.log("We have the winner: " + $scope.matchInfo.winner)
                 }
@@ -540,95 +548,96 @@ smgContainer.controller('MatchController',
           state = {};
           lastState = state;
           endGameFlag = undefined;
+          opponentOffLineFlag = undefined;
         } else {
           console.log("Exception: playerIds are null");
         }
       }
 
-      $scope.open = function(){
+      $scope.open = function () {
         showGameOverResult();
       }
       /**
        * This function should be called when the game is over, which is determined by the fact that there is a
        * EndGame operation in the lastMove response by server
        */
-      function showGameOverResult(){
-        $cookies.timeOfEachTurn =null;
-        if($cookies.playerId == $scope.matchInfo.winner){
+      function showGameOverResult() {
+        $cookies.timeOfEachTurn = null;
+        if ($cookies.playerId == $scope.matchInfo.winner) {
           $scope.matchResultInfo.message = 'Cong! You have won the game!'
-        }else{
+        } else {
           $scope.matchResultInfo.message = 'Keep calm and carry on!'
         }
-          var resultModal = $modal.open({
-            templateUrl: 'templates/directives/rematch.html',
-            controller: 'rematchCtrl',
-            resolve:{
-              resultInfo : function(){
-                return $scope.matchResultInfo;
-              }
+        var resultModal = $modal.open({
+          templateUrl: 'templates/directives/rematch.html',
+          controller: 'rematchCtrl',
+          resolve: {
+            resultInfo: function () {
+              return $scope.matchResultInfo;
             }
-            });
+          }
+        });
 
-        resultModal.result.then(function(argument){
+        resultModal.result.then(function (argument) {
           //A promise that is resolved when a modal is closed
-					if(argument === "PostFB") {
-						//postToFB("SMG Test Post: I have win the match!");
+          if (argument === "PostFB") {
+            //postToFB("SMG Test Post: I have win the match!");
             postToFB($scope.matchResultInfo['messagePostToFB']);
-					}
-        }, function(){
+          }
+        }, function () {
           //A promise that is resolved when a modal is dismissed
           $location.url('/lobby/' + $routeParams.gameId);
         });
       }
 
-	     /**
-	     * Method used to post message on Facebook
-	     */
-			var postToFB = function(messageToFB) {
-				PostMessageToFBService.save({message : messageToFB, access_token : $cookies.FBAccessToken}, "")
-						.$promise.then(function(response) {
-							console.log("Log: matchController: response from posting to FB: " + angular.toJson(response));
-						}
-				);
-	    }
+      /**
+       * Method used to post message on Facebook
+       */
+      var postToFB = function (messageToFB) {
+        PostMessageToFBService.save({message: messageToFB, access_token: $cookies.FBAccessToken}, "")
+            .$promise.then(function (response) {
+              console.log("Log: matchController: response from posting to FB: " + angular.toJson(response));
+            }
+        );
+      }
 
-	    /**
-	     * Method used to get playerIds from server
-	     */
-	    var getPlayerIds = function(){
-		    NewMatchService.get({playerId : $cookies.playerId, accessSignature: $cookies.accessSignature})
-				    .$promise.then(function(data) {
-					    console.log("Log: matchController: response from NewMatchService: " + angular.toJson(data));
-					    if (!data['matchId']) {
-						    if (data['error'] === 'WRONG_ACCESS_SIGNATURE') {
-							    alert('Sorry, your ID does not exist. Please try again.');
-						    } else if (data['error'] === 'WRONG_PLAYER_ID') {
-							    alert("Sorry, please provide correct Player ID!");
-						    } else if (data['error'] === 'NO_MATCH_FOUND') {
-							    alert("Sorry, no match found!")
-						    }
-					    } else {
-						    $rootScope.playerIds = data['playerIds'];
-						    $cookies.matchId = data['matchId'];
-						    getCurrentPlayerInfo();
-						    initiatePlayerTurn();
-						    if (!$scope.$$phase) {
-							    $scope.$apply();
-						    }
-					    }
-				    });
-	    }
+      /**
+       * Method used to get playerIds from server
+       */
+      var getPlayerIds = function () {
+        NewMatchService.get({playerId: $cookies.playerId, accessSignature: $cookies.accessSignature})
+            .$promise.then(function (data) {
+              console.log("Log: matchController: response from NewMatchService: " + angular.toJson(data));
+              if (!data['matchId']) {
+                if (data['error'] === 'WRONG_ACCESS_SIGNATURE') {
+                  alert('Sorry, your ID does not exist. Please try again.');
+                } else if (data['error'] === 'WRONG_PLAYER_ID') {
+                  alert("Sorry, please provide correct Player ID!");
+                } else if (data['error'] === 'NO_MATCH_FOUND') {
+                  alert("Sorry, no match found!")
+                }
+              } else {
+                $rootScope.playerIds = data['playerIds'];
+                $cookies.matchId = data['matchId'];
+                getCurrentPlayerInfo();
+                initiatePlayerTurn();
+                if (!$scope.$$phase) {
+                  $scope.$apply();
+                }
+              }
+            });
+      }
 
-	    /**
-	     * Filter function used to filter out the current player's information from the opponent part.
-	     */
-	    $scope.filterFnOpponents = function(playerInfo) {
-		    return playerInfo.playerId !== $cookies.playerId;
-	    }
+      /**
+       * Filter function used to filter out the current player's information from the opponent part.
+       */
+      $scope.filterFnOpponents = function (playerInfo) {
+        return playerInfo.playerId !== $cookies.playerId;
+      }
 
-	    $scope.filterFnCurrentPlayer = function(playerInfo) {
-		    return playerInfo.playerId === $cookies.playerId;
-	    }
+      $scope.filterFnCurrentPlayer = function (playerInfo) {
+        return playerInfo.playerId === $cookies.playerId;
+      }
 
       /**
        * Formal code starts here.
@@ -658,8 +667,8 @@ smgContainer.controller('MatchController',
         }
         // 1. Get game information.
         getGameInfo();
-	      // 2. Get playerIds from server: this is used for case when user refresh the web browser.
-	      getPlayerIds();
+        // 2. Get playerIds from server: this is used for case when user refresh the web browser.
+        getPlayerIds();
       }
     }
 );
