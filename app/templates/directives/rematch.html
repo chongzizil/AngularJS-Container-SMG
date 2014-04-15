@@ -5,7 +5,9 @@
 	<div class="modal-body">
 		<div class="container-fluid">
 			<row>
-				<input type="text" ng-model="resultInfo.messagePostToFB" ng-required="true" ng-show="resultInfo['FBLogin']" placeholder="Say something...">
+				<div class="col-sm-10">
+					<textarea style="width: 100%" ng-model="resultInfo.messagePostToFB" ng-required="true" ng-show="resultInfo['FBLogin']">{{resultInfo.messagePostToFB}}</textarea>
+				</div>
 			</row>
 		</div>
 	</div>

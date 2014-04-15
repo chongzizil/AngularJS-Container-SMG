@@ -607,9 +607,11 @@ smgContainer.controller('MatchController',
       function showGameOverResult() {
         $cookies.timeOfEachTurn = null;
         if ($cookies.playerId == $scope.matchInfo.winner) {
-          $scope.matchResultInfo.message = 'Cong! You have won the game!'
+          $scope.matchResultInfo.message = 'Cong! You have won the game!';
+	        $scope.matchResultInfo.messagePostToFB = 'I just won a match! :)';
         } else {
-          $scope.matchResultInfo.message = 'Keep calm and carry on!'
+          $scope.matchResultInfo.message = 'Keep calm and carry on!';
+	        $scope.matchResultInfo.messagePostToFB = 'I just lost = =!!';
         }
         var resultModal = $modal.open({
           templateUrl: 'templates/directives/rematch.html',
