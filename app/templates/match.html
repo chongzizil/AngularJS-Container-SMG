@@ -2,26 +2,38 @@
 	<row>
 		<div id="playerInfo" class="panel panel-default">
 			<div class="panel-heading">Your Information</div>
-			<div class="panel-body" ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentPlayer">
-				<div class="col-sm-3">
-					Email: {{playerInfo['info']['email']}}
-				</div>
-				<div class="col-sm-3">
-					First Name: {{playerInfo['info']['firstname']}}
-				</div>
-				<div class="col-sm-3">
-					Last Name: {{playerInfo['info']['lastname']}}
-				</div>
-				<div class="col-sm-3">
-					Nick Name: {{playerInfo['info']['nickname']}}
+			<div class="panel-body">
+				<div class="container-fluid">
+						<div class="col-md-1 col-xs-12">
+							<div align="middle">
+								<img ng-src="img/giraffe.gif" hight="50" width="50"/>
+							</div>
+						</div>
+						<div class="col-md-11 col-xs-12" ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentPlayer">
+							<row>
+								<div class="col-md-12">
+									Email: {{playerInfo['info']['email']}}
+								</div>
+							</row>
+							<row>
+								<div class="col-md-6">
+									First Name: {{playerInfo['info']['firstname']}}
+								</div>
+								<div class="col-md-6">
+									Last Name: {{playerInfo['info']['lastname']}}
+								</div>
+							</row>
+						</div>
 				</div>
 			</div>
+
 		</div>
 	</row>
 
 	<row>
 		<div id="gameContainer" class="panel panel-default">
 			<div class="panel-heading">
+				{{timer}}
 				<div id="currentTurnInfo" align="middle">
 					<td>Current turn: {{matchInfo.playerThatHasTurn}}</td>
 				</div>
@@ -40,13 +52,12 @@
 						</button>
 					</div>
 
-                    <div id="RematchButton" class="col-md-3" align="middle">
-                        <button type="button" class="btn btn-primary" ng-click="open()"> Rematch
-                            Game
-                        </button>
-                    </div>
+					<div id="RematchButton" class="col-md-3" align="middle">
+						<button type="button" class="btn btn-primary" ng-click="open()"> Rematch
+							Game
+						</button>
+					</div>
 				</row>
-
 
 
 				<br/><br/><br/>
@@ -80,7 +91,7 @@
 					</tr>
 					</thead>
 					<tbody>
-					<tr ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnOpponents"  >
+					<tr ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnOpponents">
 						<td>
 							Opponent_{{$index + 1}}:
 						</td>

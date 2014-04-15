@@ -108,6 +108,24 @@ smgContainer.factory('PostMessageToFBService', ['$resource', function($resource)
 }]);
 
 /**
+ * To get the profile picture of the player if he/she login with FB account
+ */
+smgContainer.factory('GetPicFromFBService', ['$resource', function($resource) {
+	return $resource(facebookGraphApiUrl + '/me/picture',
+			{redirect: '0', height: '50', width: '50', type: 'normal', access_token: '@access_token'}
+	);
+}]);
+
+/**
+ * To get accessToken
+ */
+/*smgContainer.factory('GetTokenFromFBService', ['$resource', function($resource) {
+	return $resource(facebookGraphApiUrl + '/oauth/access_token',
+			{client_id: '227131944153073', redirect_uri: 'http://smg-angularjs-container.appspot.com/', client_secret: '540d2fa6851aa96dc183571874afc110', code: '@code'}
+	);
+}]);*/
+
+/**
  * To login as a developer
  */
 /*smgContainer.factory('DevService', ['$resource', function($resource) {

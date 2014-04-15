@@ -177,6 +177,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 	 */
 	$scope.cancel = function () {
 		$("#autoMatching").hide();
+		$cookies.timeOfEachTurn='';
 		$rootScope.socket.close();
 	}
 
