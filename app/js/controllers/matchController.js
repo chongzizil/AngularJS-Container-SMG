@@ -80,7 +80,8 @@ smgContainer.controller('MatchController',
        */
       $scope.matchResultInfo = {
         message: '',
-        messagePostToFB: ''
+        messagePostToFB: '',
+	      FBLogin : $scope.FBLogin
       };
       /**
        * Method used to retrieve Game Information, mainly the
@@ -713,6 +714,7 @@ smgContainer.controller('MatchController',
 	      } else {
 		      $scope.FBLogin = true;
 	      }
+	      $scope.matchResultInfo.FBLogin = $scope.FBLogin;
         // 1. Get game information.
         getGameInfo();
         // 2. Get playerIds from server: this is used for case when user refresh the web browser.
