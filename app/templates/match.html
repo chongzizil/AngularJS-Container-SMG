@@ -4,12 +4,13 @@
 			<div class="panel-heading">Your Information</div>
 			<div class="panel-body">
 				<div class="container-fluid">
-						<div class="col-md-11 col-xs-12" ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentPlayer">
-							<div class="col-md-1 col-xs-12">
-								<div align="middle">
-									<img ng-src="img/giraffe.gif" hight="50" width="50"/>
-								</div>
+					<div ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentPlayer">
+						<div class="col-md-1 col-xs-12">
+							<div align="middle">
+								<img ng-src="img/giraffe.gif" hight="50" width="50"/>
 							</div>
+						</div>
+						<div class="col-md-11 col-xs-12">
 							<row>
 								<div class="col-md-12">
 									Email: {{playerInfo['info']['email']}}
@@ -24,6 +25,7 @@
 								</div>
 							</row>
 						</div>
+					</div>
 				</div>
 			</div>
 
@@ -47,7 +49,8 @@
 					</div>
 
 					<div id="endGameButton" class="col-md-3 col-xs-6" align="middle">
-						<button type="button" class="btn btn-primary" ng-show="displayEndGameButton" ng-click="endGame('p','oppo')"> End
+						<button type="button" class="btn btn-primary" ng-show="displayEndGameButton" ng-click="endGame('p','oppo')">
+							End
 							Game
 						</button>
 					</div>
