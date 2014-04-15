@@ -396,6 +396,18 @@ smgContainer.controller('MatchController',
         return angular.isUndefined(val) || val == null;
       }
 
+      function timeCount(time) {
+        $scope.timer = time;
+        $scope.countDown = function () {
+          $scope.timer--;
+          if ($scope.timer !== 0) {
+            myTimer = $timeout($scope.countDown, 1000);
+          } else {
+
+          }
+        }
+      }
+
       /**
        * This function should be called to update state and lastMoveplayerId after fetch
        */
@@ -432,6 +444,10 @@ smgContainer.controller('MatchController',
             var setTurnOperation = $scope.matchInfo.lastMove[operationMessage];
             if (setTurnOperation['type'] === "SetTurn") {
               $scope.matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
+              if (isUndefinedOrNull($cookies.timeOfEachTurn)) {
+                $cookies.timeOfEachTurn = setTurnOperation['numberOfSecondsForTurn'];
+                console.log('Log: set Time of the game to ' + $cookies.timeOfEachTurn);
+              }
               if ($scope.matchInfo.playerThatHasTurn == $cookies.playerId) {
                 $scope.displayEndGameButton = true;
               } else {
@@ -466,6 +482,18 @@ smgContainer.controller('MatchController',
         } else if (data['type'] === "MakeMove") {
           var operations = data['operations'];
           //console.log("In the container, it sends to the server, operations are " + angular.toJson(operations));
+          /*
+           To check whether the player sets the timer or not
+           */
+          if (!isUndefinedOrNull($cookies.timeOfEachTurn)) {
+            for (var operationMessage in operations) {
+              var operation = operations[operationMessage];
+              if (operation['type'] == 'SetTurn') {
+                operation['numberOfSecondsForTurn'] = $cookies.timeOfEachTurn;
+                console.log("In the container, it sets the timer in SetTurn to " + $cookies.timeOfEachTurn);
+              }
+            }
+          }
           sendMoveToServer(operations);
         } else if (data['type'] === "VerifyMoveDone") {
           //deal with verifyMoveDone
