@@ -96,6 +96,21 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
   };
   getMatchesInfo();
 
+
+	//Get FB info
+//	var getFBInfo = function () {
+//		if ($cookies.accessToken != undefined || $cookies.accessToken != '') {
+//			GetPicFromFBService.get({access_token: $cookies.accessToken}).
+//					$promise.then(function (data) {
+//						console.log(data);
+//						$scope.imageUrl = data['data']['url'];
+//
+//					}
+//			);
+//		}
+//	}
+//	getFBInfo();
+
   /**
    * Check if the player has login, if not, pop up the login page for him/her
    */

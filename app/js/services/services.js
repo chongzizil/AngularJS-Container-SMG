@@ -119,11 +119,11 @@ smgContainer.factory('GetPicFromFBService', ['$resource', function ($resource) {
 /**
  * To get accessToken
  */
-smgContainer.factory('GetTokenFromFBService', ['$resource', function($resource) {
- return $resource(facebookGraphApiUrl + '/oauth/access_token',
- {client_id: '227131944153073', redirect_uri: 'http://smg-angularjs-container.appspot.com/', client_secret: '540d2fa6851aa96dc183571874afc110', code: '@code'}
- );
- }]);
+//smgContainer.factory('GetTokenFromFBService', ['$resource', function($resource) {
+// return $resource(facebookGraphApiUrl + '/oauth/access_token',
+// {client_id: '227131944153073', redirect_uri: 'http://smg-angularjs-container.appspot.com/', client_secret: '540d2fa6851aa96dc183571874afc110', code: '@code'}
+// );
+// }]);
 
 /**
  * To login as a developer
