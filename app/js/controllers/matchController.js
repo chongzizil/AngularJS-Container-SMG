@@ -155,7 +155,7 @@ smgContainer.controller('MatchController',
             });
           }
         }
-      }
+      };
 
       /**
        * Method used to call POST method inside {@code SendMakeMoveService}.
@@ -279,16 +279,14 @@ smgContainer.controller('MatchController',
               opponentOffLineFlag = 'true';
             }
           }
-
             $scope.matchInfo.state = data['state'];
             $scope.matchInfo.lastMove = data['lastMove'];
             // 2. UpdateUI for Game with the received state.
             processLastMoveAndState();
             processLastPlayer(data);
             sendMessageToGame($cookies.playerId, $scope.matchInfo.lastMovePlayerId);
-
         };
-      }
+      };
 
       /**
        * Method used to get new game state in asynchronous game mode.
@@ -306,8 +304,6 @@ smgContainer.controller('MatchController',
                 alert('Sorry, wrong match ID provided!');
               } else {
                 console.log("Log: get new match state (async mode): " + angular.toJson(data));
-                //console.log("Log: the match info for this game: " + angular.toJson($scope.matchInfo));
-                //console.log("Log: get new match state (async mode): ");
                 // 1. Get state and last move
                 $scope.matchInfo.state = data['state'];
                 $scope.matchInfo.lastMove = data['lastMove'];
@@ -315,9 +311,7 @@ smgContainer.controller('MatchController',
                 if (isStateSame($scope.matchInfo.state, {})) {
                   replyGameReady();
                 }
-                //console.log("!isStateSame(state,$scope.matchInfo.state) " + !isStateSame(state,$scope.matchInfo.state));
                 if (!isStateSame(state, $scope.matchInfo.state)) {
-                  console.log("Log: Get new match state from server(changing local state)!")
                   console.log("Log: New State is " + angular.toJson($scope.matchInfo.state));
                   processLastMoveAndState();
                   processLastPlayer(data);
@@ -348,7 +342,7 @@ smgContainer.controller('MatchController',
                 getAllOtherPlayersInfo($rootScope.playerIds);
               }
             });
-      }
+      };
 
 	    /**
 	     * Method used to get User Image Url from Facebook
@@ -365,7 +359,7 @@ smgContainer.controller('MatchController',
 		    } else {
 			    $scope.playerImageUrl = "img/giraffe.gif";
 		    }
-	    }
+	    };
 
       /**
        * Method used to get all the players' info except for current player's.
@@ -419,9 +413,9 @@ smgContainer.controller('MatchController',
               $scope.endGame('Time Out','oppo');
             }
           }
-        }
+        };
 	      var myTimer = $timeout($scope.countDown, 1000);
-      }
+      };
 
       /**
        * This function should be called to update state and lastMoveplayerId after fetch
@@ -535,9 +529,6 @@ smgContainer.controller('MatchController',
           } else {
             console.log("Hacker Detected!!! " + data['hackerPlayerId']);
           }
-        } else {
-//          console.log("In the container listener, can't deal with the message from the game!!");
-//          console.log("It is " + data['type']);
         }
       }
 
