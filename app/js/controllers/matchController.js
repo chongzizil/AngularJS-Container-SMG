@@ -20,6 +20,7 @@
 
 smgContainer.controller('MatchController',
     function ($scope, $route, $routeParams, $rootScope, $cookies, $timeout, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService, GetPicFromFBService) {
+			$scope.imageUrl = $cookies.imageUrl;
       /*
        * Variables for interacting with Server side.
        */

@@ -2,7 +2,7 @@
 
 smgContainer.controller('MenuController',
     function ($scope, $cookies, $rootScope, $location) {
-
+				$scope.imageUrl = $cookies.imageUrl;
 //	    var absUrl = $location.absUrl();
 //	    var begIndex = '';
 //	    var endIndex = '';

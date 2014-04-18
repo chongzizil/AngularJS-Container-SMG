@@ -75,6 +75,8 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
         } else if (data['error'] == 'WRONG_TARGET_ID') {
           alert('Sorry, Wrong Target ID provided!');
         } else {
+	        $cookies.imageUrl = data['imageURL'];
+	        $scope.imageUrl = $cookies.imageUrl;
           $scope.playerEmail = data['email'];
         }
       }
