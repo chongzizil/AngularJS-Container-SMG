@@ -1,118 +1,13 @@
 <div>
 	<!--<img ng-src="{{imageUrl}}"/>-->
-	<div class="container">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<div class="panel-title">
-						<div align="middle">
-							{{gameName}}
-							<span class="glyphicon glyphicon-info-sign" data-toggle="modal"
-							      data-target="#description"></span>
-						</div>
-				</div>
-			</div>
-			<div class="panel-body">
-				<div class="container-fluid">
-					<row>
-						<!--Alerts-->
-						<div class="alert alert-success collapse" id="autoMatching">
-							<button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
-							<strong>Waiting for another player...</strong>
-						</div>
-						<div class="alert alert-danger collapse" id="inviteAlert">
-							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-							<p>{{inviteInfo.error}}</p>
-						</div>
-						<div class="alert alert-danger collapse" id="noNewMatchAlert">
-							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-							<strong>No match found, sorry...</strong>
-						</div>
-					</row>
-
-
-					<row>
-						<div class="col-xs-6 col-md-offset-3 col-md-3">
-							<button type="submit" ng-click="autoMatch()" class="btn btn-default">
-								<span class="glyphicon glyphicon-flash"></span> Auto Match
-							</button>
-						</div>
-
-						<div class="col-xs-6 col-md-3">
-							<button type="submit" ng-click="checkHasNewMatch()" class="btn btn-default ">
-								<span class="glyphicon glyphicon-search"></span> Check match
-							</button>
-						</div>
-					</row>
-					<br/><br/><br/>
-					<row>
-						<form name="inviteForm" class="form-inline" role="form">
-							<div ng-class="{ 'form-group': true, 'col-md-offset-1 col-md-5': true, 'has-error': friendIdHasError }">
-								<div class="input-group">
-									<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-									<input type="text" required ng-model="inviteInfo.friendId" class="form-control" id="friendId"
-									       placeholder="Friend ID">
-								</div>
-							</div>
-							<div class="form-group col-md-2">
-								<select required ng-model="inviteInfo.timeOfEachTurn" class="form-control" placeholder="Time limit">
-									<option value="" disabled selected>Time limit</option>
-									<option value="0">No time limit</option>
-									<option value="15">15s</option>
-									<option value="30">30s</option>
-									<option value="45">45s</option>
-									<option value="60">60s</option>
-								</select>
-							</div>
-							<div class="form-group col-md-1">
-								<button type="submit" ng-disabled="inviteForm.$invalid" ng-click="invite(inviteInfo)"
-								        class="btn btn-default">
-									<span class="glyphicon glyphicon-log-in"></span> Invite
-								</button>
-							</div>
-						</form>
-					</row>
-
-				</div>
-
-			</div>
-			<table class="table table-striped table-hover table-condensed">
-				<thead>
-				<tr>
-					<th>#</th>
-					<th>Players</th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr>
-					<td>Match1</td>
-					<td>A/B</td>
-				</tr>
-				<tr>
-					<td>Match2</td>
-					<td>C/D</td>
-				</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-
-
-	<!-- Modal for game info -->
-	<div class="modal fade" id="description" tabindex="-1" role="dialog" aria-labelledby="descriptionLabel"
-	     aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="myModalLabel">Game Description</h4>
-				</div>
-				<div class="modal-body">
-					{{gameDescription}}
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
+	<div class="container-fluid">
+		<div class="jumbotron">
+			<h1>Just Play It!</h1>
+			<p>
+				<button type="submit" ng-click="autoMatch()" class="btn btn-primary">
+					<span class="glyphicon glyphicon-flash"></span> Auto Match
+				</button>
+			</p>
 		</div>
 	</div>
 

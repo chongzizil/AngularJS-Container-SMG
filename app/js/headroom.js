@@ -1,0 +1,1 @@
+$(".navbar-fixed-top").headroom();

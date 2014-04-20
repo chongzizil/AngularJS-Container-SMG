@@ -29,4 +29,10 @@
   padding: 0;
 }
 
-body { padding-top: 70px; }
+#sidebar {
+    height: 100%;
+}
+
+body {
+    padding-top: 70px;
+}
