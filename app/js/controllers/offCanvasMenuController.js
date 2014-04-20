@@ -32,7 +32,6 @@ smgContainer.controller('OffCanvasMenuController',
 				$scope.checkMatches = function () {
 					NewMatchService.get({playerId: $cookies.playerId, accessSignature: $cookies.accessSignature, gameId: gameId}).
 							$promise.then(function (data) {
-								console.log("************* Checking *************");
 								/*
 								 {@code data} contains following data if there's a match:
 								 matchId:

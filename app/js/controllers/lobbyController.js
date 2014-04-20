@@ -11,6 +11,13 @@
 
 smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService, GetAllMatchInfoService) {
 
+	if ($(window).height() > 650) {
+		$("#autoMatch").height(500);
+	} else {
+
+		$("#autoMatch").height($(window).height() * 0.5);
+	}
+
 	$cookies.gameId=$routeParams.gameId;
 //	console.log("lobby: "+ $cookies.gameId);
 
@@ -81,48 +88,6 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
     );
   };
   getMatchesInfo();
-
-
-	//Get FB info
-//	var getFBInfo = function () {
-//		if ($cookies.accessToken != undefined || $cookies.accessToken != '') {
-//			GetPicFromFBService.get({access_token: $cookies.accessToken}).
-//					$promise.then(function (data) {
-//						console.log(data);
-//						$scope.imageUrl = data['data']['url'];
-//
-//					}
-//			);
-//		}
-//	}
-//	getFBInfo();
-
-  /**
-   * Check if the player has login, if not, pop up the login page for him/her
-   */
-  var popupLoginPage = function () {
-    // Show the modal to alert the player
-    needLoginAlert.modal('show');
-
-    // A simple count down for login page pop up
-    $scope.timer = 3;
-    $scope.countDown = function () {
-      $scope.timer--;
-      if ($scope.timer !== 0) {
-        myTimer = $timeout($scope.countDown, 1000);
-      } else {
-        needLoginAlert.modal('hide');
-        $("#login").modal('show');
-      }
-    }
-
-    var myTimer = $timeout($scope.countDown, 1000);
-  }
-
-  //If the player is not login yet, a popup will alert him/her to login first
-  if ($cookies.playerId === "Guest" || $cookies.accessSignature === null) {
-    popupLoginPage();
-  }
 
   /**
    * Insert a match when one player receive the playerIds

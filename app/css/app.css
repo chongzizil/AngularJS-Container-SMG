@@ -36,3 +36,9 @@
 body {
     padding-top: 70px;
 }
+
+.v-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

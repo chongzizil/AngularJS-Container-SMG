@@ -1,36 +1,14 @@
 <div>
-	<!--<img ng-src="{{imageUrl}}"/>-->
 	<div class="container-fluid">
-		<div class="jumbotron">
-			<h1>Just Play It!</h1>
-			<p>
-				<button type="submit" ng-click="autoMatch()" class="btn btn-primary">
-					<span class="glyphicon glyphicon-flash"></span> Auto Match
-				</button>
-			</p>
-		</div>
-	</div>
-
-	<!-- Modal for login alert -->
-	<div class="modal fade" id="needLoginAlert">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title">Modal title</h4>
-				</div>
-				<div class="alert alert-danger">
-					<div class="modal-body">
-						<p>You need to login first!</p>
-
-						<p>Jump to login page in {{timer}} seconds...</p>
-					</div>
-				</div>
+		<div class="jumbotron" id="autoMatch">
+			<div class="col-xs-12 v-center">
+				<h1>Just Play It!</h1>
 			</div>
-			<!-- /.modal-content -->
+			<div class="col-xs-12 v-center">
+				<button type="submit" ng-click="autoMatch()" class="btn btn-primary btn-lg">
+					<i class="icon-random"></i> Auto Match
+				</button>
+			</div>
 		</div>
-		<!-- /.modal-dialog -->
 	</div>
-	<!-- /.modal -->
-
 </div>
