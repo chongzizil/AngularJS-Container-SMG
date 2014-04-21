@@ -5,6 +5,14 @@ smgContainer.controller('OffCanvasMenuController',
 
 			var url = $location.url();
 
+			$scope.refreshOffCanvasMenu = function () {
+				if (angular.isDefined(gameId)) {
+					getGameName();
+				} else {
+					$scope.gameName = "No game!?";
+				}
+			}
+
 			/** If it's in the lobby page */
 			if (url.substr(0, 6) === "/lobby") {
 				var gameId = url.substr(7);
