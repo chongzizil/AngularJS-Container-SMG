@@ -1,27 +1,18 @@
 //'use strict';
 
 /**
- * Match Controller contains two parts:
- * 1. Container interacts with Server side:
- *  (1). In asynchronous mode, get new state and last move from Server.
- *  (2). In synchronous mode, receive channel API pushed new state and last move.
- *  (3). Send new moves to Server.
- * 2. Container interacts with Game side:
- *  (1). Get operations made by players
- *  (2). Send new state to Game for updateUI
- *  (3). Send new state, last state and last move to Game for verify move.
- *
- *  Match Controller contains three modes:
- *  1. Synchronous Mode: Player A presses "autoMatch" and wait for another player, player B also presses
- *  the "autoMatch", system pairs player A and B automatically, they communicate through channel API.
- *  2. Asynchronous Mode: Player A invite Player B with B's playerId, when B presses "check new game",
- *  player A and B pair, after that, they make moves and check new states manually.
- *  3. Pass-and-Play Mode: Player A and Player B both play the game on the same devices(desktop/laptop or
- *  mobiles), which means they use the same screen, and except for the initial getting game stage, the game
- *  does not need to communicate with the server.
+ * A typical procedure for Mobile Version Match Controller contains:
+ * (1). After the player chooses the game, container will ask for state from the server. If the state is empty, which
+ *      means that it's a new match, container will send initial signal to the game. Otherwise, it will update UI
+ *      based on the state.
+ * (2). Wait for game to send operations
+ * (3). Wrap the operations and send it the server
+ * (4). Container will temporarily store the state from the server. This is only used to help the container determine
+ *      whether the match is a new match or not. Since we don't verify last move, each time container updates UI, it
+ *      uses the state from the server.
  */
 
-smgContainer.controller('StandaloneController',
+smgContainer.controller('MatchController',
 		function ($scope, $route, $routeParams, $rootScope, $cookies, $timeout, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService, GetPicFromFBService) {
 			$scope.imageUrl = $cookies.imageUrl;
 			/*
@@ -29,8 +20,8 @@ smgContainer.controller('StandaloneController',
 			 */
 			$scope.opponentInfos = [];
 			$scope.gameInfo = {};
-			$scope.displayGetNewStateButton = false;
-			$scope.displayEndGameButton = false;
+//      $scope.displayGetNewStateButton = false;
+//      $scope.displayEndGameButton = false;
 			$scope.FBLogin = false;
 			$scope.playerImageUrl;
 			$scope.matchInfo = {
@@ -49,14 +40,12 @@ smgContainer.controller('StandaloneController',
 				playersInfo: [],
 				/*
 				 All new match state will be saved here:
-				 (1). Synchronous: from channel API and response from make move.
-				 (2). Asynchronous: get new game state.
+				 (1). Asynchronous: get new game state.
 				 */
 				state: {},
 				/*
 				 All last moves will be saved here, array of operations:
-				 (1). Synchronous: from channel API and response from make move.
-				 (2). Asynchronous: get new game state.
+				 (1). Asynchronous: get new game state.
 				 */
 				lastMove: [],
 				/*
@@ -64,28 +53,33 @@ smgContainer.controller('StandaloneController',
 				 */
 				history: [],
 				/*
-				 The winner of the game. If loading a new game, it should be set to the default value
+				 The winner of the game. Each time loading a new game, it should be set to the default value
 				 */
 				winner: Number.MIN_VALUE
 			};
 
 			/*
 			 * Variables for interacting with Game side. Temporarily store the game state locally.
-			 * Initiated empty every time container loads the game
+			 * Initiated empty each time container loads the game
 			 */
 			var state = {};
 			var lastState = state;
+			/**
+			 * endGameFlag is initiated undefined when loading the game. And it will be set to 'true' when there is an
+			 * endGame operation in the last move. And will be set to undefined again before container updates the game
+			 * result.
+			 * @type {undefined}
+			 */
 			var endGameFlag = undefined;
-			var opponentOffLineFlag = undefined;
-			var makeMoveFlag = undefined;
 
-			/*
-			 Currently considering using this variable to communicate with rematchController scope since they are nested
+			/**
+			 * This model is used to communicate with controllers which is responsible for FaceBook communication
+			 * @type {{message: string, messagePostToFB: string, FBLogin: (boolean|*)}}
 			 */
 			$scope.matchResultInfo = {
 				message: '',
 				messagePostToFB: '',
-				FBLogin : $scope.FBLogin
+				FBLogin: $scope.FBLogin
 			};
 			/**
 			 * Method used to retrieve Game Information, mainly the
@@ -113,12 +107,32 @@ smgContainer.controller('StandaloneController',
 				);
 			};
 
+			/*
+			 Auxiliary functions: isStateSame, isUndefinedOrNull,
+			 */
+
 			/**
-			 * Method used to check whether the state is updated. Takes two object as parameters
+			 * Method used to check whether the state is updated. Takes two object as parameters.
+			 * Convert this two object into JSON string and then check whether they are same or not.
 			 */
 			var isStateSame = function (oldState, newState) {
 				return angular.toJson(oldState) === angular.toJson(newState);
-			}
+			};
+
+			/**
+			 * Check whether the variable is undefined, null or empty string.
+			 * @param val
+			 * @returns {*|boolean}
+			 */
+			var isUndefinedOrNull = function (val) {
+				return angular.isUndefined(val) || val == null || val == '';
+			};
+
+			/*
+			 Method interacts with the game side:
+			 sendMessageToGame, showGameOverResult, replyGameReady, sendVerifyMoveToGame, sendUpdateUIToGame,
+			 processLastMoveAndState, processLastPlayer
+			 */
 
 			/**
 			 * Method send UpdateUI/VerifyMove to game. If the two parameters are the same, which means that
@@ -134,32 +148,143 @@ smgContainer.controller('StandaloneController',
 				}
 				if (!isUndefinedOrNull(endGameFlag) && endGameFlag == 'true') {
 					endGameFlag = undefined;
-					if ($cookies.isSyncMode == 'true') {
-						$cookies.isSyncMode = false;
-						$rootScope.socket.close();
-					}
 					showGameOverResult();
-				} else {
-					if (!isUndefinedOrNull(opponentOffLineFlag) && opponentOffLineFlag == 'true') {
-						opponentOffLineFlag = undefined;
-						var offLineModal = $modal.open({
-							templateUrl: 'templates/directives/offLine.html',
-							controller: 'offLineCtrl'
-						});
+				}
+			};
 
-						offLineModal.result.then(function () {
-							$scope.endGame('Time Out', 'me')
-						}, function (argument) {
-							if (!isUndefinedOrNull(argument)) {
-								if (argument == 'ASyn') {
-									$cookies.isSyncMode = false;
-									$rootScope.socket.close();
+			/**
+			 * This function should be called when the game is over, which is determined by the fact that there is a
+			 * EndGame operation in the lastMove sent by server
+			 * This method updates the matchResultInfo model based on the player
+			 */
+			var showGameOverResult = function () {
+				if ($cookies.playerId == $scope.matchInfo.winner) {
+					$scope.matchResultInfo.message = 'Cong! You have won the game!';
+					$scope.matchResultInfo.messagePostToFB = 'I just won a match! :)';
+				} else {
+					$scope.matchResultInfo.message = 'Keep calm and carry on!';
+					$scope.matchResultInfo.messagePostToFB = 'I just lost = =!!';
+				}
+
+				/*
+				 Two fundamental methods which will be used in further implementation:
+				 postToFB($scope.matchResultInfo['messagePostToFB']);
+				 $location.url('/lobby/' + $routeParams.gameId);
+				 */
+			};
+
+			/**
+			 * Container will send the initial signal. Currently it supports two players
+			 */
+			var replyGameReady = function () {
+				var initialUpdateUI = {
+					'type': 'UpdateUI',
+					'yourPlayerId': $cookies.playerId,
+					'playersInfo': [
+						{'playerId': $rootScope.playerIds[0]},
+						{'playerId': $rootScope.playerIds[1]}
+					],
+					'state': {},
+					'lastState': null,
+					'lastMove': [],
+					'lastMovePlayerId': null,
+					'playerIdToNumberOfTokensInPot': {}
+				};
+				//console.log("in the container, it sends the initial UpdateUI is " + angular.toJson(initialUpdateUI));
+				console.log("in the container, it sends the initial UpdateUI");
+				$scope.sendMessageToIframe(initialUpdateUI);
+			};
+
+			var sendVerifyMoveToGame = function () {
+				var verifyMove = {
+					"type": "VerifyMove",
+					'playersInfo': [
+						{'playerId': $rootScope.playerIds[0]},
+						{'playerId': $rootScope.playerIds[1]}
+					],
+					'state': state,
+					'lastState': lastState,
+					'lastMove': $scope.matchInfo.lastMove,
+					"lastMovePlayerId": $scope.matchInfo.lastMovePlayerId,
+					"playerIdToNumberOfTokensInPot": {}
+				};
+				//console.log("In the container, it sends the following VerifyMove to the game: " + angular.toJson(verifyMove));
+				console.log("In the container, it sends the following VerifyMove to the game: ");
+				$scope.sendMessageToIframe(verifyMove);
+			};
+
+
+			var sendUpdateUIToGame = function () {
+				var updateUI = {
+					"type": "UpdateUI",
+					'yourPlayerId': $cookies.playerId,
+					'playersInfo': [
+						{'playerId': $rootScope.playerIds[0]},
+						{'playerId': $rootScope.playerIds[1]}
+					],
+					'state': state,
+					'lastState': lastState,
+					'lastMove': $scope.matchInfo.lastMove,
+					"lastMovePlayerId": $scope.matchInfo.lastMovePlayerId,
+					"playerIdToNumberOfTokensInPot": {}
+				};
+				console.log("In the container, it sends the following UpdateUI to the game: " + angular.toJson(updateUI));
+				//console.log("In the container, it sends the following UpdateUI");
+				$scope.sendMessageToIframe(updateUI);
+			};
+
+			/**
+			 * This method updates the state in the container. If there is an EndGame in the last move, change the
+			 * endGameFlag to string true.
+			 */
+			var processLastMoveAndState = function () {
+				if (!isUndefinedOrNull($scope.matchInfo.lastMove)) {
+					lastState = state;
+					state = $scope.matchInfo.state;
+					for (var operationMessage in $scope.matchInfo.lastMove) {
+						var endGameOperation = $scope.matchInfo.lastMove[operationMessage];
+						if (endGameOperation['type'] === 'EndGame') {
+							var score = endGameOperation['playerIdToScore'];
+							for (var playerId in score) {
+								if (score[playerId] == '1') {
+									$scope.matchInfo.winner = playerId;
 								}
 							}
-						});
+							endGameFlag = 'true';
+						}
 					}
+				} else {
+					console.log("Exception: From the server the last move is undefined!");
+				}
+			};
+
+
+			/**
+			 * Update the lastPlayer and current Player based on message from the server
+			 * @param data the data received from server. It should contain lastMove and playerThatHasLastTurn key
+			 */
+			var processLastPlayer = function (data) {
+				if (!isUndefinedOrNull(data)) {
+					$scope.matchInfo.lastMovePlayerId = data['playerThatHasLastTurn'];
+					var localLastMove = data['lastMove'];
+					for (var operationMessage in localLastMove) {
+						var setTurnOperation = localLastMove[operationMessage];
+						if (setTurnOperation['type'] === "SetTurn") {
+							$scope.matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
+						}
+					}
+				} else {
+					console.log("Exception: From the server the response data is undefined!");
 				}
 			}
+
+			/**
+			 * Methods interact with the server side:
+			 * sendMakeMoveServicePost(auxiliary method), be called inside the sendMoveToServer method.
+			 * sendMoveToServer(fundamental method used to send operations to server)
+			 * getNewMatchState
+			 * $scope.endGame(reason, winner) 'oppo' stands for opponent and 'me' stands for the current player
+			 */
 
 			/**
 			 * Method used to call POST method inside {@code SendMakeMoveService}.
@@ -188,7 +313,7 @@ smgContainer.controller('StandaloneController',
 							}
 						}
 				);
-			}
+			};
 
 			/**
 			 * Method to shuffle the keys and returns the shuffled set
@@ -213,6 +338,28 @@ smgContainer.controller('StandaloneController',
 				var str = JSON.stringify(obj)
 				var copy = JSON.parse(str);
 				return copy;
+			};
+
+			/**
+			 * Method used to get state for certain playerId.
+			 */
+			var getStateForPlayerId = function(playerId, move){
+				console.log("Log: getStateForPlayerId: Input Move: " + move);
+				var gameState = makeMoveInPassAndPlayMode(move);
+				var result = {};
+				var keys = getKeys(state);
+				for(var k=0;k<keys.length;k++){
+					var visibleToPlayers = visibleTo[keys[k]];
+					var value = null;
+					if(visibleToPlayers=="ALL"){
+						value = state[keys[k]];
+					}
+					if(visibleToPlayers.indexOf(playerId)>-1){
+						value = state[keys[k]];
+					}
+					result[keys[k]] = value;
+				}
+				return result;
 			};
 
 			/**
@@ -299,7 +446,7 @@ smgContainer.controller('StandaloneController',
 			};
 
 			/**
-			 * Method used to send operation from Game to Server, of cause data will be wrapped before sending.
+			 * Method used to send operation from Game to Server. Wrap the message with gameOverReason.
 			 * @param operations operations got from Game.
 			 */
 			var sendMoveToServer = function (operations) {
@@ -367,40 +514,9 @@ smgContainer.controller('StandaloneController',
 					}
 					move["operations"][0]['playerIdToScore'][$cookies.playerId] = 1;
 				}
-
 				var jsonMove = angular.toJson(move);
 				sendMakeMoveServicePost(jsonMove);
-				// 2. If in synchronous mode, also close the channel API.
-				if ($cookies.isSyncMode === 'true') {
-					$cookies.isSyncMode = false;
-					$rootScope.socket.close();
-				}
 			};
-
-			/**
-			 * Method used to override the onmessage method on channel API's socket
-			 */
-			var overrideOnMessage = function () {
-				$rootScope.socket.onmessage = function (event) {
-					// 1. Get pushed data from channel API and parse it from JSON to object
-					var data = angular.fromJson(event.data);
-					console.log("Log: data pushed by channel API: " + angular.toJson(data));
-					//console.log("Log: data pushed by channel API:")
-					for (var message in data) {
-						if (message == 'message' && data[message] == 'OPPONENTS_LOST_CONNECTION') {
-							opponentOffLineFlag = 'true';
-						}
-					}
-
-					$scope.matchInfo.state = data['state'];
-					$scope.matchInfo.lastMove = data['lastMove'];
-					// 2. UpdateUI for Game with the received state.
-					processLastMoveAndState();
-					processLastPlayer(data);
-					sendMessageToGame($cookies.playerId, $scope.matchInfo.lastMovePlayerId);
-
-				};
-			}
 
 			/**
 			 * Method used to get new game state in asynchronous game mode.
@@ -418,12 +534,11 @@ smgContainer.controller('StandaloneController',
 								alert('Sorry, wrong match ID provided!');
 							} else {
 								console.log("Log: get new match state (async mode): " + angular.toJson(data));
-								//console.log("Log: the match info for this game: " + angular.toJson($scope.matchInfo));
-								//console.log("Log: get new match state (async mode): ");
 								// 1. Get state and last move
 								$scope.matchInfo.state = data['state'];
 								$scope.matchInfo.lastMove = data['lastMove'];
 								// 2. UpdateUI for Game with the received state.
+								// If the state is empty
 								if (isStateSame($scope.matchInfo.state, {})) {
 									replyGameReady();
 								}
@@ -438,7 +553,7 @@ smgContainer.controller('StandaloneController',
 							}
 						}
 				);
-			}
+			};
 
 			/**
 			 * Method used to get current user's information
@@ -460,16 +575,16 @@ smgContainer.controller('StandaloneController',
 								getAllOtherPlayersInfo($rootScope.playerIds);
 							}
 						});
-			}
+			};
 
 			/**
 			 * Method used to get User Image Url from Facebook
 			 * @return User's Image Url
 			 */
-			var getImageUrlFromFB = function() {
-				if($scope.FBLogin) {
+			var getImageUrlFromFB = function () {
+				if ($scope.FBLogin) {
 					GetPicFromFBService.get({access_token: $cookies.FBAccessToken}).
-							$promise.then(function(data) {
+							$promise.then(function (data) {
 								console.log("Log: matchController: getImageUrlFromFB: " + angular.toJson(data));
 								$scope.playerImageUrl = data['data']['url'];
 							}
@@ -477,7 +592,7 @@ smgContainer.controller('StandaloneController',
 				} else {
 					$scope.playerImageUrl = "img/giraffe.gif";
 				}
-			}
+			};
 
 			/**
 			 * Method used to get all the players' info except for current player's.
@@ -516,255 +631,6 @@ smgContainer.controller('StandaloneController',
 				}
 			};
 
-			function isUndefinedOrNull(val) {
-				return angular.isUndefined(val) || val == null || val == '';
-			}
-
-			var timeCount = function(time) {
-				$scope.timer = time;
-				$scope.countDown = function () {
-					if(makeMoveFlag=='false'){
-						$scope.timer--;
-						if ($scope.timer !== 0) {
-							myTimer = $timeout($scope.countDown, 1000);
-						} else {
-							$scope.endGame('Time Out','oppo');
-						}
-					}
-				}
-				var myTimer = $timeout($scope.countDown, 1000);
-			}
-
-			/**
-			 * This function should be called to update state and lastMoveplayerId after fetch
-			 */
-			function processLastMoveAndState() {
-				if (!isUndefinedOrNull($scope.matchInfo.lastMove)) {
-					//console.log("Here we change the state/laststate and lastPlayerId" );
-					lastState = state;
-					//console.log("VerifyMove: lastState " + angular.toJson(lastState));
-					state = $scope.matchInfo.state;
-					//console.log("VerifyMove: state " + angular.toJson(state));
-					for (var operationMessage in $scope.matchInfo.lastMove) {
-						var endGameOperation = $scope.matchInfo.lastMove[operationMessage];
-						if (endGameOperation['type'] === 'EndGame') {
-							var score = endGameOperation['playerIdToScore'];
-							for (var playerId in score) {
-								if (score[playerId] == '1') {
-									$scope.matchInfo.winner = playerId;
-									//console.log("We have the winner: " + $scope.matchInfo.winner)
-								}
-							}
-							//showGameOverResult();
-							endGameFlag = 'true';
-						}
-					}
-				} else {
-					console.log("Exception: From the server the last move is undefined!");
-				}
-			}
-
-			function processLastPlayer(data) {
-				if (!isUndefinedOrNull(data)) {
-					$scope.matchInfo.lastMovePlayerId = data['playerThatHasLastTurn'];
-					for (var operationMessage in $scope.matchInfo.lastMove) {
-						var setTurnOperation = $scope.matchInfo.lastMove[operationMessage];
-						if (setTurnOperation['type'] === "SetTurn") {
-							$scope.matchInfo.playerThatHasTurn = setTurnOperation['playerId'];
-							console.log('!isUndefinedOrNull($rootScope.timeOfEachTurn ' + !isUndefinedOrNull($rootScope.timeOfEachTurn));
-							console.log("$rootScope.timeOfEachTurn " + $rootScope.timeOfEachTurn );
-							if (!isUndefinedOrNull($rootScope.timeOfEachTurn)&&$rootScope.timeOfEachTurn!='0') {
-								if($scope.matchInfo.playerThatHasTurn == $cookies.playerId){
-									makeMoveFlag = 'false';
-									timeCount($rootScope.timeOfEachTurn);
-									console.log('Log1111111: set Time of the game to ' + $rootScope.timeOfEachTurn);
-								}
-							}else{
-								if(!isUndefinedOrNull(setTurnOperation['numberOfSecondsForTurn'])&&setTurnOperation['numberOfSecondsForTurn']!='0') {
-									if($scope.matchInfo.playerThatHasTurn == $cookies.playerId){
-										$rootScope.timeOfEachTurn = setTurnOperation['numberOfSecondsForTurn'];
-										makeMoveFlag = 'false';
-										timeCount($rootScope.timeOfEachTurn);
-										console.log('Log22222222: set Time of the game to ' + $rootScope.timeOfEachTurn);
-										console.log('setTurnOperation[\'numberOfSecondsForTurn\']' + setTurnOperation['numberOfSecondsForTurn']);
-									}
-								}
-							}
-
-							if ($scope.matchInfo.playerThatHasTurn == $cookies.playerId) {
-								$scope.displayEndGameButton = true;
-							} else {
-								$scope.displayEndGameButton = false;
-							}
-							if (!$scope.$$phase) {
-								$scope.$apply();
-							}
-						}
-					}
-				} else {
-					console.log("Exception: From the server the response data is undefined!");
-				}
-			}
-
-			$scope.sendMessageToIframe = function (message) {
-				var win = $window.document.getElementById('gameIFrame').contentWindow;
-				win.postMessage(message, "*");
-			};
-
-			function listener(event) {
-				var data = event.data;
-				console.log("In the container, it receives the data from the game Iframe " + data['type']);
-				/*
-				 if (!data['type']) {
-				 console.log("The undefined data is " + angular.toJson(data));
-				 }
-				 */
-				if (data['type'] === "GameReady") {
-					//replyGameReady();
-					$scope.getNewMatchState();
-				} else if (data['type'] === "MakeMove") {
-					var operations = data['operations'];
-					//console.log("In the container, it sends to the server, operations are " + angular.toJson(operations));
-					/*
-					 To check whether the player sets the timer or not
-					 */
-					if (!isUndefinedOrNull($rootScope.timeOfEachTurn)) {
-						makeMoveFlag='true';
-						for (var operationMessage in operations) {
-							var operation = operations[operationMessage];
-							if (operation['type'] == 'SetTurn') {
-								operation['numberOfSecondsForTurn'] = parseInt($rootScope.timeOfEachTurn);
-								console.log("In the container, it sets the timer in SetTurn to " + $rootScope.timeOfEachTurn);
-							}
-						}
-					}
-					sendMoveToServer(operations);
-				} else if (data['type'] === "VerifyMoveDone") {
-					//deal with verifyMoveDone
-					//no hacker detected
-					if (isUndefinedOrNull(data['hackerPlayerId'])) {
-						sendUpdateUIToGame();
-					} else {
-						console.log("Hacker Detected!!! " + data['hackerPlayerId']);
-					}
-				} else {
-//          console.log("In the container listener, can't deal with the message from the game!!");
-//          console.log("It is " + data['type']);
-				}
-			}
-
-
-			function replyGameReady() {
-				var initialUpdateUI = {
-					'type': 'UpdateUI',
-					'yourPlayerId': $cookies.playerId,
-					'playersInfo': [
-						{'playerId': $rootScope.playerIds[0]},
-						{'playerId': $rootScope.playerIds[1]}
-					],
-					'state': {},
-					'lastState': null,
-					'lastMove': [],
-					'lastMovePlayerId': null,
-					'playerIdToNumberOfTokensInPot': {}
-				};
-				//console.log("in the container, it sends the initial UpdateUI is " + angular.toJson(initialUpdateUI));
-				console.log("in the container, it sends the initial UpdateUI");
-				$scope.sendMessageToIframe(initialUpdateUI);
-			}
-
-			function sendVerifyMoveToGame() {
-
-				var verifyMove = {
-					"type": "VerifyMove",
-					'playersInfo': [
-						{'playerId': $rootScope.playerIds[0]},
-						{'playerId': $rootScope.playerIds[1]}
-					],
-					'state': state,
-					'lastState': lastState,
-					'lastMove': $scope.matchInfo.lastMove,
-					"lastMovePlayerId": $scope.matchInfo.lastMovePlayerId,
-					"playerIdToNumberOfTokensInPot": {}
-				};
-				//console.log("In the container, it sends the following VerifyMove to the game: " + angular.toJson(verifyMove));
-				console.log("In the container, it sends the following VerifyMove to the game: ");
-				$scope.sendMessageToIframe(verifyMove);
-			}
-
-
-			function sendUpdateUIToGame() {
-				var updateUI = {
-					"type": "UpdateUI",
-					'yourPlayerId': $cookies.playerId,
-					'playersInfo': [
-						{'playerId': $rootScope.playerIds[0]},
-						{'playerId': $rootScope.playerIds[1]}
-					],
-					'state': state,
-					'lastState': lastState,
-					'lastMove': $scope.matchInfo.lastMove,
-					"lastMovePlayerId": $scope.matchInfo.lastMovePlayerId,
-					"playerIdToNumberOfTokensInPot": {}
-				};
-				console.log("In the container, it sends the following UpdateUI to the game: " + angular.toJson(updateUI));
-				//console.log("In the container, it sends the following UpdateUI");
-				$scope.sendMessageToIframe(updateUI);
-			}
-
-			function initiatePlayerTurn() {
-				if (!isUndefinedOrNull($rootScope.playerIds)) {
-					$scope.matchInfo.playerThatHasTurn = $rootScope.playerIds[0];
-					$scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
-					$scope.matchInfo.winner = Number.MIN_VALUE;
-					state = {};
-					lastState = state;
-					endGameFlag = undefined;
-					opponentOffLineFlag = undefined;
-					makeMoveFlag = undefined;
-				} else {
-					console.log("Exception: playerIds are null");
-				}
-			}
-
-			$scope.open = function () {
-				showGameOverResult();
-			}
-			/**
-			 * This function should be called when the game is over, which is determined by the fact that there is a
-			 * EndGame operation in the lastMove response by server
-			 */
-			function showGameOverResult() {
-				$rootScope.timeOfEachTurn = null;
-				if ($cookies.playerId == $scope.matchInfo.winner) {
-					$scope.matchResultInfo.message = 'Cong! You have won the game!';
-					$scope.matchResultInfo.messagePostToFB = 'I just won a match! :)';
-				} else {
-					$scope.matchResultInfo.message = 'Keep calm and carry on!';
-					$scope.matchResultInfo.messagePostToFB = 'I just lost = =!!';
-				}
-				var resultModal = $modal.open({
-					templateUrl: 'templates/directives/rematch.html',
-					controller: 'rematchCtrl',
-					resolve: {
-						resultInfo: function () {
-							return $scope.matchResultInfo;
-						}
-					}
-				});
-
-				resultModal.result.then(function (argument) {
-					//A promise that is resolved when a modal is closed
-					if (argument === "PostFB") {
-						//postToFB("SMG Test Post: I have win the match!");
-						postToFB($scope.matchResultInfo['messagePostToFB']);
-					}
-				}, function () {
-					//A promise that is resolved when a modal is dismissed
-					$location.url('/lobby/' + $routeParams.gameId);
-				});
-			}
-
 			/**
 			 * Method used to post message on Facebook
 			 */
@@ -774,7 +640,7 @@ smgContainer.controller('StandaloneController',
 							console.log("Log: matchController: response from posting to FB: " + angular.toJson(response));
 						}
 				);
-			}
+			};
 
 			/**
 			 * Method used to get playerIds from server
@@ -801,18 +667,65 @@ smgContainer.controller('StandaloneController',
 								}
 							}
 						});
-			}
+			};
 
 			/**
 			 * Filter function used to filter out the current player's information from the opponent part.
 			 */
 			$scope.filterFnOpponents = function (playerInfo) {
 				return playerInfo.playerId !== $cookies.playerId;
-			}
+			};
 
 			$scope.filterFnCurrentPlayer = function (playerInfo) {
 				return playerInfo.playerId === $cookies.playerId;
-			}
+			};
+
+
+			/**
+			 *Bootstrapped method
+			 *initiatePlayerTurn, $scope.sendMessageToIframe, listener
+			 */
+
+
+			var initiatePlayerTurn = function () {
+				if (!isUndefinedOrNull($rootScope.playerIds)) {
+					$scope.matchInfo.playerThatHasTurn = $rootScope.playerIds[0];
+					$scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
+					$scope.matchInfo.winner = Number.MIN_VALUE;
+					state = {};
+					lastState = state;
+					endGameFlag = undefined;
+				} else {
+					console.log("Exception: playerIds are null");
+				}
+			};
+
+			$scope.sendMessageToIframe = function (message) {
+				var win = $window.document.getElementById('gameIFrame').contentWindow;
+				win.postMessage(message, "*");
+			};
+
+			function listener(event) {
+				var data = event.data;
+				console.log("In the container, it receives the data from the game Iframe " + data['type']);
+				if (data['type'] === "GameReady") {
+					$scope.getNewMatchState();
+				} else if (data['type'] === "MakeMove") {
+					var operations = data['operations'];
+					//console.log("In the container, it sends to the server, operations are " + angular.toJson(operations));
+					sendMoveToServer(operations);
+				} else if (data['type'] === "VerifyMoveDone") {
+					//deal with verifyMoveDone
+					//no hacker detected
+					if (isUndefinedOrNull(data['hackerPlayerId'])) {
+						sendUpdateUIToGame();
+					} else {
+						console.log("Hacker Detected!!! " + data['hackerPlayerId']);
+					}
+				} else {
+					console.log("In the container listener, can't deal with the message from the game!!" + " Type " + data['type']);
+				}
+			};
 
 			/**
 			 * Formal code starts here.
@@ -826,22 +739,10 @@ smgContainer.controller('StandaloneController',
 				} else {
 					attachEvent("onmessage", listener);
 				}
-				// Display different button based on different mode: synchronous and asynchronous.
-				if ($cookies.isSyncMode === 'true') {
-					// 0. Override the onmessage method on socket.
-					overrideOnMessage();
-					$scope.displayGetNewStateButton = false;
-				} else {
-					$scope.displayGetNewStateButton = true;
-				}
-				// Check whether need to display the "End Game" button
-				if ($scope.matchInfo.playerThatHasTurn == $cookies.playerId) {
-					$scope.displayEndGameButton = true;
-				} else {
-					$scope.displayEndGameButton = false;
-				}
+				$scope.displayGetNewStateButton = true;
+
 				// Check whether the player login with Facebook
-				if($cookies.FBAccessToken == "undefined" || isUndefinedOrNull($cookies.FBAccessToken)) {
+				if ($cookies.FBAccessToken == "undefined" || isUndefinedOrNull($cookies.FBAccessToken)) {
 					$scope.FBLogin = false;
 				} else {
 					$scope.FBLogin = true;
