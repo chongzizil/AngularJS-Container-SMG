@@ -23,6 +23,10 @@ smgContainer.config(['$routeProvider',
 					templateUrl: 'templates/logout.html',
 					controller: 'LogoutController'
 				}).
+				when('/standalone', {
+					templateUrl: 'templates/standalone.html',
+					controller: 'StandaloneController'
+				}).
 				otherwise({
 					redirectTo: '/'
 				});
