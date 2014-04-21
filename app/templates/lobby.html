@@ -1,15 +1,15 @@
 <div>
 	<div class="container-fluid">
 		<div class="jumbotron" id="justPlay">
-			<div class="col-xs-12 v-center">
-				<h1>Have Fun :)</h1>
+			<div class="col-xs-12 v-center" id="welcome">
+				<h1>Have Fun</h1>
 			</div>
 			<div class="col-xs-12 v-center" id="autoMatch">
 				<button type="submit" ng-click="autoMatch()" class="btn btn-primary btn-lg">
 					<i class="fa fa-random fa-fw"></i> Auto Match
 				</button>
 			</div>
-			<form name="inviteForm" class="form-inline" role="form" id="passAndPlay">
+			<form name="inviteForm" role="form" id="passAndPlay">
 				<div class="form-group col-xs-12 v-center">
 					<button type="submit" ng-disabled="inviteForm.$invalid" ng-click="passAndPlay()" class="btn btn-primary btn-lg">
 						<i class="fa fa-exchange fa-fw"></i> Pass & Play

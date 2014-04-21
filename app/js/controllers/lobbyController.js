@@ -17,7 +17,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 			$("#justPlay").height(600);
 		} else {
 
-			$("#justPlay").height($(window).height() * 0.70);
+			$("#justPlay").height($(window).height() * 0.60);
 		}
 
 		// Adjust the three buttons position
@@ -25,8 +25,8 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 		var heightOfEachButton = $("#autoMatch").height();
 		var restOfJustPlay = heightOfJustPlay - 3 * heightOfEachButton;
 		var autoMatchOffset = restOfJustPlay * 0.10;
-		var passAndPlayOffset = restOfJustPlay * 0.30 ;
-		var PlayAiOffset = restOfJustPlay * 0.40 ;
+		var passAndPlayOffset = restOfJustPlay * 0.20 ;
+		var PlayAiOffset = restOfJustPlay * 0.30 ;
 
 		$("#autoMatch").css({position: 'relative', top: autoMatchOffset + 'px'});
 		$("#passAndPlay").css({position: 'relative', top: passAndPlayOffset + 'px'});
