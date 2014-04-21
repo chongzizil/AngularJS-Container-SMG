@@ -65,11 +65,11 @@ smgContainer.controller('OffCanvasMenuController',
 				var autoRefresh = function(time) {
 					$scope.countDown = function () {
 						$scope.checkMatches();
-						myTimer = $timeout($scope.countDown, 1000);
+						myTimer = $timeout($scope.countDown, time);
 					}
-					var myTimer = $timeout($scope.countDown, 1000);
+					var myTimer = $timeout($scope.countDown, time);
 				}
-				autoRefresh(5000);
+				autoRefresh(60*1000);
 			}
 		}
 );
