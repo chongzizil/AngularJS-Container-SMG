@@ -24,9 +24,9 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 		var heightOfJustPlay = $("#justPlay").height();
 		var heightOfEachButton = $("#autoMatch").height();
 		var restOfJustPlay = heightOfJustPlay - 3 * heightOfEachButton;
-		var autoMatchOffset = restOfJustPlay * 0.20;
-		var passAndPlayOffset = restOfJustPlay * 0.40 ;
-		var PlayAiOffset = restOfJustPlay * 0.60 ;
+		var autoMatchOffset = restOfJustPlay * 0.10;
+		var passAndPlayOffset = restOfJustPlay * 0.30 ;
+		var PlayAiOffset = restOfJustPlay * 0.40 ;
 
 		$("#autoMatch").css({position: 'relative', top: autoMatchOffset + 'px'});
 		$("#passAndPlay").css({position: 'relative', top: passAndPlayOffset + 'px'});
@@ -223,4 +223,20 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 			  }
 	  );
   } // End of autoMatch
+
+	/**
+	 * Start pass and play game mode
+	 */
+	$scope.passAndPlay = function () {
+		console.log("Stand along url is:" + $routeParams.gameId + '/standalone?mode=pass_and_play&timeOfEachTurn=' + $scope.timeOfEachTurn);
+		$location.url($routeParams.gameId + '/standalone?mode=pass_and_play&timeOfEachTurn=' + $scope.timeOfEachTurn);
+	}
+
+	/**
+	 * Start pass and play game mode
+	 */
+	$scope.playWithAi = function () {
+		console.log("Stand along url is:" + $routeParams.gameId + '/standalone?mode=play_with_ai');
+		$location.url($routeParams.gameId + '/standalone?mode=play_with_ai');
+	}
 });
