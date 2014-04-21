@@ -11,15 +11,30 @@
 
 smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService, GetAllMatchInfoService) {
 
-	if ($(window).height() > 650) {
-		$("#autoMatch").height(500);
-	} else {
+	var setJumbotron = function() {
+		// Adjust the jumbotron to a suitable size
+		if ($(window).height() > 800) {
+			$("#justPlay").height(600);
+		} else {
 
-		$("#autoMatch").height($(window).height() * 0.5);
+			$("#justPlay").height($(window).height() * 0.70);
+		}
+
+		// Adjust the three buttons position
+		var heightOfJustPlay = $("#justPlay").height();
+		var heightOfEachButton = $("#autoMatch").height();
+		var restOfJustPlay = heightOfJustPlay - 3 * heightOfEachButton;
+		var autoMatchOffset = restOfJustPlay * 0.20;
+		var passAndPlayOffset = restOfJustPlay * 0.40 ;
+		var PlayAiOffset = restOfJustPlay * 0.60 ;
+
+		$("#autoMatch").css({position: 'relative', top: autoMatchOffset + 'px'});
+		$("#passAndPlay").css({position: 'relative', top: passAndPlayOffset + 'px'});
+		$("#PlayAi").css({position: 'relative', top: PlayAiOffset + 'px'});
 	}
+	setJumbotron();
 
 	$cookies.gameId=$routeParams.gameId;
-//	console.log("lobby: "+ $cookies.gameId);
 
   var needLoginAlert = $("#needLoginAlert");
   needLoginAlert.on('close.bs.alert', function () {
