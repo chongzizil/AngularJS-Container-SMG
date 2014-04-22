@@ -234,6 +234,8 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 	 */
 	$scope.passAndPlay = function () {
 		console.log("Stand along url is:" + $routeParams.gameId + '/standalone?mode=pass_and_play&timeOfEachTurn=' + $scope.timeOfEachTurn);
+		var opponentPlayerId = $cookies.playerId + "11111";
+		$rootScope.playerIds = [$cookies.playerId, opponentPlayerId];
 		$location.url($routeParams.gameId + '/standalone?mode=pass_and_play&timeOfEachTurn=' + $scope.timeOfEachTurn);
 	}
 
