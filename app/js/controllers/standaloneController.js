@@ -1,18 +1,8 @@
-//'use strict';
-
 /**
- * A typical procedure for Mobile Version Match Controller contains:
- * (1). After the player chooses the game, container will ask for state from the server. If the state is empty, which
- *      means that it's a new match, container will send initial signal to the game. Otherwise, it will update UI
- *      based on the state.
- * (2). Wait for game to send operations
- * (3). Wrap the operations and send it the server
- * (4). Container will temporarily store the state from the server. This is only used to help the container determine
- *      whether the match is a new match or not. Since we don't verify last move, each time container updates UI, it
- *      uses the state from the server.
+ * Pass-And-Play Mode Container
  */
 
-smgContainer.controller('MatchController',
+smgContainer.controller('StandaloneController',
 		function ($scope, $route, $routeParams, $rootScope, $cookies, $timeout, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService, GetPicFromFBService) {
 			$scope.imageUrl = $cookies.imageUrl;
 			/*
@@ -20,8 +10,6 @@ smgContainer.controller('MatchController',
 			 */
 			$scope.opponentInfos = [];
 			$scope.gameInfo = {};
-//      $scope.displayGetNewStateButton = false;
-//      $scope.displayEndGameButton = false;
 			$scope.FBLogin = false;
 			$scope.playerImageUrl;
 			$scope.matchInfo = {
@@ -57,6 +45,14 @@ smgContainer.controller('MatchController',
 				 */
 				winner: Number.MIN_VALUE
 			};
+
+			/*
+			 * Variable for "Pass And Play" mode
+			 */
+			var currentPlayerIdThatHasTurn = $rootScope.playerIds[0];
+			var lastPlayerIdThatHasTurn = $rootScope.playerIds[0];
+			var mode;
+			var timeOfEachTurn;
 
 			/*
 			 * Variables for interacting with Game side. Temporarily store the game state locally.
@@ -341,14 +337,34 @@ smgContainer.controller('MatchController',
 			};
 
 			/**
-			 * Method used to get state for certain playerId.
+			 * Method used to get keys of the state
+			 * @param state
+			 * @returns {Array}
 			 */
-			var getStateForPlayerId = function(playerId, move){
+			var getKeys = function(state){
+				var keys = [];
+				for(var key in state){
+					keys.push(key);
+				}
+				return keys;
+			};
+
+			/**
+			 * Method used to set {@code $scope.matchInfo.state} and {@code $scope.matchInfo.lastMove}
+			 * @param playerId
+			 * @param move
+			 */
+			var passAndPlayServer = function(playerId, move){
 				console.log("Log: getStateForPlayerId: Input Move: " + move);
 				var gameState = makeMoveInPassAndPlayMode(move);
-				var result = {};
+				var state = gameState['state'];
+				var visibleTo = gameState['visibleTo'];
+				lastPlayerIdThatHasTurn = currentPlayerIdThatHasTurn;
+				currentPlayerIdThatHasTurn = gameState.playerThatHasTurn;
+				// 1. get new state according to visibility.
+				var newState = {};
 				var keys = getKeys(state);
-				for(var k=0;k<keys.length;k++){
+				for (var k = 0; k < keys.length; k++) {
 					var visibleToPlayers = visibleTo[keys[k]];
 					var value = null;
 					if(visibleToPlayers=="ALL"){
@@ -357,9 +373,21 @@ smgContainer.controller('MatchController',
 					if(visibleToPlayers.indexOf(playerId)>-1){
 						value = state[keys[k]];
 					}
-					result[keys[k]] = value;
+					newState[keys[k]] = value;
 				}
-				return result;
+				// 2. Construct the data which is similar to the 'data' returned by makeMoveToRealServer
+				var data = {
+					'state' : newState,
+					'lastMove' : move['operations'],
+					'playerThatHasLastTurn' : lastPlayerIdThatHasTurn
+				};
+				// 3. Assign the 'data' data to {@code matchInfo}
+				console.log("Log: standaloneController: passAndPlayServer: " + angular.toJson(data));
+				$scope.matchInfo.state = data['state'];
+				$scope.matchInfo.lastMove = data['lastMove'];
+				processLastMoveAndState();
+				processLastPlayer(data);
+				sendMessageToGame($cookies.playerId, $scope.matchInfo.lastMovePlayerId);
 			};
 
 			/**
@@ -371,7 +399,7 @@ smgContainer.controller('MatchController',
 	     *  'operations':
 	     *  'gameOverReason': (Optional)
 	     * }
-			 * @return gameState The format is as following:
+			 * @return {*} The format is as following:
 			 * {
 			 *  'state' :
 			 *  'visibleTo' :
@@ -390,7 +418,6 @@ smgContainer.controller('MatchController',
 					'playerThatHasTurn' : Number.MIN_VALUE,
 					'gameOverReason' : ""
 				}
-				var lastMove = operations;
 				for (var i = 0; i < operations.length(); i++) {
 					var operation = operations[i];
 
@@ -472,8 +499,11 @@ smgContainer.controller('MatchController',
 						"operations": operations
 					};
 				}
-				var jsonMove = angular.toJson(move);
-				sendMakeMoveServicePost(jsonMove);
+//				var jsonMove = angular.toJson(move);
+//				sendMakeMoveServicePost(jsonMove);
+				if (mode === "pass_and_play") {
+					passAndPlayServer(currentPlayerIdThatHasTurn, move);
+				}
 			};
 
 			/**
@@ -572,7 +602,8 @@ smgContainer.controller('MatchController',
 							} else {
 								getImageUrlFromFB();
 								$scope.matchInfo.playersInfo.push({playerId: $cookies.playerId, info: data});
-								getAllOtherPlayersInfo($rootScope.playerIds);
+								// No need to get the opponents' information, because they are all fake players.
+//								getAllOtherPlayersInfo($rootScope.playerIds);
 							}
 						});
 			};
@@ -709,7 +740,8 @@ smgContainer.controller('MatchController',
 				var data = event.data;
 				console.log("In the container, it receives the data from the game Iframe " + data['type']);
 				if (data['type'] === "GameReady") {
-					$scope.getNewMatchState();
+//					$scope.getNewMatchState();
+					// did nothing when receiving "GameReady"
 				} else if (data['type'] === "MakeMove") {
 					var operations = data['operations'];
 					//console.log("In the container, it sends to the server, operations are " + angular.toJson(operations));
@@ -730,6 +762,7 @@ smgContainer.controller('MatchController',
 			/**
 			 * Formal code starts here.
 			 */
+			console.log("Log: standaloneController: StandAloneController starts here...");
 			if (!$cookies.accessSignature || !$cookies.playerId) {
 				alert('You have to log in first!');
 				$location.url('/');
@@ -748,10 +781,15 @@ smgContainer.controller('MatchController',
 					$scope.FBLogin = true;
 				}
 				$scope.matchResultInfo.FBLogin = $scope.FBLogin;
+				// 0. Get the input parameters
+				mode = $location.search("mode");
+				timeOfEachTurn = $location.search("timeOfEachTurn");
 				// 1. Get game information.
 				getGameInfo();
 				// 2. Get playerIds from server: this is used for case when user refresh the web browser.
-				getPlayerIds();
+//				getPlayerIds();
+				getCurrentPlayerInfo();
+				initiatePlayerTurn();
 			}
 		}
 );
