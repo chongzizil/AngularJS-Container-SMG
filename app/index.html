@@ -43,7 +43,8 @@
 			<ul class="nav navbar-nav navbar-right">
 
 				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><img ng-src="{{imageUrl}}" height="30" width="30"/>
+					<!--<a href="#" class="dropdown-toggle" data-toggle="dropdown"><img ng-src="{{imageUrl}}" height="30" width="30"/>-->
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="img/giraffe.gif" height="30" width="30"/>
 						{{idDisplay}}<b class="caret"></b></a>
 					<ul class="dropdown-menu">
 						<li>
@@ -80,8 +81,8 @@
 					</button>
 				</div>
 				<br/>
-				<div class="list-group">
-					<a ng-href="{{matchUrl}}" class="list-group-item"><i class="icon-signin icon-adjust"></i>     match</a>
+				<div class="list-group" ng-repeat="matchInfo in matchInfos">
+					<button class="btn btn-primary col-xs-offset-2 col-xs-8" ng-click="enterMatch(matchInfo)"><i class="fa fa-sign-in"></i>   match</button>
 				</div>
 			</div>
 			<!--/span-->

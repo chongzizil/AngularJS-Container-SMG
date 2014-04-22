@@ -11,6 +11,7 @@
 
 smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService, GetAllMatchInfoService) {
 
+	/** Set the jumbotron */
 	var setJumbotron = function() {
 		// Adjust the jumbotron to a suitable size
 		if ($(window).height() > 800) {
@@ -64,10 +65,12 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 //	          console.log(data);
             $scope.gameName = data['gameName'];
             $scope.gameDescription = data['description'];
+	          console.log("Game's name got!");
           }
         }
     );
   };
+	console.log("Getting game's name...");
   getGameName();
 
   // Get the player email from the server
@@ -114,7 +117,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
       playerIds: playerIds,
       gameId: $routeParams.gameId
     }
-//    console.log("Inserting a match..........................");
+    console.log("Inserting a match..........................");
 //    console.log(data);
     var jsonData = angular.toJson(data);
     InsertMatchService.save({}, jsonData).
@@ -129,10 +132,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
            */
           if (!data['matchId']) {
             if (data['error'] === 'WRONG_PLAYER_ID') {
-              $scope.friendIdHasError = true;
-              $scope.inviteInfo = {};
-              $scope.inviteInfo.error = 'Sorry, your friend\'s ID does not exist. Please try again.';
-              alert('Sorry, please provide the correct player id!');
+              alert('Sorry, you need to finish the current match first. (multiple match is not supported yet...)');
             } else if (data['error'] === 'WRONG_GAME_ID') {
               alert('Sorry, the game\'s ID does not exist. Please try again.');
             }
@@ -208,14 +208,16 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 			  $promise.then(function (data) {
 				  if (!data['channelToken']) {
 					  if (data['error'] === 'WRONG_PLAYER_ID') {
-						  popupLoginPage();
+						  alert('Sorry, you have the wrong player ID');
 					  } else if (data['error'] === 'WRONG_GAME_ID') {
 						  alert('Sorry, the game\'s ID does not exist. Please try again.');
 					  } else if (data['error'] === 'MISSING_INFO') {
 						  alert("Missing info:" + jsonJoinQueueData);
 					  }
 				  } else {
+					  console.log("Join the queue, waiting for auto match...");
 					  if (data['playerIds']) {
+						  console.log("Auto matched... Ready to insert a new match...");
 						  $cookies.isSyncMode = false;
 						  insertMatch(data['playerIds']);
 					  }

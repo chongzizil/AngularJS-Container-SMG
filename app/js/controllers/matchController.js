@@ -93,6 +93,7 @@ smgContainer.controller('MatchController',
               if (data['error'] == 'WRONG_GAME_ID') {
                 alert('Sorry, Wrong Game ID provided!');
               } else {
+//	              console.log("Getting game info...");
                 //console.log("Log: get game info from server: " + angular.toJson(data));
                 // 1. Get game information, all the .
                 $scope.gameInfo.url = $sce.trustAsResourceUrl(data['url']);
@@ -102,6 +103,7 @@ smgContainer.controller('MatchController',
                 if (data['width'] >= $(window).width()) {
                   $scope.gameInfo.width = "90%";
                 }
+//	              console.log(data);
               }
             }
         );
@@ -386,6 +388,7 @@ smgContainer.controller('MatchController',
         }
         var jsonMove = angular.toJson(move);
         sendMakeMoveServicePost(jsonMove);
+	      console.log("End game send!!!!");
       };
 
       /**
