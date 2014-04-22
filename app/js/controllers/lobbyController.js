@@ -13,14 +13,12 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 
 	// Refresh the off canvas menu
 	$rootScope.refreshOffCanvasMenu()
-
 	/** Set the jumbotron */
 	var setJumbotron = function() {
 		// Adjust the jumbotron to a suitable size
 		if ($(window).height() > 800) {
 			$("#justPlay").height(600);
 		} else {
-
 			$("#justPlay").height($(window).height() * 0.60);
 		}
 

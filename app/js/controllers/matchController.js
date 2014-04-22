@@ -101,8 +101,8 @@ smgContainer.controller('MatchController',
                 $scope.gameInfo.height = data['height'];
                 $scope.gameInfo.width = data['width'];
                 $scope.gameInfo.gameName = data['gameName'];
-                if (data['width'] >= $(window).width()) {
-                  $scope.gameInfo.width = "90%";
+                if (data['width'] >= $(window).width() * 0.9) {
+                  $scope.gameInfo.width = "100%";
                 }
 //	              console.log(data);
               }
@@ -450,10 +450,10 @@ smgContainer.controller('MatchController',
               } else if (data['error'] == 'WRONG_TARGET_ID') {
                 alert('Sorry, Wrong Target ID provided!');
               } else {
-	              console.log("******************playerInfo*****************");
-	              console.log(data);
                 getImageUrlFromFB();
                 $scope.matchInfo.playersInfo.push({playerId: $cookies.playerId, info: data});
+	              console.log("*********** Getting current player info... ***********");
+	              console.log(data);
                 getAllOtherPlayersInfo($rootScope.playerIds);
               }
             });
@@ -528,7 +528,7 @@ smgContainer.controller('MatchController',
        * Method used to get playerIds from server
        */
       var getPlayerIds = function () {
-        NewMatchService.get({playerId: $cookies.playerId, accessSignature: $cookies.accessSignature})
+        NewMatchService.get({playerId: $cookies.playerId, accessSignature: $cookies.accessSignature, gameId: $routeParams.gameId})
             .$promise.then(function (data) {
               console.log("Log: matchController: response from NewMatchService: " + angular.toJson(data));
               if (!data['matchId']) {
