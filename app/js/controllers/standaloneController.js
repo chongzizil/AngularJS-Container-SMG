@@ -610,8 +610,14 @@ smgContainer.controller('StandaloneController',
 							} else {
 								getImageUrlFromFB();
 								$scope.matchInfo.playersInfo.push({playerId: $cookies.playerId, info: data});
-								// No need to get the opponents' information, because they are all fake players.
-//								getAllOtherPlayersInfo($rootScope.playerIds);
+								if ($routeParams.mode === "pass_and_play") {
+									console.log("*******************************")
+									// Insert a opponent for pass and play
+									$scope.matchInfo.playersInfo.push({playerId: $cookies.playerId + "1111",
+										info: {nickname: "Player 2", email:"Pass&Play", lastname: "Player 2", firstname: "Player 2",
+										imageURL: "http://smg-server.appspot.com/images/giraffe.gif"}});
+									console.log($scope.matchInfo.playersInfo);
+								}
 							}
 						});
 			};
@@ -719,6 +725,10 @@ smgContainer.controller('StandaloneController',
 				return playerInfo.playerId === $cookies.playerId;
 			};
 
+			$scope.filterFnCurrentTurnPlayer = function (playerInfo) {
+				return playerInfo.playerId === $scope.matchInfo.playerThatHasTurn;
+			};
+
 
 			/**
 			 *Bootstrapped method
@@ -793,8 +803,8 @@ smgContainer.controller('StandaloneController',
 				}
 				$scope.matchResultInfo.FBLogin = $scope.FBLogin;
 				// 0. Get the input parameters
-				mode = $location.search("mode");
-				timeOfEachTurn = $location.search("timeOfEachTurn");
+				mode = $routeParams.mode;
+				timeOfEachTurn = $routeParams.timeOfEachTurn;
 				// 1. Get game information.
 				getGameInfo();
 				// 2. Get playerIds from server: this is used for case when user refresh the web browser.

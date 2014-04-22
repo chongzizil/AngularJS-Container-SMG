@@ -23,7 +23,7 @@ smgContainer.config(['$routeProvider',
 					templateUrl: 'templates/logout.html',
 					controller: 'LogoutController'
 				}).
-				when('/:gameId/standalone', {
+				when('/:gameId/standalone:mode?:timeOfEachTurn?', {
 					templateUrl: 'templates/standalone.html',
 					controller: 'StandaloneController'
 				}).

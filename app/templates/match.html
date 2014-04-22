@@ -1,6 +1,6 @@
 <div>
 	<div align="middle">
-		<div ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentPlayer">
+		<div ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentTurnPlayer">
 			Current turn: {{playerInfo['info']['nickname']}}
 		</div>
 	</div>
@@ -33,7 +33,7 @@
 					<!--<img ng-src="img/giraffe.gif" hight="50" width="50"/>-->
 					<!--</div>-->
 					<!--</div>-->
-					<div class="col-md-1 col-xs-offset-4 col-xs-4">
+					<div class="col-md-1">
 						<img ng-src="{{imageUrl}}" hight="50" width="50"/>
 					</div>
 					<div class="col-md-11 col-xs-12">

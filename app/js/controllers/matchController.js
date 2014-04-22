@@ -562,6 +562,10 @@ smgContainer.controller('MatchController',
         return playerInfo.playerId === $cookies.playerId;
       };
 
+	    $scope.filterFnCurrentTurnPlayer = function (playerInfo) {
+		    return playerInfo.playerId === $scope.matchInfo.playerThatHasTurn;
+	    };
+
 
       /**
        *Bootstrapped method
