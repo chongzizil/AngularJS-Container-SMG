@@ -167,7 +167,10 @@ smgContainer.controller('MatchController',
           $scope.matchResultInfo.message = 'Keep calm and carry on!';
           $scope.matchResultInfo.messagePostToFB = 'I just lost = =!!';
         }
-
+	      console.log("Game result info...");
+	      console.log($scope.matchResultInfo);
+	      $rootScope.matchResultInfo = $scope.matchResultInfo;
+	      $location.url('/gameResult/' + $routeParams.matchId);
         /*
          Two fundamental methods which will be used in further implementation:
          postToFB($scope.matchResultInfo['messagePostToFB']);

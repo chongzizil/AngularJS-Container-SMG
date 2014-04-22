@@ -203,12 +203,14 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
     };
     // Change the data to json object
     var jsonJoinQueueData = angular.toJson(joinQueueData);
-
+		console.log("Trying to join the queue for auto match...");
 	  /**
 	   * Post data to the server in order to join the queue for auto match.
 	   */
 	  joinQueueService.save({}, jsonJoinQueueData).
 			  $promise.then(function (data) {
+				  console.log("Call back from auto match request...");
+				  console.log(data);
 				  if (!data['channelToken']) {
 					  if (data['error'] === 'WRONG_PLAYER_ID') {
 						  alert('Sorry, you have the wrong player ID');

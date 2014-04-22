@@ -89,6 +89,6 @@ smgContainer.controller('OffCanvasMenuController',
 				}
 				var myTimer = $timeout($scope.autoRefreshHelper, time);
 			}
-			autoRefresh(60 * 1000);
+			//autoRefresh(60 * 1000);
 		}
 );

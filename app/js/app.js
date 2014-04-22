@@ -27,6 +27,10 @@ smgContainer.config(['$routeProvider',
 					templateUrl: 'templates/standalone.html',
 					controller: 'StandaloneController'
 				}).
+				when('/gameResult/:matchId', {
+					templateUrl: 'templates/gameResult.html',
+					controller: 'GameResultController'
+				}).
 				otherwise({
 					redirectTo: '/'
 				});
