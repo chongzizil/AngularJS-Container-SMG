@@ -77,8 +77,9 @@ smgContainer.controller('MatchController',
        * @type {{message: string, messagePostToFB: string, FBLogin: (boolean|*)}}
        */
       $scope.matchResultInfo = {
-        message: '',
-        messagePostToFB: '',
+	      winner: '',
+	      opponentId: '',
+	      hasWon: false,
         FBLogin: $scope.FBLogin
       };
       /**
@@ -161,14 +162,17 @@ smgContainer.controller('MatchController',
        */
       var showGameOverResult = function () {
         if ($cookies.playerId == $scope.matchInfo.winner) {
-          $scope.matchResultInfo.message = 'Cong! You have won the game!';
-          $scope.matchResultInfo.messagePostToFB = 'I just won a match! :)';
+	        $scope.matchResultInfo.winner = $cookies.playerId;
+          $scope.matchResultInfo.hasWon = true;
         } else {
-          $scope.matchResultInfo.message = 'Keep calm and carry on!';
-          $scope.matchResultInfo.messagePostToFB = 'I just lost = =!!';
+	        $scope.matchResultInfo.winner = $scope.matchInfo.winner;
+	        $scope.matchResultInfo.hasWon = false;
         }
-	      console.log("Game result info...");
-	      console.log($scope.matchResultInfo);
+	      if ($cookies.playerId === $rootScope.playerIds[0]) {
+		      $scope.matchResultInfo.opponentId = $rootScope.playerIds[1];
+	      } else {
+		      $scope.matchResultInfo.opponentId = $rootScope.playerIds[0];
+	      }
 	      $rootScope.matchResultInfo = $scope.matchResultInfo;
 	      $location.url('/gameResult/' + $routeParams.matchId);
         /*
@@ -446,6 +450,8 @@ smgContainer.controller('MatchController',
               } else if (data['error'] == 'WRONG_TARGET_ID') {
                 alert('Sorry, Wrong Target ID provided!');
               } else {
+	              console.log("******************playerInfo*****************");
+	              console.log(data);
                 getImageUrlFromFB();
                 $scope.matchInfo.playersInfo.push({playerId: $cookies.playerId, info: data});
                 getAllOtherPlayersInfo($rootScope.playerIds);
