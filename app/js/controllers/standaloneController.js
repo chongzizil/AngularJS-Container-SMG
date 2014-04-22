@@ -55,6 +55,13 @@ smgContainer.controller('StandaloneController',
 			var mode;
 			var timeOfEachTurn;
 
+			var gameState = {
+				'state' : {},
+				'visibleTo' : {},
+				'playerIdToNumberOfTokensInPot' : {},
+				'playerThatHasTurn' : Number.MIN_VALUE,
+				'gameOverReason' : ""
+			}
 			/*
 			 * Variables for interacting with Game side. Temporarily store the game state locally.
 			 * Initiated empty each time container loads the game
@@ -357,22 +364,26 @@ smgContainer.controller('StandaloneController',
 			 * @param move
 			 */
 			var passAndPlayServer = function(playerId, move){
+				console.log("Log: getStateForPlayerId: playerId: " + angular.toJson(playerId));
 				console.log("Log: getStateForPlayerId: Input Move: " + angular.toJson(move));
 				var gameState = makeMoveInPassAndPlayMode(move);
+				console.log("Log: standaloneController: gameState: " + angular.toJson(gameState));
 				var state = gameState['state'];
 				var visibleTo = gameState['visibleTo'];
 				lastPlayerIdThatHasTurn = currentPlayerIdThatHasTurn;
 				currentPlayerIdThatHasTurn = gameState.playerThatHasTurn;
 				// 1. get new state according to visibility.
-				var newState = {};
+				var newState = clone(state);
 				var keys = getKeys(state);
-				for (var k = 0; k < keys.length; k++) {
+				console.log("Log: standaloneController: keys: " + angular.toJson(keys));
+				console.log("Log: standaloneController: visibleTo: " + angular.toJson(visibleTo));
+				for (var k in keys) {
 					var visibleToPlayers = visibleTo[keys[k]];
 					var value = null;
 					if(visibleToPlayers=="ALL"){
 						value = state[keys[k]];
 					}
-					if(visibleToPlayers.indexOf(playerId)>-1){
+					if(visibleToPlayers.indexOf(currentPlayerIdThatHasTurn)>-1){
 						value = state[keys[k]];
 					}
 					newState[keys[k]] = value;
@@ -413,13 +424,7 @@ smgContainer.controller('StandaloneController',
 			var makeMoveInPassAndPlayMode = function (move) {
 				console.log("Log: standaloneController: json typed Move data from Game: " + angular.toJson(move));
 				var operations = move['operations'];
-				var gameState = {
-					'state' : {},
-					'visibleTo' : {},
-					'playerIdToNumberOfTokensInPot' : {},
-					'playerThatHasTurn' : Number.MIN_VALUE,
-					'gameOverReason' : ""
-				}
+
 				for (var i in operations) {
 					var operation = operations[i];
 
