@@ -224,12 +224,18 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 					  if (data['playerIds']) {
 						  console.log("Auto matched... Ready to insert a new match...");
 						  $cookies.isSyncMode = false;
-						  insertMatch(data['playerIds']);
+							var playerIds = flipPlayerIds(data['playerIds']);
+						  insertMatch(playerIds);
 					  }
 				  }
 			  }
 	  );
   } // End of autoMatch
+
+	/** Flip the playerIds, so the second player who enter the game automatically will make the move first without waiting... */
+	var flipPlayerIds = function (playerIds) {
+		return [playerIds[1], playerIds[0]];
+	}
 
 	/**
 	 * Start pass and play game mode
