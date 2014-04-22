@@ -25,11 +25,22 @@ smgContainer.controller('GameResultController', function ($scope, $rootScope, $l
 //	var yourId = $cookies.playerId;
 	var hasWon = $rootScope.matchResultInfo['hasWon'];
 
-	getWinnerInfo(winnerId);
 
-	if (hasWon) {
-		$scope.resultMsg = "Congratulation, You won!";
+	if (winnerId === $cookies.playerId || !$rootScope.matchResultInfo['isStandAlone']) {
+		getWinnerInfo(winnerId);
 	} else {
-		$scope.resultMsg = "Sorry, maybe next time...";
+		$scope.winnerNickName = "player 2";
+		$scope.winnerImageUrl = "../img/giraffe.gif";
 	}
+
+	if (!$rootScope.matchResultInfo['isStandAlone']) {
+		if (hasWon) {
+			$scope.resultMsg = "Congratulation, You won!";
+		} else {
+			$scope.resultMsg = "Sorry, maybe next time...";
+		}
+	} else {
+		$scope.resultMsg = "...";
+	}
+
 });

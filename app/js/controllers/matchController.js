@@ -80,6 +80,7 @@ smgContainer.controller('MatchController',
 	      winner: '',
 	      opponentId: '',
 	      hasWon: false,
+	      isStandAlone: false,
         FBLogin: $scope.FBLogin
       };
       /**

@@ -81,8 +81,10 @@ smgContainer.controller('StandaloneController',
 			 * @type {{message: string, messagePostToFB: string, FBLogin: (boolean|*)}}
 			 */
 			$scope.matchResultInfo = {
-				message: '',
-				messagePostToFB: '',
+				winner: '',
+				opponentId: '',
+				hasWon: false,
+				isStandAlone: true,
 				FBLogin: $scope.FBLogin
 			};
 			/**
@@ -172,7 +174,13 @@ smgContainer.controller('StandaloneController',
 					$scope.matchResultInfo.message = 'Keep calm and carry on!';
 					$scope.matchResultInfo.messagePostToFB = 'I just lost = =!!';
 				}
-
+				if ($cookies.playerId === $rootScope.playerIds[0]) {
+					$scope.matchResultInfo.opponentId = $rootScope.playerIds[1];
+				} else {
+					$scope.matchResultInfo.opponentId = $rootScope.playerIds[0];
+				}
+				$rootScope.matchResultInfo = $scope.matchResultInfo;
+				$location.url('/gameResult/' + $routeParams.matchId);
 				/*
 				 Two fundamental methods which will be used in further implementation:
 				 postToFB($scope.matchResultInfo['messagePostToFB']);
