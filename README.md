@@ -15,7 +15,7 @@ The design doc is [here] (https://docs.google.com/document/d/1Jm7VgALEnLfRTvEVG6
     - Handle the initial match insertion
   - Handle the layout of all pages
   - Deal with other trivial stuff (login, submit test players and games and etc.)
-  - Improved the page to support mobile device (Not complete yet)
+  - Improved the page UI to support mobile device
 
 - Yuanyi Yang (Team member)
   - Write initial test for server V2
@@ -34,6 +34,7 @@ The design doc is [here] (https://docs.google.com/document/d/1Jm7VgALEnLfRTvEVG6
       - Retrieve the players info and game info from the server
     - Display the match info, also player and opponents info
     - Added the feature related to facebook (Not complete yet)
+  - Added the pass and play mode
 
 ## Versions
 
@@ -50,6 +51,11 @@ The design doc is [here] (https://docs.google.com/document/d/1Jm7VgALEnLfRTvEVG6
 - Playable
 - Bugs
   - After one of the player wins, the other player will get two modals pop up... One is the game result info and another is the disconnection prompt of the winner...
+
+### [Version 5] (http://5.smg-angularjs-container.appspot.com/index.html#/)
+- Changed to mobile UI
+- Added pass and play mode
+- Auto match in async mode
 
 ## Initial server Tests
 Since the API are not determined at that time, the tests can't pass...
