@@ -1,17 +1,17 @@
 <div>
 	<div class="container-fluid">
 		<div class="jumbotron" id="justPlay">
-			<div class="col-xs-12" align="middle"  id="welcome">
-				<h1>Have Fun</h1>
-			</div>
+			<!--<div class="col-sm-12 hidden-xs hidden-sm" align="middle"  id="welcome">-->
+				<!--<h1>Have Fun</h1>-->
+			<!--</div>-->
 			<div class="col-xs-12" align="middle" id="autoMatch">
-				<button type="submit" ng-click="autoMatch()" class="btn btn-primary btn-lg">
+				<button type="submit" ng-click="autoMatch()" class="btn btn-primary">
 					<i class="fa fa-random fa-fw"></i> Auto Match
 				</button>
 			</div>
 			<form name="inviteForm" role="form" id="passAndPlay">
 				<div class="form-group col-xs-12" align="middle">
-					<button type="submit" ng-disabled="inviteForm.$invalid" ng-click="passAndPlay()" class="btn btn-primary btn-lg">
+					<button type="submit" ng-disabled="inviteForm.$invalid" ng-click="passAndPlay()" class="btn btn-primary">
 						<i class="fa fa-exchange fa-fw"></i> Pass & Play
 					</button>
 				</div>
@@ -27,8 +27,8 @@
 				</div>
 			</form>
 			<div class="col-xs-12" align="middle"  id="PlayAi">
-				<button type="submit" disabled ng-click="playWithAi()" class="btn btn-primary btn-lg">
-					<i class="fa fa-desktop fa-fw"></i> AI (Working on it)
+				<button type="submit" disabled ng-click="playWithAi()" class="btn btn-primary">
+					<i class="fa fa-desktop fa-fw"></i> Play with AI
 				</button>
 			</div>
 		</div>

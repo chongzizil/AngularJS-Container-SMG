@@ -5,7 +5,7 @@
 	<meta Content-Type="text/csv"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1.0, minimum-scale=1.0, maximum-scale=1.0">
 	<meta name="description" content="">
 	<meta name="author" content="">
 
@@ -71,7 +71,7 @@
 
 <div class="container" ng-controller="OffCanvasMenuController">
 	<div class="row row-offcanvas row-offcanvas-left">
-		<div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		<div class="col-xs-12 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
 			<div class="well">
 				<div align="middle">
 					<button type="submit" ng-click="checkMatches()" class="btn btn-default">
@@ -82,8 +82,8 @@
 				<div ng-show="noMatch">
 					Empty...
 				</div>
-				<div class="list-group" ng-repeat="matchInfo in matchInfos">
-					<button class="btn btn-primary col-xs-offset-2 col-xs-8" ng-click="enterMatch(matchInfo)"><i
+				<div class="list-group" ng-repeat="matchInfo in matchInfos" align="middle">
+					<button class="btn btn-primary btn-sm" ng-click="enterMatch(matchInfo)"><i
 							class="fa fa-sign-in"></i> match
 					</button>
 				</div>
@@ -92,8 +92,8 @@
 		</div>
 		<div class="container-fluid">
 			<div class="col-xs-12 col-sm-9">
-				<div class="container-fluid">
-					<div class="col-xs-2 visible-xs">
+				<!--<div class="container-fluid">-->
+					<div class="col-xs-3 visible-xs">
 						<button type="submit" data-toggle="offcanvas" class="btn btn-default visible-xs">
 							<i class="fa fa-th"></i>
 						</button>
@@ -103,7 +103,7 @@
 							<strong>{{gameName}}</strong>
 						</div>
 					</div>
-				</div>
+				<!--</div>-->
 				<div class="container-fluid">
 					<ng-view></ng-view>
 				</div>
