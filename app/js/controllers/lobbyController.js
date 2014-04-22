@@ -11,6 +11,9 @@
 
 smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService, GetAllMatchInfoService) {
 
+	// Refresh the off canvas menu
+	$rootScope.refreshOffCanvasMenu()
+
 	/** Set the jumbotron */
 	var setJumbotron = function() {
 		// Adjust the jumbotron to a suitable size

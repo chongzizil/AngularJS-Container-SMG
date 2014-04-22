@@ -3,7 +3,37 @@
 smgContainer.controller('OffCanvasMenuController',
 		function ($scope, $rootScope, $cookies, $location, $routeParams, $timeout, GetGameInfoService, NewMatchService) {
 
-			var url = $location.url();
+			/** Refresh the off canvas menu */
+			$rootScope.refreshOffCanvasMenu = function () {
+				getGameName();
+			}
+
+			var getGameId = function () {
+				var url = $location.url();
+				if (url.substr(0, 6) === "/lobby") {
+					return url.substr(7);
+				} else {
+					return undefined;
+				}
+			}
+
+			var getGameName = function () {
+				$scope.gameId = getGameId();
+				if (angular.isDefined($scope.gameId)) {
+					GetGameInfoService.get({gameId: $scope.gameId}).
+							$promise.then(function (data) {
+								if (data['error'] == 'WRONG_GAME_ID') {
+									alert('Sorry, wrong Game ID provided!');
+								} else {
+									$scope.gameName = data['gameName'];
+//									$scope.gameDescription = data['description'];
+								}
+							}
+					);
+				} else {
+					$scope.gameName = "No game name... error...";
+				}
+			}
 
 			$scope.enterMatch = function (matchInfo) {
 				$rootScope.playerIds = matchInfo['playerIds'];
@@ -14,81 +44,51 @@ smgContainer.controller('OffCanvasMenuController',
 				}
 			}
 
-
-			$scope.refreshOffCanvasMenu = function () {
-				if (angular.isDefined(gameId)) {
-					getGameName();
-				} else {
-					$scope.gameName = "No game!?";
-				}
-			}
-
-			/** If it's in the lobby page */
-			if (url.substr(0, 6) === "/lobby") {
-				var gameId = url.substr(7);
-				var playerIds;
-				var matchId;
-
-				// Get the game info from the server
-				var getGameName = function () {
-					GetGameInfoService.get({gameId: gameId}).
-							$promise.then(function (data) {
-								if (data['error'] == 'WRONG_GAME_ID') {
-									alert('Sorry, wrong Game ID provided!');
-								} else {
-									$scope.gameName = data['gameName'];
-									$scope.gameDescription = data['description'];
-								}
-							}
-					);
-				}
-				getGameName();
-			}
-
-
 			/**
 			 * Try to retrieve the match info if there is one for the player
 			 */
 			$scope.checkMatches = function () {
-				console.log("Refreshing match info...");
-				NewMatchService.get({playerId: $cookies.playerId, accessSignature: $cookies.accessSignature, gameId: gameId}).
-						$promise.then(function (data) {
-							console.log("Got match info...");
-							console.log(data);
-							/*
-							 {@code data} contains following data if there's a match:
-							 matchId:
-							 playerIds: should be an array, and we can store this into the $cookies and
-							 delete it after all players exit the match.
-							 */
-							if (!data['matchId']) {
+				if (angular.isDefined($scope.gameId)) {
+					$scope.matchInfos = [];
+					NewMatchService.get({playerId: $cookies.playerId, accessSignature: $cookies.accessSignature, gameId: $scope.gameId}).
+							$promise.then(function (data) {
+								console.log("Got match info from checkMatches()...");
+								/*
+								 {@code data} contains following data if there's a match:
+								 matchId:
+								 playerIds: should be an array, and we can store this into the $cookies and
+								 delete it after all players exit the match.
+								 */
 								if (data['error'] === 'WRONG_ACCESS_SIGNATURE') {
 									alert('Sorry, your ID does not exist. Please try again.');
 								} else if (data['error'] === 'WRONG_PLAYER_ID') {
 									alert('WRONG_PLAYER_ID');
+								} else if (data['error'] === 'WRONG_GAME_ID') {
+									//TODO: delete later
+									//alert('WRONG_GAME_ID');
 								} else if (data['error'] === 'NO_MATCH_FOUND') {
-									//TODO: delte later
-									alert('NO_MATCH_FOUND');
+									//TODO:
+									$scope.noMatch = true;
+								} else {
+									$scope.noMatch = false;
+									$scope.matchInfos = [
+										{matchUrl: '/' + $scope.gameId + '/match/' + data['matchId'], playerIds: data['playerIds']}
+									];
 								}
-							} else {
-								$scope.matchInfos = [
-									{matchUrl: '/' + gameId + '/match/' + data['matchId'], playerIds: data['playerIds']}
-								];
-								console.log($scope.matchInfos);
 							}
-						}
-				);
+					);
+				}
 			}
 
 			/** Auto refresh all match info in a specific time */
 			var autoRefresh = function (time) {
-				$scope.countDown = function () {
+				$scope.autoRefreshHelper = function () {
+					console.log("Auto refresh the match info in off canvas menu per " + time/1000 + " seconds...");
 					$scope.checkMatches();
-					myTimer = $timeout($scope.countDown, time);
+					myTimer = $timeout($scope.autoRefreshHelper, time);
 				}
-				var myTimer = $timeout($scope.countDown, time);
+				var myTimer = $timeout($scope.autoRefreshHelper, time);
 			}
 			autoRefresh(60 * 1000);
-
 		}
 );
