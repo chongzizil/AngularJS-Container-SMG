@@ -2,10 +2,11 @@
 <html lang="en" ng-app="smgContainer">
 <head>
 	<meta charset="utf-8">
-	<meta Content-Type="text/csv"/>
+	<!--<meta Content-Type="text/csv"/>-->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1.0, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="viewport"
+	      content="width=device-width, initial-scale=1.0, user-scalable=1.0, minimum-scale=1.0, maximum-scale=1.0">
 	<meta name="description" content="">
 	<meta name="author" content="">
 
@@ -23,8 +24,7 @@
 </head>
 
 <body>
-<!-- Navbar, for debug purpose only -->
-<!--<div class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="MenuController">
+<div class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="MenuController">
 	<div class="container">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -41,18 +41,17 @@
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">
-					&lt;!&ndash;<a href="#" class="dropdown-toggle" data-toggle="dropdown"><img ng-src="{{imageUrl}}" height="30" width="30"/>&ndash;&gt;
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><img ng-src="{{imageUrl}}" height="30" width="30"/>
 						{{idDisplay}}<b class="caret"></b></a>
 					<ul class="dropdown-menu">
 						<li>
-							&lt;!&ndash; Button trigger modal &ndash;&gt;
+							<!-- Button trigger modal -->
 							<a data-toggle="modal" data-target="#login">
 								Login
 							</a>
 						</li>
 						<li>
-							&lt;!&ndash; Button trigger modal &ndash;&gt;
+							<!-- Button trigger modal -->
 							<a data-toggle="modal" data-target="#register">
 								Register
 							</a>
@@ -63,10 +62,10 @@
 				</li>
 			</ul>
 		</div>
-		&lt;!&ndash; /.nav-collapse &ndash;&gt;
+		<!-- /.nav-collapse -->
 	</div>
-	&lt;!&ndash; /.container &ndash;&gt;
-</div>-->
+	<!-- /.container -->
+</div>
 <!-- /.navbar -->
 
 <div class="container" ng-controller="OffCanvasMenuController">
@@ -79,7 +78,8 @@
 					</button>
 				</div>
 				<br/>
-				<div ng-show="noMatch">
+
+				<div ng-show="hasNoMatch">
 					Empty...
 				</div>
 				<div class="list-group" ng-repeat="matchInfo in matchInfos" align="middle">
@@ -90,30 +90,21 @@
 			</div>
 			<!--/span-->
 		</div>
-		<div class="container">
-			<div class="col-xs-12 col-sm-9">
-				<!--<div class="container-fluid">-->
-					<div class="col-xs-3 visible-xs">
-						<button type="submit" data-toggle="offcanvas" class="btn btn-default visible-xs">
-							<i class="fa fa-th"></i>
-						</button>
-					</div>
-					<div class="well well-sm col-sm-12 col-xs-9">
-						<div align="middle">
-							<strong>{{gameName}}</strong>
-						</div>
-					</div>
-				<!--</div>-->
-				<div class="container-fluid">
-					<ng-view></ng-view>
+		<div class="col-xs-12 col-sm-9" id="mainContainer">
+			<div class="col-xs-2 visible-xs">
+				<button type="submit" data-toggle="offcanvas" class="btn btn-default visible-xs">
+					<i class="fa fa-th"></i>
+				</button>
+			</div>
+			<div class="col-xs-10 col-sm-12">
+				<div class="well well-sm" align="middle">
+					<strong>{{gameName}}</strong>
 				</div>
 			</div>
+			<ng-view></ng-view>
 		</div>
-		<!--/row-->
 	</div>
-<!--/row-->
 </div>
-<!--/.container-->
 
 <!-- Modal -->
 <div player-login></div>

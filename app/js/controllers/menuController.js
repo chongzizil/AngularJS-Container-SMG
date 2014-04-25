@@ -4,7 +4,7 @@ smgContainer.controller('MenuController',
     function ($scope, $cookies, $rootScope, $location) {
 	    $location.search();
 
-			$scope.imageUrl = $cookies.imageUrl;
+			$scope.playerImageUrl = $cookies.playerImageUrl;
 
 	    $scope.getToken = function () {
 		    $cookies.FBAccessToken = $scope.accessToken;

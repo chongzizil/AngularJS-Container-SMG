@@ -29,19 +29,57 @@ smgContainer.factory('PlayerService', ['$resource', function ($resource) {
 /**
  * To get the game info
  */
-smgContainer.factory('GetGameInfoService', ['$resource', function ($resource) {
-	return $resource(domainUrl + '/games/:gameId',
-			{gameId: '@gameId'}
-	);
+smgContainer.factory('GetGameInfoService', ['$resource', '$q', function ($resource, $q) {
+	return {
+		getGameInfo: function (gameId) {
+			var deferred = $q.defer();
+
+			$resource(domainUrl + '/games/:gameId', {gameId: '@gameId'}).get({gameId: gameId}).
+					$promise.then(function (data) {
+						if (angular.isDefined(data['error'])) {
+							console.error("********** Error from GetGameInfoService...");
+							console.error(angular.toJson(data));
+							deferred.resolve(undefined);
+						} else {
+							console.log("********** Get game info from the server...");
+							console.log(angular.toJson(data));
+							deferred.resolve(data);
+						}
+					}
+			);
+
+			return deferred.promise;
+		}
+	}
 }]);
 
 /**
  * To get a player's info
  */
-smgContainer.factory('GetPlayerInfoService', ['$resource', function ($resource) {
-	return $resource(domainUrl + '/playerInfo',
-			{playerId: '@playerId', targetId: '@targetId', accessSignature: '@accessSignature'}
-	);
+smgContainer.factory('GetPlayerInfoService', ['$resource', '$q', function ($resource, $q) {
+	return {
+		getPlayerInfo: function (playerId, targetId, accessSignature) {
+			var deferred = $q.defer();
+
+			$resource(domainUrl + '/playerInfo',
+					{playerId: '@playerId', targetId: '@targetId', accessSignature: '@accessSignature'})
+					.get({playerId: playerId, targetId: targetId, accessSignature: accessSignature})
+					.$promise.then(function (data) {
+						if (angular.isDefined(data['error'])) {
+							console.error("********** Error from GetPlayerInfoService...");
+							console.error(angular.toJson(data));
+							deferred.resolve(undefined);
+						} else {
+							console.log("********** Get player info from the server...");
+							console.log(angular.toJson(data));
+							deferred.resolve(data);
+						}
+					}
+			);
+
+			return deferred.promise;
+		}
+	}
 }]);
 
 /**
@@ -65,19 +103,58 @@ smgContainer.factory('InsertMatchService', ['$resource', function ($resource) {
 /**
  * To get new match info (asynchronous mode)
  */
-smgContainer.factory('NewMatchService', ['$resource', function ($resource) {
-	return $resource(domainUrl + '/newMatch/:playerId',
-			{playerId: '@playerId', accessSignature: '@accessSignature', gameId: '@gameId'}
-	);
+smgContainer.factory('NewMatchService', ['$resource', '$q', function ($resource, $q) {
+	return {
+		getMatchInfo: function (playerId, accessSignature, gameId) {
+			var deferred = $q.defer();
+
+			$resource(domainUrl + '/newMatch/:playerId',
+					{playerId: '@playerId', accessSignature: '@accessSignature', gameId: '@gameId'})
+					.get({playerId: playerId, accessSignature: accessSignature, gameId: gameId})
+					.$promise.then(function (data) {
+						if (angular.isDefined(data['error'])) {
+							console.warn("********** Error from NewMatchService...");
+							console.warn(angular.toJson(data));
+							deferred.resolve(undefined);
+						} else {
+							console.log("********** Get match info from the server...");
+							console.log(angular.toJson(data));
+							deferred.resolve(data);
+						}
+					}
+			);
+			return deferred.promise;
+		}
+	};
+
 }]);
 
 /**
  * To get the new state from the server (asynchronous mode)
  */
-smgContainer.factory('NewMatchStateService', ['$resource', function ($resource) {
-	return $resource(domainUrl + '/state/:matchId',
-			{matchId: '@matchId', playerId: '@playerId', accessSignature: '@accessSignature'}
-	);
+smgContainer.factory('NewMatchStateService', ['$resource', '$q', function ($resource, $q) {
+	return {
+		getNewMatchState: function (matchId, playerId, accessSignature) {
+			var deferred = $q.defer();
+
+			$resource(domainUrl + '/state/:matchId',
+					{matchId: '@matchId', playerId: '@playerId', accessSignature: '@accessSignature'})
+					.get({matchId: matchId, playerId: playerId, accessSignature: accessSignature})
+					.$promise.then(function (data) {
+						if (angular.isDefined(data['error'])) {
+							console.error("********** Error from NewMatchStateService...");
+							console.error(angular.toJson(data));
+							deferred.resolve(undefined);
+						} else {
+							console.log("********** Get game state from the server through NewMatchStateService...");
+							console.log(angular.toJson(data));
+							deferred.resolve(data);
+						}
+					}
+			);
+			return deferred.promise;
+		}
+	}
 }]);
 
 /**

@@ -1,32 +1,46 @@
 'use strict';
 
-smgContainer.controller('GameResultController', function ($scope, $rootScope, $location, $cookies, GetPlayerInfoService) {
-	/** Get a winner's info */
-	var getWinnerInfo = function (targetId) {
-		GetPlayerInfoService.get({playerId: $cookies.playerId,
-			targetId: targetId, accessSignature: $cookies.accessSignature}).
-				$promise.then(function (data) {
-					if (data['error'] == "WRONG_PLAYER_ID") {
-						alert("Sorry, Wrong Player ID provided!");
-					} else if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
-						alert('Sorry, Wrong Access Signature provided!');
-					} else if (data['error'] == 'WRONG_TARGET_ID') {
-						alert('Sorry, Wrong Target ID provided!');
-					} else {
-						$scope.winnerNickName = data['nickname'];
-						$scope.winnerImageUrl = data['imageURL'];
-					}
-				}
-		);
-	}
+smgContainer.controller('GameResultController', function ($scope, $rootScope, $location, $q, $cookies, GetPlayerInfoService, PostMessageToFBService) {
+
+	/************************************** Variables *************************************/
 
 	var winnerId = $rootScope.matchResultInfo['winner'];
 //	var opponentId = $rootScope.matchResultInfo['opponentId'];
-//	var yourId = $cookies.playerId;
 	var hasWon = $rootScope.matchResultInfo['hasWon'];
 
+	/********************************** End of variables **********************************/
 
-	if (winnerId === $cookies.playerId || !$rootScope.matchResultInfo['isStandAlone']) {
+
+	/************************************** Functions *************************************/
+
+	/** Get winner's info */
+	var getWinnerInfo = function (targetId) {
+		GetPlayerInfoService.getPlayerInfo($cookies.playerId, targetId, $cookies.accessSignature)
+				.then(function (data) {
+					if (angular.isDefined(data)) {
+						$scope.winnerNickName = data['nickname'];
+						$scope.winnerImageUrl = data['imageURL'];
+					}
+				});
+	};
+
+	/**
+	 * Post message on Facebook,
+	 */
+	var postMsgToFB = function () {
+		PostMessageToFBService.save({message: messageToFB, access_token: $cookies.FBAccessToken}, "")
+				.$promise.then(function (response) {
+					console.log("********** Response from posting to FB: " + angular.toJson(response));
+				}
+		);
+	};
+
+	/*********************************** End of functions *********************************/
+
+
+	/************************************* Start point ************************************/
+
+	if (!$rootScope.matchResultInfo['isStandAlone']) {
 		getWinnerInfo(winnerId);
 	} else {
 		$scope.winnerNickName = "player 2";
@@ -37,10 +51,11 @@ smgContainer.controller('GameResultController', function ($scope, $rootScope, $l
 		if (hasWon) {
 			$scope.resultMsg = "Congratulation, You won!";
 		} else {
-			$scope.resultMsg = "Sorry, maybe next time...";
+			$scope.resultMsg = "Maybe next time...";
 		}
 	} else {
 		$scope.resultMsg = "...";
 	}
 
+	/************************************* End point ************************************/
 });

@@ -9,7 +9,7 @@
  *    a match, the page will be redirected to the match page.
  */
 
-smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService, GetAllMatchInfoService) {
+smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $q, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService, GetAllMatchInfoService) {
 
 	// Refresh the off canvas menu
 	$rootScope.refreshOffCanvasMenu()
@@ -55,43 +55,19 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
     $rootScope.refreshDisplayId();
   }
 
-  // Get the game info from the server
-  var getGameName = function () {
-    GetGameInfoService.get({gameId: $routeParams.gameId}).
-        $promise.then(function (data) {
-          if (data['error'] == 'WRONG_GAME_ID') {
-            alert('Sorry, Wrong Game ID provided!');
-          } else {
-//	          console.log("**************** Game Info ****************");
-//	          console.log(data);
-            $scope.gameName = data['gameName'];
-            $scope.gameDescription = data['description'];
-	          console.log("Game's name got!");
-          }
-        }
-    );
-  };
-	console.log("Getting game's name...");
-  getGameName();
+	var getPlayerInfo = function () {
+		GetPlayerInfoService.getPlayerInfo($cookies.playerId, $cookies.playerId,
+				$cookies.accessSignature)
+				.then(function (data) {
+					if (angular.isDefined(data)) {
+						$cookies.playerImageUrl = data['imageURL'];
+						$scope.playerImageUrl = $cookies.playerImageUrl;
+						$scope.playerEmail = data['email'];
+					}
+				});
+	};
+	getPlayerInfo();
 
-  // Get the player email from the server
-  GetPlayerInfoService.get({playerId: $cookies.playerId,
-    targetId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
-      $promise.then(function (data) {
-        if (data['error'] == "WRONG_PLAYER_ID") {
-          alert("Sorry, Wrong Player ID provided!");
-        } else if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
-          alert('Sorry, Wrong Access Signature provided!');
-        } else if (data['error'] == 'WRONG_TARGET_ID') {
-          alert('Sorry, Wrong Target ID provided!');
-        } else {
-	        $cookies.imageUrl = data['imageURL'];
-	        $scope.imageUrl = $cookies.imageUrl;
-          $scope.playerEmail = data['email'];
-        }
-      }
-  );
-  GetPlayerInfoService();
 
   // Get all on ongoing matches from the server
   var getMatchesInfo = function () {
