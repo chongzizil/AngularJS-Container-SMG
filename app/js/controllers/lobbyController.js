@@ -9,223 +9,177 @@
  *    a match, the page will be redirected to the match page.
  */
 
-smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $q, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService, GetAllMatchInfoService) {
+smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $q, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService, GetAllMatchesService) {
 
-	// Refresh the off canvas menu
-	$rootScope.refreshOffCanvasMenu()
-	/** Set the jumbotron */
-	var setJumbotron = function() {
-		// Adjust the jumbotron to a suitable size
-		if ($(window).height() > 800) {
-			$("#justPlay").height(600);
+	/********************************** Initial jumbotron *********************************/
+
+	/** Adjust the jumbotron's size. */
+	var adjustJumbotron = function () {
+		var windowHeight = $(window).height();
+		var justPlayJumbotron = $("#justPlay");
+		if (windowHeight > 800) {
+			justPlayJumbotron.height(600);
 		} else {
-			$("#justPlay").height($(window).height() * 0.60);
+			justPlayJumbotron.height(windowHeight * 0.60);
 		}
 
 		// Adjust the three buttons position
-		var heightOfJustPlay = $("#justPlay").height();
-		var heightOfEachButton = $("#autoMatch").height();
-		var restOfJustPlay = heightOfJustPlay - 3 * heightOfEachButton;
+		var heightOfJustPlay = justPlayJumbotron.height();
+		var autoMatchButton = $("#autoMatch");
+		var passAndPlayButton = $("#passAndPlay");
+		var playWithAiButton = $("#playWithAi");
+
+		var buttonHeight = autoMatchButton.height();
+
+
+		var restOfJustPlay = heightOfJustPlay - 3 * buttonHeight;
 		var autoMatchOffset = restOfJustPlay * 0.10;
-		var passAndPlayOffset = restOfJustPlay * 0.20 ;
-		var PlayAiOffset = restOfJustPlay * 0.30 ;
+		var passAndPlayOffset = restOfJustPlay * 0.20;
+		var PlayAiOffset = restOfJustPlay * 0.30;
 
-		$("#autoMatch").css({position: 'relative', top: autoMatchOffset + 'px'});
-		$("#passAndPlay").css({position: 'relative', top: passAndPlayOffset + 'px'});
-		$("#PlayAi").css({position: 'relative', top: PlayAiOffset + 'px'});
+		autoMatchButton.css({position: 'relative', top: autoMatchOffset + 'px'});
+		passAndPlayButton.css({position: 'relative', top: passAndPlayOffset + 'px'});
+		playWithAiButton.css({position: 'relative', top: PlayAiOffset + 'px'});
+	};
+
+	/** Every time the broswer is resized, adjust the size of the jumbotron. */
+	$(window).resize(function () {
+		adjustJumbotron();
+	});
+
+	/****************************** End of initial jumbotron ******************************/
+
+	/************************************** Variables *************************************/
+
+	// Get the game ID
+	$cookies.gameId = $routeParams.gameId;
+
+	// Initial the mode check
+	$cookies.isSyncMode = false;
+
+	// If the url containers a player's info, retrieve it.
+	var urlData = $location.search();
+
+	if (urlData['playerId'] != undefined && urlData['accessSignature'] != undefined) {
+		$cookies.playerId = urlData['playerId'];
+		$cookies.accessSignature = urlData['accessSignature'];
+		$rootScope.refreshDisplayId();
 	}
-	setJumbotron();
 
-	$cookies.gameId=$routeParams.gameId;
+	/********************************** End of Variables **********************************/
 
-  var needLoginAlert = $("#needLoginAlert");
-  needLoginAlert.on('close.bs.alert', function () {
-    needLoginAlert.hide();
-    return false;
-  })
+	/************************************** Functions *************************************/
 
-  // Initial the mode check
-  $cookies.isSyncMode = false;
+//	/** Get the player */
+//	var getPlayerInfo = function () {
+//		GetPlayerInfoService.getPlayerInfo($cookies.playerId, $cookies.playerId,
+//				$cookies.accessSignature)
+//				.then(function (data) {
+//					if (angular.isDefined(data)) {
+//						$cookies.playerImageUrl = data['imageURL'];
+//						$scope.playerImageUrl = $cookies.playerImageUrl;
+//						$scope.playerEmail = data['email'];
+//					}
+//				});
+//	};
+//	getPlayerInfo();
 
-  // If the login info is contained in the url, then retrieve the login data
-  var urlData = $location.search();
-  if (urlData['playerId'] != undefined && urlData['accessSignature'] != undefined) {
-    $cookies.playerId = urlData['playerId'];
-    $cookies.accessSignature = urlData['accessSignature'];
-    $rootScope.refreshDisplayId();
-  }
+	/** Get all on ongoing matches from the server. */
+	var getMatchesInfo = function () {
+		GetAllMatchesService.getAllMatches($routeParams.gameId).then(function (data) {
+			if (angular.isDefined(data)) {
+				$scope.allMatches = data['currentGames'];
+			}
+		});
+	};
 
-	var getPlayerInfo = function () {
-		GetPlayerInfoService.getPlayerInfo($cookies.playerId, $cookies.playerId,
-				$cookies.accessSignature)
+	/**
+	 * Insert a match when one player receive the playerIds
+	 * from the server and change the page to start play.
+	 */
+	var insertMatch = function (playerIds) {
+		var data = {
+			accessSignature: $cookies.accessSignature,
+			playerIds: playerIds,
+			gameId: $routeParams.gameId
+		};
+		console.log("********** Inserting a match...");
+
+		InsertMatchService.sendInsertMatch(angular.toJson(data))
 				.then(function (data) {
 					if (angular.isDefined(data)) {
-						$cookies.playerImageUrl = data['imageURL'];
-						$scope.playerImageUrl = $cookies.playerImageUrl;
-						$scope.playerEmail = data['email'];
+//						$("#autoMatching").hide();
+
+						// Store the playerIds and matchId in the cookies
+						$rootScope.playerIds = data['playerIds'];
+						$cookies.matchId = data['matchId'];
+
+						// Redirect the page
+						$location.url($routeParams.gameId + '/match/' + data['matchId']);
+						if (!$scope.$$phase) {
+							$scope.$apply();
+						}
 					}
 				});
 	};
-	getPlayerInfo();
 
+	/** Start a auto match. */
+	$scope.autoMatch = function () {
+		//The data send to the server in order to join a auto match queue
+		var joinQueueData = {
+			accessSignature: $cookies.accessSignature,
+			playerId: $cookies.playerId,
+			gameId: $routeParams.gameId
+		};
 
-  // Get all on ongoing matches from the server
-  var getMatchesInfo = function () {
-    GetAllMatchInfoService.get({gameId: $routeParams.gameId}).
-        $promise.then(function (data) {
-          if (data['error'] == 'WRONG_GAME_ID') {
-            alert('Sorry, Wrong Game ID provided!');
-          } else {
-//            console.log(data)
-            $scope.allMatches = data['currentGames'];
-          }
-        }
-    );
-  };
-  getMatchesInfo();
+		console.log("********** Trying to join the queue for auto match...");
 
-  /**
-   * Insert a match when one player receive the playerIds
-   * from the server and change the page to start play.
-   */
-  var insertMatch = function (playerIds) {
-    var data = {
-      accessSignature: $cookies.accessSignature,
-      playerIds: playerIds,
-      gameId: $routeParams.gameId
-    }
-    console.log("Inserting a match..........................");
-//    console.log(data);
-    var jsonData = angular.toJson(data);
-    InsertMatchService.save({}, jsonData).
-        $promise.then(function (data) {
-//          console.log("From insertMatch.............................");
-//          console.log(data);
-          /*
-           {@code data} contains following data:
-           matchId:
-           playerIds: should be an array, and we can store this into the $cookies and
-           delete it after all players exit the match.
-           */
-          if (!data['matchId']) {
-            if (data['error'] === 'WRONG_PLAYER_ID') {
-              alert('Sorry, you need to finish the current match first. (multiple match is not supported yet...)');
-            } else if (data['error'] === 'WRONG_GAME_ID') {
-              alert('Sorry, the game\'s ID does not exist. Please try again.');
-            }
-          } else {
-//            console.log("insertMatch");
-            $("#autoMatching").hide();
-            // Store the playerIds and matchId in the cookies
-            $rootScope.playerIds = data['playerIds'];
-//            console.log($rootScope.playerIds);
-            $cookies.matchId = data['matchId'];
-            $location.url($routeParams.gameId + '/match/' + data['matchId']);
-            if (!$scope.$$phase) {
-              $scope.$apply();
-            }
-          }
-        }
-    );
-  }
-
-  /**
-   * Try to retrieve the match info if there is one for the player
-   */
-  $scope.checkHasNewMatch = function () {
-    NewMatchService.get({playerId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
-        $promise.then(function (data) {
-//          console.log("Getting new match info.......................");
-//          console.log(data);
-          /*
-           {@code data} contains following data if there's a match:
-           matchId:
-           playerIds: should be an array, and we can store this into the $cookies and
-           delete it after all players exit the match.
-           */
-          if (!data['matchId']) {
-            if (data['error'] === 'WRONG_ACCESS_SIGNATURE') {
-              alert('Sorry, your ID does not exist. Please try again.');
-            } else if (data['error'] === 'WRONG_PLAYER_ID') {
-              popupLoginPage();
-            } else if (data['error'] === 'NO_MATCH_FOUND') {
-              noNewMatchAlert.show();
-            }
-          } else {
-            autoMatching.hide();
-            // Store the playerIds and matchId in the cookies
-            $rootScope.playerIds = data['playerIds'];
-            $cookies.matchId = data['matchId'];
-            $location.url($routeParams.gameId + '/match/' + data['matchId']);
-            if (!$scope.$$phase) {
-              $scope.$apply();
-            }
-          }
-        }
-    );
-  }
-
-  /**
-   * Start a auto match
-   */
-  $scope.autoMatch = function () {
-    //The data send to the server in order to join a auto match queue
-    var joinQueueData = {
-      accessSignature: $cookies.accessSignature,
-      playerId: $cookies.playerId,
-      gameId: $routeParams.gameId
-    };
-    // Change the data to json object
-    var jsonJoinQueueData = angular.toJson(joinQueueData);
-		console.log("Trying to join the queue for auto match...");
-	  /**
-	   * Post data to the server in order to join the queue for auto match.
-	   */
-	  joinQueueService.save({}, jsonJoinQueueData).
-			  $promise.then(function (data) {
-				  console.log("Call back from auto match request...");
-				  console.log(data);
-				  if (!data['channelToken']) {
-					  if (data['error'] === 'WRONG_PLAYER_ID') {
-						  alert('Sorry, you have the wrong player ID');
-					  } else if (data['error'] === 'WRONG_GAME_ID') {
-						  alert('Sorry, the game\'s ID does not exist. Please try again.');
-					  } else if (data['error'] === 'MISSING_INFO') {
-						  alert("Missing info:" + jsonJoinQueueData);
-					  }
-				  } else {
-					  console.log("Join the queue, waiting for auto match...");
-					  if (data['playerIds']) {
-						  console.log("Auto matched... Ready to insert a new match...");
-						  $cookies.isSyncMode = false;
+		/**
+		 * Post data to the server in order to join the queue for auto match.
+		 */
+		joinQueueService.joinQueue(angular.toJson(joinQueueData))
+				.then(function (data) {
+					if (angular.isDefined(data)) {
+						console.log("********** Joined the queue, waiting for auto match...");
+						if (data['playerIds']) {
+							console.log("********** Auto matched... Ready to insert a new match...");
+							$cookies.isSyncMode = false;
 							var playerIds = flipPlayerIds(data['playerIds']);
-						  insertMatch(playerIds);
-					  }
-				  }
-			  }
-	  );
-  } // End of autoMatch
-
-	/** Flip the playerIds, so the second player who enter the game automatically will make the move first without waiting... */
-	var flipPlayerIds = function (playerIds) {
-		return [playerIds[1], playerIds[0]];
-	}
+							insertMatch(playerIds);
+						}
+					}
+				});
+	};
 
 	/**
-	 * Start pass and play game mode
+	 * Flip the playerIds, so the second player who enter the game
+	 * automatically will make the move first without waiting...
 	 */
+	var flipPlayerIds = function (playerIds) {
+		return [playerIds[1], playerIds[0]];
+	};
+
+	/** Start pass and play game mode. */
 	$scope.passAndPlay = function () {
 		console.log("Stand along url is:" + $routeParams.gameId + '/standalone?mode=pass_and_play&timeOfEachTurn=' + $scope.timeOfEachTurn);
 		var opponentPlayerId = $cookies.playerId + "11111";
 		$rootScope.playerIds = [$cookies.playerId, opponentPlayerId];
 		$location.url($routeParams.gameId + '/standalone?mode=pass_and_play&timeOfEachTurn=' + $scope.timeOfEachTurn);
-	}
+	};
 
-	/**
-	 * Start pass and play game mode
-	 */
+	/** Start pass and play game mode. */
 	$scope.playWithAi = function () {
 		console.log("Stand along url is:" + $routeParams.gameId + '/standalone?mode=play_with_ai');
 		$location.url($routeParams.gameId + '/standalone?mode=play_with_ai');
-	}
+	};
+
+	/********************************** End of Functions **********************************/
+
+	/************************************* Start point ************************************/
+
+	adjustJumbotron();
+
+	getMatchesInfo();
+
+	/************************************* End point ************************************/
 });

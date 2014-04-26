@@ -27,7 +27,7 @@ smgContainer.config(['$routeProvider',
 					templateUrl: 'templates/standalone.html',
 					controller: 'StandaloneController'
 				}).
-				when('/gameResult/:matchId', {
+				when('/gameResult/:gameId', {
 					templateUrl: 'templates/gameResult.html',
 					controller: 'GameResultController'
 				}).

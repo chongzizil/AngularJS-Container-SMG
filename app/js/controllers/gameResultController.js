@@ -44,7 +44,7 @@ smgContainer.controller('GameResultController', function ($scope, $rootScope, $l
 		getWinnerInfo(winnerId);
 	} else {
 		$scope.winnerNickName = "player 2";
-		$scope.winnerImageUrl = "../img/giraffe.gif";
+		$scope.winnerImageUrl = "img/giraffe.gif";
 	}
 
 	if (!$rootScope.matchResultInfo['isStandAlone']) {

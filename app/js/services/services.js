@@ -41,8 +41,8 @@ smgContainer.factory('GetGameInfoService', ['$resource', '$q', function ($resour
 							console.error(angular.toJson(data));
 							deferred.resolve(undefined);
 						} else {
-							console.log("********** Get game info from the server...");
-							console.log(angular.toJson(data));
+//							console.log("********** Get game info from the server...");
+//							console.log(angular.toJson(data));
 							deferred.resolve(data);
 						}
 					}
@@ -70,8 +70,8 @@ smgContainer.factory('GetPlayerInfoService', ['$resource', '$q', function ($reso
 							console.error(angular.toJson(data));
 							deferred.resolve(undefined);
 						} else {
-							console.log("********** Get player info from the server...");
-							console.log(angular.toJson(data));
+//							console.log("********** Get player info from the server...");
+//							console.log(angular.toJson(data));
 							deferred.resolve(data);
 						}
 					}
@@ -85,19 +85,55 @@ smgContainer.factory('GetPlayerInfoService', ['$resource', '$q', function ($reso
 /**
  * To join a queue for auto match through Channel API
  */
-smgContainer.factory('joinQueueService', ['$resource', function ($resource) {
-	return $resource(domainUrl + '/queue',
-			{}
-	);
+smgContainer.factory('joinQueueService', ['$resource', '$q', function ($resource, $q) {
+	return {
+		joinQueue: function (data) {
+			var deferred = $q.defer();
+
+			$resource(domainUrl + '/queue', {}).save({}, data)
+					.$promise.then(function (data) {
+						if (angular.isDefined(data['error'])) {
+							console.error("********** Error from joinQueueService...");
+							console.error(angular.toJson(data));
+							deferred.resolve(undefined);
+						} else {
+//							console.log("********** Join a queue...");
+//							console.log(angular.toJson(data));
+							deferred.resolve(data);
+						}
+					}
+			);
+
+			return deferred.promise;
+		}
+	};
 }]);
 
 /**
  * To insert a match to the server.
  */
-smgContainer.factory('InsertMatchService', ['$resource', function ($resource) {
-	return $resource(domainUrl + '/newMatch',
-			{}
-	);
+smgContainer.factory('InsertMatchService', ['$resource', '$q', function ($resource, $q) {
+	return {
+		sendInsertMatch: function (data) {
+			var deferred = $q.defer();
+
+			$resource(domainUrl + '/newMatch', {}).save({}, data)
+					.$promise.then(function (data) {
+						if (angular.isDefined(data['error'])) {
+							console.error("********** Error from InsertMatchService...");
+							console.error(angular.toJson(data));
+							deferred.resolve(undefined);
+						} else {
+//							console.log("********** Insert a match to the server...");
+//							console.log(angular.toJson(data));
+							deferred.resolve(data);
+						}
+					}
+			);
+
+			return deferred.promise;
+		}
+	};
 }]);
 
 /**
@@ -117,12 +153,13 @@ smgContainer.factory('NewMatchService', ['$resource', '$q', function ($resource,
 							console.warn(angular.toJson(data));
 							deferred.resolve(undefined);
 						} else {
-							console.log("********** Get match info from the server...");
-							console.log(angular.toJson(data));
+//							console.log("********** Get match info from the server...");
+//							console.log(angular.toJson(data));
 							deferred.resolve(data);
 						}
 					}
 			);
+
 			return deferred.promise;
 		}
 	};
@@ -146,12 +183,13 @@ smgContainer.factory('NewMatchStateService', ['$resource', '$q', function ($reso
 							console.error(angular.toJson(data));
 							deferred.resolve(undefined);
 						} else {
-							console.log("********** Get game state from the server through NewMatchStateService...");
-							console.log(angular.toJson(data));
+//							console.log("********** Get game state from the server through NewMatchStateService...");
+//							console.log(angular.toJson(data));
 							deferred.resolve(data);
 						}
 					}
 			);
+
 			return deferred.promise;
 		}
 	}
@@ -169,10 +207,29 @@ smgContainer.factory('SendMakeMoveService', ['$resource', function ($resource) {
 /**
  * To get on going match info
  */
-smgContainer.factory('GetAllMatchInfoService', ['$resource', function ($resource) {
-	return $resource(domainUrl + '/gameinfo/stats',
-			{gameId: '@gameId'}
-	);
+smgContainer.factory('GetAllMatchesService', ['$resource', '$q', function ($resource, $q) {
+	return {
+		getAllMatches: function (gameId) {
+			var deferred = $q.defer();
+
+			$resource(domainUrl + '/gameinfo/stats', {gameId: '@gameId'})
+					.get({gameId: gameId})
+					.$promise.then(function (data) {
+						if (angular.isDefined(data['error'])) {
+							console.warn("********** Error from GetAllMatchesService...");
+							console.warn(angular.toJson(data));
+							deferred.resolve(undefined);
+						} else {
+//							console.log("********** Get all matches...");
+//							console.log(angular.toJson(data));
+							deferred.resolve(data);
+						}
+					}
+			);
+
+			return deferred.promise;
+		}
+	}
 }]);
 
 /**

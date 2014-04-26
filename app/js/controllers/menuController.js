@@ -1,15 +1,18 @@
 'use strict';
 
 smgContainer.controller('MenuController',
-    function ($scope, $cookies, $rootScope, $location) {
-	    $location.search();
+    function ($scope, $cookies, $rootScope) {
+	    if (angular.isDefined($cookies.playerImageUrl)) {
+		    $scope.playerImageUrl = $cookies.playerImageUrl;
+	    } else {
+		    $scope.playerImageUrl = "/img/giraffe.gif";
+	    }
 
-			$scope.playerImageUrl = $cookies.playerImageUrl;
 
 	    $scope.getToken = function () {
 		    $cookies.FBAccessToken = $scope.accessToken;
 		    console.log($cookies.FBAccessToken);
-	    }
+	    };
 
       $rootScope.refreshDisplayId = function () {
         $scope.idDisplay = 'Guest';
@@ -20,7 +23,8 @@ smgContainer.controller('MenuController',
           $scope.idDisplay = $cookies.developerId;
           $scope.accessSignature = $cookies.accessSignature;
         }
-      }
+      };
+
       $rootScope.refreshDisplayId();
     }
 );

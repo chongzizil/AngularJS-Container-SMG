@@ -24,7 +24,7 @@ smgContainer.controller('MatchController',
 		    var gameContainer = $("#gameContainer");
 		    gameContainer.css("width", mainContainerWidth + "px");
 		    gameContainer.css("height", windowHeight + "px");
-	    }
+	    };
 
 	    /** Every time the broswer is resized, adjust the size of the game container too. */
 	    $(window).resize(function() {
@@ -269,6 +269,7 @@ smgContainer.controller('MatchController',
           "lastMovePlayerId": $scope.matchInfo.lastMovePlayerId,
           "playerIdToNumberOfTokensInPot": {}
         };
+		    console.log("********" + angular.toJson(updateUI));
 //	      console.log("********** The container sent the UpdateUI...");
 //	      console.log(angular.toJson(initialUpdateUI));
         sendMessageToIFrame(updateUI);

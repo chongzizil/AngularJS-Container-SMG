@@ -14,7 +14,7 @@ smgContainer.controller('StandaloneController',
 				var gameContainer = $("#gameContainer");
 				gameContainer.css("width", mainContainerWidth + "px");
 				gameContainer.css("height", windowHeight + "px");
-			}
+			};
 
 			/** Every time the broswer is resized, adjust the size of the game container too. */
 			$(window).resize(function() {
@@ -68,10 +68,8 @@ smgContainer.controller('StandaloneController',
 
 			/******************************* Variables: Stand alone *******************************/
 
-			var currentPlayerIdThatHasTurn = $rootScope.playerIds[0];
-			var lastPlayerIdThatHasTurn = $rootScope.playerIds[0];
-			var mode;
-			var timeOfEachTurn;
+			var currentPlayerIdThatHasTurn = $cookies.playerId;
+			var lastPlayerIdThatHasTurn = $cookies.playerId;
 
 			var gameState = {
 				'state' : {},
@@ -98,7 +96,7 @@ smgContainer.controller('StandaloneController',
 			 * result.
 			 * @type {boolean}
 			 */
-			var hasGameEnded = true;
+			var hasGameEnded = false;
 
 			/**
 			 * After the game is ended, matchResultInfo stores all necessary info.
@@ -171,6 +169,9 @@ smgContainer.controller('StandaloneController',
 			 * Id is a string.
 			 */
 			var sendMessageToGame = function (IdOne, IdTwo) {
+				if (!$scope.$$phase) {
+					$scope.$apply();
+				}
 				if (IdOne === IdTwo) {
 					sendUpdateUIToGame();
 				} else {
@@ -209,7 +210,7 @@ smgContainer.controller('StandaloneController',
 				$scope.matchResultInfo.isStandAlone = true;
 				$rootScope.matchResultInfo = $scope.matchResultInfo;
 
-				$location.url('/gameResult/' + $routeParams.matchId);
+				$location.url('/gameResult/' + $routeParams.gameId);
 			};
 
 			/**
@@ -264,7 +265,7 @@ smgContainer.controller('StandaloneController',
 			var sendUpdateUIToGame = function () {
 				var updateUI = {
 					"type": "UpdateUI",
-					'yourPlayerId': $cookies.playerId,
+					'yourPlayerId': $scope.matchInfo.playerThatHasTurn,
 					'playersInfo': [
 						{'playerId': $rootScope.playerIds[0]},
 						{'playerId': $rootScope.playerIds[1]}
@@ -565,6 +566,7 @@ smgContainer.controller('StandaloneController',
 						"operations": operations
 					};
 				}
+
 //				var jsonMove = angular.toJson(move);
 //				sendMakeMoveServicePost(jsonMove);
 //				console.log("********** Current play mode is: " + angular.toJson(mode));
@@ -678,35 +680,6 @@ smgContainer.controller('StandaloneController',
 			};
 
 			/**
-			 * Method used to get current user's information
-			 */
-			var getCurrentPlayerInfo = function () {
-				$scope.matchInfo.playersInfo = [];
-				GetPlayerInfoService.get({playerId: $cookies.playerId,
-					targetId: $cookies.playerId, accessSignature: $cookies.accessSignature}).
-						$promise.then(function (data) {
-							if (data['error'] == "WRONG_PLAYER_ID") {
-								alert("Sorry, Wrong Player ID provided!");
-							} else if (data['error'] == 'WRONG_ACCESS_SIGNATURE') {
-								alert('Sorry, Wrong Access Signature provided!');
-							} else if (data['error'] == 'WRONG_TARGET_ID') {
-								alert('Sorry, Wrong Target ID provided!');
-							} else {
-								getImageUrlFromFB();
-								$scope.matchInfo.playersInfo.push({playerId: $cookies.playerId, info: data});
-								if ($routeParams.mode === "pass_and_play") {
-//									console.log("*******************************")
-									// Insert a opponent for pass and play
-									$scope.matchInfo.playersInfo.push({playerId: $cookies.playerId + "11111",
-										info: {nickname: "Player 2", email:"Pass&Play", lastname: "Player 2", firstname: "Player 2",
-										imageURL: "http://smg-server.appspot.com/images/giraffe.gif"}});
-//									console.log($scope.matchInfo.playersInfo);
-								}
-							}
-						});
-			};
-
-			/**
 			 * Method used to get User Image Url
 			 * @return User's Image Url
 			 */
@@ -765,7 +738,7 @@ smgContainer.controller('StandaloneController',
 //				console.log("********** The container receives data from the game iFrame...");
 //				console.log(data['type']);
 				if (data['type'] === "GameReady") {
-					$scope.getNewMatchState();
+					replyGameReady();
 				} else if (data['type'] === "MakeMove") {
 					var operations = data['operations'];
 //					console.log("********** The container sends operations to the server...");
@@ -806,15 +779,20 @@ smgContainer.controller('StandaloneController',
 
 				// Check whether the player login with Facebook
 				if ($cookies.FBAccessToken == "undefined" || isUndefinedOrNullOrEmpty($cookies.FBAccessToken)) {
-					$scope.isFBLogin = false;
+					isFBLogin = false;
 				} else {
-					$scope.isFBLogin = true;
+					isFBLogin = true;
 				}
-				$scope.matchResultInfo.isFBLogin = $scope.isFBLogin;
+				$scope.matchResultInfo.isFBLogin = isFBLogin;
 
 				// 0. Get the input parameters
 //				mode = $routeParams.mode;
 //				timeOfEachTurn = $routeParams.timeOfEachTurn;
+
+				$rootScope.playerIds = [
+						$cookies.playerId,
+						$cookies.playerId + "11111"
+				];
 
 				// 1. Get game information.
 				getGameInfo();
