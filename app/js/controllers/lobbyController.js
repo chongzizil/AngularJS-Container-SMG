@@ -63,26 +63,27 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 	if (urlData['playerId'] != undefined && urlData['accessSignature'] != undefined) {
 		$cookies.playerId = urlData['playerId'];
 		$cookies.accessSignature = urlData['accessSignature'];
-		$rootScope.refreshDisplayId();
+		$rootScope.refreshUserDisplay();
 	}
 
 	/********************************** End of Variables **********************************/
 
 	/************************************** Functions *************************************/
 
-//	/** Get the player */
-//	var getPlayerInfo = function () {
-//		GetPlayerInfoService.getPlayerInfo($cookies.playerId, $cookies.playerId,
-//				$cookies.accessSignature)
-//				.then(function (data) {
-//					if (angular.isDefined(data)) {
-//						$cookies.playerImageUrl = data['imageURL'];
-//						$scope.playerImageUrl = $cookies.playerImageUrl;
-//						$scope.playerEmail = data['email'];
-//					}
-//				});
-//	};
-//	getPlayerInfo();
+	/** Get the player */
+	var getPlayerInfo = function () {
+		GetPlayerInfoService.getPlayerInfo($cookies.playerId, $cookies.playerId,
+				$cookies.accessSignature)
+				.then(function (data) {
+					if (angular.isDefined(data)) {
+						$cookies.playerImageUrl = data['imageURL'];
+						$scope.playerImageUrl = $cookies.playerImageUrl;
+						$cookies.playerEmail = data['email'];
+
+						$rootScope.refreshUserDisplay();
+					}
+				});
+	};
 
 	/** Get all on ongoing matches from the server. */
 	var getMatchesInfo = function () {
@@ -178,6 +179,10 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 	/************************************* Start point ************************************/
 
 	adjustJumbotron();
+
+	getPlayerInfo();
+
+	$rootScope.refreshOffCanvasMenu();
 
 	getMatchesInfo();
 

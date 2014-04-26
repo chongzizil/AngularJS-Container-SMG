@@ -30,7 +30,7 @@ smgContainer.directive('playerLogin', function () {
 								$cookies.playerId = loginInfo.playerId;
 								$cookies.accessSignature = data['accessSignature'];
 								console.log("data['accessSignature'] " + data['accessSignature']);
-								$rootScope.refreshDisplayId();
+								$rootScope.refreshUserDisplay();
 								$('#login').modal('hide');
 							}
 						}

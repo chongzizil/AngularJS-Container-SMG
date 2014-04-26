@@ -7,7 +7,7 @@ smgContainer.controller('SelectGameController',
       if (urlData['playerId'] != undefined && urlData['accessSignature'] != undefined) {
         $cookies.playerId = urlData['playerId'];
         $cookies.accessSignature = urlData['accessSignature'];
-        $rootScope.refreshDisplayId();
+        $rootScope.refreshUserDisplay();
       }
     }
 );

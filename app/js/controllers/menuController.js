@@ -2,29 +2,28 @@
 
 smgContainer.controller('MenuController',
     function ($scope, $cookies, $rootScope) {
-	    if (angular.isDefined($cookies.playerImageUrl)) {
-		    $scope.playerImageUrl = $cookies.playerImageUrl;
-	    } else {
-		    $scope.playerImageUrl = "/img/giraffe.gif";
-	    }
-
-
 	    $scope.getToken = function () {
 		    $cookies.FBAccessToken = $scope.accessToken;
 		    console.log($cookies.FBAccessToken);
 	    };
 
-      $rootScope.refreshDisplayId = function () {
+      $rootScope.refreshUserDisplay = function () {
         $scope.idDisplay = 'Guest';
         if ($cookies.playerId !== undefined) {
-          $scope.idDisplay = $cookies.playerId;
+          $scope.idDisplay = $cookies.playerEmail;
           $scope.accessSignature = $cookies.accessSignature;
         } else if ($cookies.developerId !== undefined) {
-          $scope.idDisplay = $cookies.developerId;
+          $scope.idDisplay = $cookies.playerEmail;
           $scope.accessSignature = $cookies.accessSignature;
         }
+
+	      if (angular.isDefined($cookies.playerImageUrl)) {
+		      $scope.playerImageUrl = $cookies.playerImageUrl;
+	      } else {
+		      $scope.playerImageUrl = "img/giraffe.gif";
+	      }
       };
 
-      $rootScope.refreshDisplayId();
+      $rootScope.refreshUserDisplay();
     }
 );
