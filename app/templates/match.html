@@ -1,18 +1,18 @@
 <div>
 	<div align="middle">
 		<div ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentTurnPlayer">
-			Current turn: {{playerInfo['info']['nickname']}}
+			{{ 'CURRENTTURN' | translate }}: {{playerInfo['info']['nickname']}}
 		</div>
 	</div>
 	<div id="refreshButton" class="col-md-offset-3 col-md-3 col-xs-6" align="middle">
 		<button type="button" class="btn btn-primary" ng-show='displayGetNewStateButton'
-		        ng-click="getNewMatchState()"> Refresh
+		        ng-click="getNewMatchState()"> {{ 'REFRESH' | translate }}
 		</button>
 	</div>
 	<div id="endGameButton" class="col-md-3 col-xs-6" align="middle">
 		<!--<button type="button" class="btn btn-primary" ng-show="displayEndGameButton" ng-click="endGame('p','oppo')">-->
 		<button type="button" class="btn btn-primary" ng-click="endGame('p','oppo')">
-			Quit
+			{{ 'QUIT' | translate }}
 		</button>
 	</div>
 
@@ -24,7 +24,7 @@
 	<br/><br/><br/>
 
 	<div id="playerInfo" class="panel panel-default">
-		<div class="panel-heading">Your Information</div>
+		<div class="panel-heading">{{ 'YOURINFO' | translate }}</div>
 		<div class="panel-body">
 			<div class="container-fluid">
 				<div ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentPlayer">
@@ -44,10 +44,10 @@
 						</row>
 						<row>
 							<div class="col-md-6">
-								First Name: {{playerInfo['info']['firstname']}}
+								{{ 'FIRSTNAME' | translate }}: {{playerInfo['info']['firstname']}}
 							</div>
 							<div class="col-md-6">
-								Last Name: {{playerInfo['info']['lastname']}}
+								{{ 'LASTNAME' | translate }}: {{playerInfo['info']['lastname']}}
 							</div>
 						</row>
 					</div>
@@ -57,14 +57,14 @@
 	</div>
 
 	<div id="opponentInfo" class="panel panel-default">
-		<div class="panel-heading">Opponent Information</div>
+		<div class="panel-heading">{{ 'OPPONENTINFO' | translate }}</div>
 		<div class="panel-body">
 			<table class="table">
 				<thead>
 				<tr>
 					<th>#</th>
-					<th>First Name</th>
-					<th>Nick Name</th>
+					<th>{{ 'FIRSTNAME' | translate }}</th>
+					<th>{{ 'NICKNAME' | translate }}</th>
 				</tr>
 				</thead>
 				<tbody>
@@ -73,10 +73,10 @@
 						Opponent_{{$index + 1}}:
 					</td>
 					<td>
-						First Name: {{playerInfo['info']['firstname']}}
+						{{playerInfo['info']['firstname']}}
 					</td>
 					<td>
-						Nick Name: {{playerInfo['info']['nickname']}}
+						{{playerInfo['info']['nickname']}}
 					</td>
 				</tr>
 				</tbody>

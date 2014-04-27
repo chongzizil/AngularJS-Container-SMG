@@ -1,13 +1,15 @@
 <div>
 	<div class="jumbotron">
 		<div align="middle">
-			<Strong>Winner: {{winnerNickName}}</Strong>
+			<p><strong>{{ 'WINNER' | translate }}: {{winnerNickName}}</strong></p>
 		</div>
 		<div align="middle">
 			<img ng-src="{{winnerImageUrl}}" height="150" width="150"/>
 		</div>
 		<div align="middle">
-			{{resultMsg}}
+			<p ng-show="winnerMsg">{{ 'WINNERMSG' | translate }}</p>
+			<p ng-show="loserMsg">{{ 'LOSERMSG' | translate }}</p>
+			<p ng-show="passAndPlayMsg">......................</p>
 		</div>
 	</div>
 </div>

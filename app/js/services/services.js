@@ -233,6 +233,34 @@ smgContainer.factory('GetAllMatchesService', ['$resource', '$q', function ($reso
 }]);
 
 /**
+ * To get the player's friend list if he/she login with FB account.
+ */
+smgContainer.factory('GetFriendListFromFBService', ['$resource', '$q', function ($resource, $q) {
+	return {
+		getFBFriendList: function (userId, accessSignature) {
+			var deferred = $q.defer();
+
+			$resource(domainUrl + '/userfriendlist/:userId', {userId: '@userId',accessSignature: '@accessSignature'})
+					.get({userId: userId, accessSignature: accessSignature})
+					.$promise.then(function (data) {
+						if (angular.isDefined(data['error'])) {
+							console.warn("********** Error from GetFriendListFromFBService...");
+							console.warn(angular.toJson(data));
+							deferred.resolve(undefined);
+						} else {
+							console.log("********** Get all FB friend list...");
+							console.log(angular.toJson(data));
+							deferred.resolve(data);
+						}
+					}
+			);
+
+			return deferred.promise;
+		}
+	}
+}]);
+
+/**
  * To post status on Facebook page, e.g. "I have won a match of XXX again YYY".
  */
 smgContainer.factory('PostMessageToFBService', ['$resource', function ($resource) {

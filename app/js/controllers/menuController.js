@@ -1,7 +1,7 @@
 'use strict';
 
 smgContainer.controller('MenuController',
-    function ($scope, $cookies, $rootScope) {
+    function ($scope, $cookies, $rootScope, $translate) {
 	    $scope.getToken = function () {
 		    $cookies.FBAccessToken = $scope.accessToken;
 		    console.log($cookies.FBAccessToken);
@@ -23,6 +23,10 @@ smgContainer.controller('MenuController',
 		      $scope.playerImageUrl = "img/giraffe.gif";
 	      }
       };
+
+	    $scope.changeLanguage = function (langKey) {
+		    $translate.use(langKey);
+	    };
 
       $rootScope.refreshUserDisplay();
     }

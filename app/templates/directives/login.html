@@ -3,28 +3,28 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title" id="loginLabel">Login</h4>
+				<h4 class="modal-title" id="loginLabel">{{ 'LOGIN' | translate }}</h4>
 			</div>
-
 			<div class="modal-body">
-
 				<div class="alert alert-danger collapse" id="loginAlert">
 					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 					<p>{{loginInfo.error}}</p>
 				</div>
-
 				<div id="search_player" class="col-sm-12">
 					<form name="loginForm" class="form-horizontal" role="form">
 						<div ng-class="{ 'form-group': true, 'has-error': idHasError }">
-							<label for="playerId" class="col-sm-2 control-label">Player Id</label>
+							<label for="playerId" class="col-sm-2 control-label">{{ 'PLAYER' | translate }} ID</label>
 							<div class="col-sm-8">
-								<input type="text" required ng-model="loginInfo.playerId" class="form-control" id="playerId" placeholder="Player Id">
+								<input type="text" required ng-model="loginInfo.playerId" class="form-control" id="playerId"
+								       placeholder="{{ 'PLAYER' | translate }} ID">
 							</div>
 						</div>
-						<div  ng-class="{ 'form-group': true, 'has-error': passwordHasError }">
-							<label for="password" class="col-sm-2 control-label">Password</label>
+						<div ng-class="{ 'form-group': true, 'has-error': passwordHasError }">
+							<label for="password" class="col-sm-2 control-label">{{ 'PASSWORD' | translate }}</label>
+
 							<div class="col-sm-8">
-								<input type="password" required ng-model="loginInfo.password" class="form-control" id="password" placeholder="password">
+								<input type="password" required ng-model="loginInfo.password" class="form-control" id="password"
+								       placeholder="{{ 'PASSWORD' | translate }}">
 							</div>
 						</div>
 						<div class="form-group">
@@ -33,16 +33,17 @@
 							</div>
 						</div>
 					</form>
-				</div> <!-- Invite player bar -->
+				</div>
+				<!-- Invite player bar -->
 
 				<br/><br/><br/><br/>
 			</div>
 
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				<!--<button type="submit" ng-click="fb()" class="btn btn-default">FB</button>-->
-				<!--<a type="submit" href="https://www.facebook.com/dialog/oauth?client_id=227131944153073&redirect_uri=http://smg-angularjs-container.appspot.com/#/index.html" class="btn btn-default">FB Login</a>-->
-				<button type="submit" ng-disabled="loginForm.$invalid" ng-click="login(loginInfo)" class="btn btn-default">Login</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">{{ 'CLOSE' | translate }}</button>
+				<button type="submit" ng-disabled="loginForm.$invalid" ng-click="login(loginInfo)" class="btn btn-default">{{
+					'LOGIN' | translate }}
+				</button>
 			</div>
 		</div>
 	</div>

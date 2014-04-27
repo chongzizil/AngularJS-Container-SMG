@@ -1,7 +1,7 @@
 'use strict';
 
 smgContainer.controller('OffCanvasMenuController',
-		function ($scope, $rootScope, $cookies, $location, $routeParams, $timeout, $q, GetGameInfoService, NewMatchService) {
+		function ($scope, $rootScope, $cookies, $location, $routeParams, $timeout, $q, $translate, GetGameInfoService, NewMatchService) {
 
 			/****************************** Initial off canvas menu *******************************/
 
@@ -94,7 +94,7 @@ smgContainer.controller('OffCanvasMenuController',
 				}
 			};
 
-			/** Auto refresh all match info and game's name in a specific time */
+			/** Auto refresh all match info and game's name in a specific time. */
 			var autoRefresh = function (time) {
 				if (angular.isDefined(getGameId())) {
 					$scope.autoRefreshHelper = function () {
@@ -105,6 +105,11 @@ smgContainer.controller('OffCanvasMenuController',
 					};
 					var myTimer = $timeout($scope.autoRefreshHelper, time);
 				}
+			};
+
+			/** Change the language of the page. */
+			$scope.changeLanguage = function (langKey) {
+				$translate.use(langKey);
 			};
 
 			/********************************** End of Functions **********************************/

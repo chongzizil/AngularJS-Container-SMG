@@ -49,12 +49,16 @@ smgContainer.controller('GameResultController', function ($scope, $rootScope, $l
 
 	if (!$rootScope.matchResultInfo['isStandAlone']) {
 		if (hasWon) {
-			$scope.resultMsg = "Congratulation, You won!";
+			$scope.winnerMsg = true;
+			$scope.loserMsg = false;
+			$scope.passAndPlayMsg = false;
 		} else {
-			$scope.resultMsg = "Maybe next time...";
+			$scope.winnerMsg = false;
+			$scope.loserMsg = true;
+			$scope.passAndPlayMsg = false;
 		}
 	} else {
-		$scope.resultMsg = "...";
+		$scope.passAndPlayMsg = true;
 	}
 
 	/************************************* End point ************************************/

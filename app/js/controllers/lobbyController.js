@@ -9,7 +9,7 @@
  *    a match, the page will be redirected to the match page.
  */
 
-smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $q, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetGameInfoService, GetPlayerInfoService, GetAllMatchesService) {
+smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeParams, $location, $cookies, $q, $timeout, joinQueueService, NewMatchService, InsertMatchService, GetFriendListFromFBService, GetGameInfoService, GetPlayerInfoService, GetAllMatchesService) {
 
 	/********************************** Initial jumbotron *********************************/
 
@@ -81,6 +81,16 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 						$cookies.playerEmail = data['email'];
 
 						$rootScope.refreshUserDisplay();
+					}
+				});
+	};
+
+	/** Get the player's FB friend list */
+	var getPlayerFBFriendList = function () {
+		GetFriendListFromFBService.getFBFriendList($cookies.playerId, $cookies.accessSignature)
+				.then(function (data) {
+					if (angular.isDefined(data)) {
+
 					}
 				});
 	};
@@ -181,6 +191,8 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 	adjustJumbotron();
 
 	getPlayerInfo();
+
+	getPlayerFBFriendList();
 
 	$rootScope.refreshOffCanvasMenu();
 
