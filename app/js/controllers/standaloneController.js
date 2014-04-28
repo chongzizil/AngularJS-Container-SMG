@@ -105,6 +105,7 @@ smgContainer.controller('StandaloneController',
 			$scope.matchResultInfo = {
 				winner: '',
 				opponentId: '',
+				gameId: $routeParams.gameId,
 				hasWon: false,
 				isStandAlone: true,
 				isFBLogin: isFBLogin

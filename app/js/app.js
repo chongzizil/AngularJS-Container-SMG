@@ -73,7 +73,8 @@ smgContainer.config(function($translateProvider) {
 		REGISTERSUCCESS: 'Welcome! Your player ID is ',
 		WINNER: 'Winner',
 		WINNERMSG: 'Congratulation, You won!',
-		LOSERMSG: 'Maybe next time...'
+		LOSERMSG: 'Maybe next time...',
+		BACKTOLOBBY: 'Back to the lobby'
 	});
 	$translateProvider.translations('cn', {
 		LANGUAGE: '语言',
@@ -106,7 +107,8 @@ smgContainer.config(function($translateProvider) {
 		REGISTERSUCCESS: '欢迎! 你的用户ID是 ',
 		WINNER: '赢家',
 		WINNERMSG: '恭喜! 你赢啦!!!',
-		LOSERMSG: '→_→ 再接再厉呗...'
+		LOSERMSG: '→_→ 再接再厉呗...',
+		BACKTOLOBBY: '返回游戏大厅'
 	});
 	$translateProvider.preferredLanguage('en');
 });

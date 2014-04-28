@@ -61,5 +61,7 @@ smgContainer.controller('GameResultController', function ($scope, $rootScope, $l
 		$scope.passAndPlayMsg = true;
 	}
 
+	$scope.backUrl = "#/lobby/" + $rootScope.matchResultInfo.gameId;
+
 	/************************************* End point ************************************/
 });
