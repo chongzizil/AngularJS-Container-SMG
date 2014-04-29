@@ -10,10 +10,11 @@ smgContainer.controller('StandaloneController',
 			/** Adjust the game container to the full size of the broswer. */
 			var adjustGameContainer = function () {
 				var mainContainerWidth = $("#mainContainer").width();
+				console.log(mainContainerWidth);
 				var windowHeight = $(window).height();
-				var gameContainer = $("#gameContainer");
-				gameContainer.css("width", mainContainerWidth + "px");
-				gameContainer.css("height", windowHeight + "px");
+				var gameIFrame = $("#gameIFrame");
+				gameIFrame.css("width", mainContainerWidth + "px");
+				gameIFrame.css("height", windowHeight + "px");
 			};
 
 			/** Every time the broswer is resized, adjust the size of the game container too. */
@@ -125,12 +126,12 @@ smgContainer.controller('StandaloneController',
 						.then(function (data) {
 							if (angular.isDefined(data)) {
 								$scope.gameInfo.url = $sce.trustAsResourceUrl(data['url']);
-								$scope.gameInfo.height = data['height'];
-								$scope.gameInfo.width = data['width'];
-								$scope.gameInfo.gameName = data['gameName'];
-								if (data['width'] >= $(window).width() * 0.9) {
-									$scope.gameInfo.width = "100%";
-								}
+//								$scope.gameInfo.height = data['height'];
+//								$scope.gameInfo.width = data['width'];
+//								$scope.gameInfo.gameName = data['gameName'];
+//								if (data['width'] >= $(window).width() * 0.9) {
+								$scope.gameInfo.width = "100%";
+//								}
 							}
 						});
 			};
