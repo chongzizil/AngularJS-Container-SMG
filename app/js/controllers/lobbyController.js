@@ -61,8 +61,10 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 	var urlData = $location.search();
 
 	if (urlData['playerId'] != undefined && urlData['accessSignature'] != undefined) {
+		console.log("******* The login info from the url: PlayerId=" + urlData['playerId'] + " & AccessSignature=" + urlData['accessSignature']);
 		$cookies.playerId = urlData['playerId'];
 		$cookies.accessSignature = urlData['accessSignature'];
+		//TODO: Delete in formal version
 		$rootScope.refreshUserDisplay();
 	}
 
@@ -76,10 +78,12 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 				$cookies.accessSignature)
 				.then(function (data) {
 					if (angular.isDefined(data)) {
+						console.log("Got player info from the server...");
 						$cookies.playerImageUrl = data['imageURL'];
 						$scope.playerImageUrl = $cookies.playerImageUrl;
 						$cookies.playerEmail = data['email'];
 
+						//TODO: Delete in formal version
 						$rootScope.refreshUserDisplay();
 					}
 				});
@@ -90,7 +94,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 		GetFriendListFromFBService.getFBFriendList($cookies.playerId, $cookies.accessSignature)
 				.then(function (data) {
 					if (angular.isDefined(data)) {
-
+						console.log("Got player FB Friend info from the server...");
 					}
 				});
 	};
@@ -99,6 +103,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 	var getMatchesInfo = function () {
 		GetAllMatchesService.getAllMatches($routeParams.gameId).then(function (data) {
 			if (angular.isDefined(data)) {
+				console.log("Got match info from the server...");
 				$scope.allMatches = data['currentGames'];
 			}
 		});

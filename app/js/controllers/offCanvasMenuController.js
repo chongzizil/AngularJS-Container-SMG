@@ -7,7 +7,6 @@ smgContainer.controller('OffCanvasMenuController',
 
 			/** Adjust the off canvas menu size. */
 			var adjustOffCanvasMenu = function () {
-
 				var windowHeight = $(window).height();
 				var offCanvasMenu = $("#offCanvasMenu");
 				if (windowHeight > 800) {
@@ -37,7 +36,7 @@ smgContainer.controller('OffCanvasMenuController',
 			var getGameId = function () {
 				var url = $location.url();
 				if (url.substr(0, 6) === "/lobby") {
-					return url.substr(7);
+					return url.substr(7, 16);
 				} else if (url.substr(0, 10) === "/gameResult") {
 					return url.substr(11, 16);
 				} else if (url.substr(17, 6) === "/match") {
@@ -51,6 +50,7 @@ smgContainer.controller('OffCanvasMenuController',
 
 			/** Get the game name. */
 			var getGameName = function () {
+				console.log("******* The gameID from the url is: " + getGameId());
 				GetGameInfoService.getGameInfo(getGameId())
 						.then(function (data) {
 							if (angular.isDefined(data)) {
