@@ -26,7 +26,8 @@ smgContainer.controller('StandaloneController',
 
 			/******************************* Variables: Server side *******************************/
 
-			var isFBLogin = false;
+
+//		var isFBLogin = false;
 			$scope.playerImageUrl = '';
 //      $scope.displayQuitButton = false;
 			$scope.opponentInfos = [];
@@ -40,8 +41,8 @@ smgContainer.controller('StandaloneController',
 				 (2). If other players (opponents): firstname, nickname
 				 e.g.:
 				 {
-				   "playerId1" : {"email": "a@b.com", "firstname": "Long", "lastname": "Yang", "nickname": "Jason"},
-				   "playerId2" : {"firstname" : "Xiao", "nickname" : "Shawn"}
+				 "playerId1" : {"email": "a@b.com", "firstname": "Long", "lastname": "Yang", "nickname": "Jason"},
+				 "playerId2" : {"firstname" : "Xiao", "nickname" : "Shawn"}
 				 }
 				 */
 				playersInfo: [],
@@ -65,19 +66,21 @@ smgContainer.controller('StandaloneController',
 				winner: Number.MIN_VALUE
 			};
 
+
+
 			/*************************** End of Variables: Server side ****************************/
 
 			/******************************* Variables: Stand alone *******************************/
 
+			var playerIds = [];
 			var currentPlayerIdThatHasTurn = $cookies.playerId;
 			var lastPlayerIdThatHasTurn = $cookies.playerId;
-
-			var gameState = {
-				'state' : {},
-				'visibleTo' : {},
-				'playerIdToNumberOfTokensInPot' : {},
-				'playerThatHasTurn' : Number.MIN_VALUE,
-				'gameOverReason' : ""
+			var serverGameState = {
+				state : {},
+				visibleTo : {},
+				playerIdToNumberOfTokensInPot : {},
+				playerThatHasTurn : Number.MIN_VALUE,
+				gameOverReason : ""
 			};
 
 			/*************************** End of Variables: Stand alone ****************************/
@@ -109,7 +112,7 @@ smgContainer.controller('StandaloneController',
 				gameId: $routeParams.gameId,
 				hasWon: false,
 				isStandAlone: true,
-				isFBLogin: isFBLogin
+				isFBLogin: false
 			};
 
 			/**************************** End of variables: Game Side *****************************/
@@ -126,12 +129,7 @@ smgContainer.controller('StandaloneController',
 						.then(function (data) {
 							if (angular.isDefined(data)) {
 								$scope.gameInfo.url = $sce.trustAsResourceUrl(data['url']);
-//								$scope.gameInfo.height = data['height'];
-//								$scope.gameInfo.width = data['width'];
-//								$scope.gameInfo.gameName = data['gameName'];
-//								if (data['width'] >= $(window).width() * 0.9) {
 								$scope.gameInfo.width = "100%";
-//								}
 							}
 						});
 			};
@@ -203,10 +201,10 @@ smgContainer.controller('StandaloneController',
 					$scope.matchResultInfo.hasWon = false;
 				}
 
-				if ($cookies.playerId === $rootScope.playerIds[0]) {
-					$scope.matchResultInfo.opponentId = $rootScope.playerIds[1];
+				if ($cookies.playerId === playerIds[0]) {
+					$scope.matchResultInfo.opponentId = playerIds[1];
 				} else {
-					$scope.matchResultInfo.opponentId = $rootScope.playerIds[0];
+					$scope.matchResultInfo.opponentId = playerIds[0];
 				}
 
 				$scope.matchResultInfo.isStandAlone = true;
@@ -220,12 +218,13 @@ smgContainer.controller('StandaloneController',
 			 * Currently it supports two players.
 			 */
 			var replyGameReady = function () {
+				console.log("relying.......................................");
 				var initialUpdateUI = {
 					'type': 'UpdateUI',
 					'yourPlayerId': $cookies.playerId,
 					'playersInfo': [
-						{'playerId': $rootScope.playerIds[0]},
-						{'playerId': $rootScope.playerIds[1]}
+						{'playerId': playerIds[0]},
+						{'playerId': playerIds[1]}
 					],
 					'state': {},
 					'lastState': null,
@@ -269,8 +268,8 @@ smgContainer.controller('StandaloneController',
 					"type": "UpdateUI",
 					'yourPlayerId': $scope.matchInfo.playerThatHasTurn,
 					'playersInfo': [
-						{'playerId': $rootScope.playerIds[0]},
-						{'playerId': $rootScope.playerIds[1]}
+						{'playerId': playerIds[0]},
+						{'playerId': playerIds[1]}
 					],
 					'state': state,
 					'lastState': lastState,
@@ -407,13 +406,13 @@ smgContainer.controller('StandaloneController',
 			 * @param playerId
 			 * @param move
 			 */
-			var passAndPlayServer = function(playerId, move){
+			var standAloneServer = function(playerId, move){
 //				console.log("********** Get state for playerId: " + angular.toJson(playerId));
 //				console.log("********** Get input Move...");
 //				console.log(angular.toJson(move));
 				var gameState = makeMoveInPassAndPlayMode(move);
-//				console.log("********** Game state in passAndPlayServer()...");
-//				console.log(angular.toJson(gameState));
+//				console.log("********** Game state in standAloneServer()...");
+//				console.log(angular.toJson(serverGameState));
 				var state = gameState['state'];
 				var visibleTo = gameState['visibleTo'];
 				lastPlayerIdThatHasTurn = currentPlayerIdThatHasTurn;
@@ -422,9 +421,9 @@ smgContainer.controller('StandaloneController',
 				// 1. get new state according to visibility.
 				var newState = clone(state);
 				var keys = getKeys(state);
-//				console.log("********** Keys in passAndPlayServer()...");
+//				console.log("********** Keys in standAloneServer()...");
 //				console.log(angular.toJson(keys));
-//				console.log("********** VisibleTo in passAndPlayServer()...");
+//				console.log("********** VisibleTo in standAloneServer()...");
 //				console.log(angular.toJson(visibleTo));
 				for (var k in keys) {
 					var visibleToPlayers = visibleTo[keys[k]];
@@ -446,7 +445,7 @@ smgContainer.controller('StandaloneController',
 				};
 
 				// 3. Assign the 'data' data to {@code matchInfo}
-//				console.log("********** Data in passAndPlayServer()...");
+//				console.log("********** Data in standAloneServer()...");
 //				console.log(angular.toJson(data));
 				$scope.matchInfo.state = data['state'];
 				$scope.matchInfo.lastMove = data['lastMove'];
@@ -485,12 +484,12 @@ smgContainer.controller('StandaloneController',
 					if (operation['type'] === 'SetTurn' ) {
 //				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - SetTurn...");
 //				    console.log(angular.toJson(operation));
-						gameState['playerThatHasTurn'] = operation['playerId'];
+						serverGameState['playerThatHasTurn'] = operation['playerId'];
 					} else if (operation['type'] === 'Set') {
 //				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - Set...");
 //				    console.log(angular.toJson(operation));
-						gameState['state'][operation['key']] = operation['value'];
-						gameState['visibleTo'][operation['key']] = operation['visibleToPlayerIds'];
+						serverGameState['state'][operation['key']] = operation['value'];
+						serverGameState['visibleTo'][operation['key']] = operation['visibleToPlayerIds'];
 					} else if (operation['type'] === 'SetRandomInteger') {
 //				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - SetRandomInteger...");
 //				    console.log(angular.toJson(operation));
@@ -498,29 +497,29 @@ smgContainer.controller('StandaloneController',
 						var from = operation['from'];
 						var to = operation['to'];
 						var value = Math.floor((Math.random()*(to-from))+from);
-						gameState['state'][key] = value;
-						gameState['visibleTo'] = "ALL";
+						serverGameState['state'][key] = value;
+						serverGameState['visibleTo'] = "ALL";
 					} else if (operation['type'] === 'SetVisibility') {
 //				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - SetVisibility...");
 //				    console.log(angular.toJson(operation));
-						gameState['visibleTo'][operation['key']] = operation['visibleToPlayerIds'];
+						serverGameState['visibleTo'][operation['key']] = operation['visibleToPlayerIds'];
 					} else if (operation['type'] === 'Delete') {
 //				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - Delete...");
 //				    console.log(angular.toJson(operation));
-						delete gameState['state'][operation['key']];
-						delete gameState['visibleTo'][operation['key']];
+						delete serverGameState['state'][operation['key']];
+						delete serverGameState['visibleTo'][operation['key']];
 					} else if (operation['type'] === 'Shuffle') {
 //				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - Shuffle...");
 //				    console.log(angular.toJson(operation));
 						var keys = operation.keys;
 						var shuffledKeys = shuffle(keys);
-						var oldGameState = clone(gameState['state']);
-						var oldVisibleTo = clone(gameState['visibleTo']);
+						var oldGameState = clone(serverGameState['state']);
+						var oldVisibleTo = clone(serverGameState['visibleTo']);
 						for (var j = 0; j < shuffledKeys.length; j++) {
 							var fromKey = keys[j];
 							var toKey = shuffledKeys[j];
-							gameState['state'][toKey] = oldGameState[fromKey];
-							gameState['visibleTo'][toKey] = oldVisibleTo[fromKey];
+							serverGameState['state'][toKey] = oldGameState[fromKey];
+							serverGameState['visibleTo'][toKey] = oldVisibleTo[fromKey];
 						}
 					} else if (operation['type'] === 'AttemptChangeTokens') {
 //				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode: - AttemptChangeTokens...");
@@ -528,17 +527,17 @@ smgContainer.controller('StandaloneController',
 						var p = operation['playerIdToNumberOfTokensInPot'];
 						for (var index in $cookies.playerIds) {
 							var id = $cookies.playerIds[index];
-							gameState['playerIdToNumberOfTokensInPot'][id] = p[id];
+							serverGameState['playerIdToNumberOfTokensInPot'][id] = p[id];
 						}
 					} else if (operation['type'] === 'EndGame') {
 //				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode: - EndGame...");
 //				    console.log(angular.toJson(operation));
 						if (operation['gameOverReason']) {
-							gameState['gameOverReason'] = operation['gameOverReason'];
+							serverGameState['gameOverReason'] = operation['gameOverReason'];
 						}
 					}
 				}
-				return gameState;
+				return serverGameState;
 			};
 
 			/**
@@ -557,14 +556,14 @@ smgContainer.controller('StandaloneController',
 				if (hasGameEnded == true) {
 					move = {
 						"accessSignature": $cookies.accessSignature,
-						"playerIds": $rootScope.playerIds,
+						"playerIds": playerIds,
 						"operations": operations,
 						"gameOverReason": "Over"
 					};
 				} else {
 					move = {
 						"accessSignature": $cookies.accessSignature,
-						"playerIds": $rootScope.playerIds,
+						"playerIds": playerIds,
 						"operations": operations
 					};
 				}
@@ -575,7 +574,7 @@ smgContainer.controller('StandaloneController',
 //				console.log("********** currentPlayerIdThatHasTurn: " + currentPlayerIdThatHasTurn);
 //				console.log("********** The move from sendMoveToServer()...");
 //				console.log(angular.toJson(move));
-				passAndPlayServer(currentPlayerIdThatHasTurn, move);
+				standAloneServer(currentPlayerIdThatHasTurn, move);
 			};
 
 			/**
@@ -589,7 +588,7 @@ smgContainer.controller('StandaloneController',
 				// 1. Make up the EndGame typed move.
 				var move = {
 					"accessSignature": $cookies.accessSignature,
-					"playerIds": $rootScope.playerIds,
+					"playerIds": playerIds,
 					"operations": [
 						{
 							"type": "EndGame",
@@ -603,7 +602,7 @@ smgContainer.controller('StandaloneController',
 				 * If one player pressed the "quit" button, he is considered to surrender,
 				 * and current implementation supports multiple players (>= 2).
 				 */
-				var forkPlayerIds = $rootScope.playerIds.slice(0);
+				var forkPlayerIds = playerIds.slice(0);
 				var indexOfPlayerId = forkPlayerIds.indexOf($cookies.playerId);
 				forkPlayerIds.splice(indexOfPlayerId, 1);
 				if (passinWinner == 'oppo') {
@@ -674,8 +673,11 @@ smgContainer.controller('StandaloneController',
 									$scope.matchInfo.playersInfo.push({playerId: $cookies.playerId + "11111",
 										info: {nickname: "Player 2", email:"Pass&Play", lastname: "Player 2", firstname: "Player 2",
 											imageURL: "http://smg-server.appspot.com/images/giraffe.gif"}});
-//									console.log("********** The second player info of the pass and play mode...");
-//									console.log($scope.matchInfo.playersInfo);
+								} else if ($routeParams.mode === "play_with_ai") {
+									// Insert a opponent for play with ai
+									$scope.matchInfo.playersInfo.push({playerId: "0",
+										info: {nickname: "AI", email:"-----", lastname: "D2", firstname: "R2",
+											imageURL: "http://smg-server.appspot.com/images/giraffe.gif"}});
 								}
 							}
 						});
@@ -718,8 +720,8 @@ smgContainer.controller('StandaloneController',
 			 */
 
 			var initiatePlayerTurn = function () {
-				if (!isUndefinedOrNullOrEmpty($rootScope.playerIds)) {
-					$scope.matchInfo.playerThatHasTurn = $rootScope.playerIds[0];
+				if (!isUndefinedOrNullOrEmpty(playerIds)) {
+					$scope.matchInfo.playerThatHasTurn = playerIds[0];
 					$scope.matchInfo.lastMovePlayerId = $scope.matchInfo.playerThatHasTurn;
 					$scope.matchInfo.winner = Number.MIN_VALUE;
 					state = {};
@@ -777,27 +779,36 @@ smgContainer.controller('StandaloneController',
 					attachEvent("onmessage", listener);
 				}
 
-				$scope.displayGetNewStateButton = true;
+//				$scope.displayGetNewStateButton = true;
 
 				// Check whether the player login with Facebook
-				if ($cookies.FBAccessToken == "undefined" || isUndefinedOrNullOrEmpty($cookies.FBAccessToken)) {
-					isFBLogin = false;
-				} else {
-					isFBLogin = true;
-				}
-				$scope.matchResultInfo.isFBLogin = isFBLogin;
+//				if ($cookies.FBAccessToken == "undefined" || isUndefinedOrNullOrEmpty($cookies.FBAccessToken)) {
+//					isFBLogin = false;
+//				} else {
+//					isFBLogin = true;
+//				}
+//				$scope.matchResultInfo.isFBLogin = isFBLogin;
 
 				// 0. Get the input parameters
 //				mode = $routeParams.mode;
 //				timeOfEachTurn = $routeParams.timeOfEachTurn;
 
-				$rootScope.playerIds = [
+
+				if ($routeParams.mode === "pass_and_play") {
+					playerIds = [
 						$cookies.playerId,
 						$cookies.playerId + "11111"
-				];
+					];
+				} else if ($routeParams.mode === "play_with_ai") {
+					playerIds = [
+						$cookies.playerId,
+						"0"
+					];
+				}
 
 				// 1. Get game information.
 				getGameInfo();
+
 				// 2. Get playerIds from server: this is used for case when user refresh the web browser.
 				getCurrentPlayerInfo();
 				initiatePlayerTurn();

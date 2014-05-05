@@ -27,13 +27,13 @@ smgContainer.controller('GameResultController', function ($scope, $rootScope, $l
 	/**
 	 * Post message on Facebook,
 	 */
-	var postMsgToFB = function () {
-		PostMessageToFBService.save({message: messageToFB, access_token: $cookies.FBAccessToken}, "")
-				.$promise.then(function (response) {
-					console.log("********** Response from posting to FB: " + angular.toJson(response));
-				}
-		);
-	};
+//	var postMsgToFB = function () {
+//		PostMessageToFBService.save({message: messageToFB, access_token: $cookies.FBAccessToken}, "")
+//				.$promise.then(function (response) {
+//					console.log("********** Response from posting to FB: " + angular.toJson(response));
+//				}
+//		);
+//	};
 
 	/*********************************** End of functions *********************************/
 

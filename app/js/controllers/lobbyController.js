@@ -186,6 +186,8 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 	/** Start pass and play game mode. */
 	$scope.playWithAi = function () {
 		console.log("Stand along url is:" + $routeParams.gameId + '/standalone?mode=play_with_ai');
+		var opponentPlayerId = "0";
+		$rootScope.playerIds = [$cookies.playerId, opponentPlayerId];
 		$location.url($routeParams.gameId + '/standalone?mode=play_with_ai');
 	};
 
