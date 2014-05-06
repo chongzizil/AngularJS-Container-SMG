@@ -9,7 +9,7 @@ smgContainer.controller('SelectGameController',
         $cookies.accessSignature = urlData['accessSignature'];
 
 	      //TODO: Delete in formal version
-        $rootScope.refreshUserDisplay();
+//        $rootScope.refreshUserDisplay();
       }
     }
 );

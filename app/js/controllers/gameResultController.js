@@ -40,6 +40,9 @@ smgContainer.controller('GameResultController', function ($scope, $rootScope, $l
 
 	/************************************* Start point ************************************/
 
+	// Refresh the matches info in the canvas menu first
+	$rootScope.refreshMatches();
+
 	if (!$rootScope.matchResultInfo['isStandAlone']) {
 		getWinnerInfo(winnerId);
 	} else {

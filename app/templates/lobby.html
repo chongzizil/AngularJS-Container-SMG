@@ -1,7 +1,13 @@
-<div class="jumbotron" id="justPlay">
-	<!--<div class="col-sm-12 hidden-xs hidden-sm" align="middle"  id="welcome">-->
-	<!--<h1>Have Fun</h1>-->
-	<!--</div>-->
+<div class="jumbotron col-xs-12" id="justPlay">
+	<div class="alert alert-success collapse" id="autoMatchSuccessAlert">
+		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+		<p style="font-size: 14px">{{ 'AUTOMATCHSUCCESS' | translate }}</p>
+	</div>
+
+	<div class="alert alert-danger collapse" id="autoMatchFailAlert">
+		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+		<p style="font-size: 14px">{{ 'AUTOMATCHFAIL' | translate }}</p>
+	</div>
 	<div class="col-xs-12" align="middle" id="autoMatch">
 		<button type="submit" ng-click="autoMatch()" class="btn btn-primary">
 			<i class="fa fa-random fa-fw"></i> {{ 'AUTOMATCH' | translate }}

@@ -74,7 +74,10 @@ smgContainer.config(function($translateProvider) {
 		WINNER: 'Winner',
 		WINNERMSG: 'Congratulation, You won!',
 		LOSERMSG: 'Maybe next time...',
-		BACKTOLOBBY: 'Back to the lobby'
+		BACKTOLOBBY: 'Back to the lobby',
+		AUTOMATCHSUCCESS: 'You\'ve joined the queue, try to refresh the side panel to check for new matches...',
+		AUTOMATCHFAIL: 'Sorry, you can only have at most one match per game for now.\n (Otherwise something goes wrong on the server side...)',
+		MATCH: 'match'
 	});
 	$translateProvider.translations('cn', {
 		LANGUAGE: '语言',
@@ -108,7 +111,10 @@ smgContainer.config(function($translateProvider) {
 		WINNER: '赢家',
 		WINNERMSG: '恭喜! 你赢啦!!!',
 		LOSERMSG: '→_→ 再接再厉呗...',
-		BACKTOLOBBY: '返回游戏大厅'
+		BACKTOLOBBY: '返回游戏大厅',
+		AUTOMATCHSUCCESS: '你已成功进入自动配对队列, 请点击侧边栏刷新按钮查看已配对比赛',
+		AUTOMATCHFAIL: '抱歉, 目前你最多每个游戏只能进行一场比赛... (如果不是的话就是服务器那边出问题了.)',
+		MATCH: '局'
 	});
 	$translateProvider.preferredLanguage('en');
 });

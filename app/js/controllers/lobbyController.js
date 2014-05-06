@@ -65,8 +65,20 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 		$cookies.playerId = urlData['playerId'];
 		$cookies.accessSignature = urlData['accessSignature'];
 		//TODO: Delete in formal version
-		$rootScope.refreshUserDisplay();
+//		$rootScope.refreshUserDisplay();
 	}
+
+	var autoMatchSuccessAlert = $("#autoMatchSuccessAlert");
+	autoMatchSuccessAlert.on('close.bs.alert', function () {
+		autoMatchSuccessAlert.hide();
+		return false;
+	});
+
+	var autoMatchFailAlert = $("#autoMatchFailAlert");
+	autoMatchFailAlert.on('close.bs.alert', function () {
+		autoMatchFailAlert.hide();
+		return false;
+	});
 
 	/********************************** End of Variables **********************************/
 
@@ -84,7 +96,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 						$cookies.playerEmail = data['email'];
 
 						//TODO: Delete in formal version
-						$rootScope.refreshUserDisplay();
+//						$rootScope.refreshUserDisplay();
 					}
 				});
 	};
@@ -158,12 +170,17 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 					if (angular.isDefined(data)) {
 						$rootScope.hasRefreshed = false;
 						console.log("********** Joined the queue, waiting for auto match...");
+						autoMatchSuccessAlert.show();
+						autoMatchFailAlert.hide();
 						if (data['playerIds']) {
 							console.log("********** Auto matched... Ready to insert a new match...");
 							$cookies.isSyncMode = false;
 							var playerIds = flipPlayerIds(data['playerIds']);
 							insertMatch(playerIds);
 						}
+					} else {
+						autoMatchSuccessAlert.hide();
+						autoMatchFailAlert.show();
 					}
 				});
 	};
@@ -198,11 +215,14 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 
 	/************************************* Start point ************************************/
 
+
+	$scope.alerts = { msg: 'Oh snap! Change a few things up and try submitting again.' };
+
 	adjustJumbotron();
 
 	getPlayerInfo();
 
-	getPlayerFBFriendList();
+//	getPlayerFBFriendList();
 
 	$rootScope.refreshOffCanvasMenu();
 

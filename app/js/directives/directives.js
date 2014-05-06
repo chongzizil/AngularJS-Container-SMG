@@ -54,13 +54,13 @@ smgContainer.directive('playerRegister', function () {
 				registerSuccessAlert.on('close.bs.alert', function () {
 					registerSuccessAlert.hide();
 					return false;
-				})
+				});
 
 				var registerFailedAlert = $("#registerFailedAlert");
 				registerFailedAlert.on('close.bs.alert', function () {
 					registerFailedAlert.hide();
 					return false;
-				})
+				});
 
 				var player = {
 					email: registerInfo.email,

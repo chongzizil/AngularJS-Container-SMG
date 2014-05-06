@@ -1,21 +1,21 @@
-<div>
+<div id="gameContainer">
 	<div align="middle">
 		<div ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentTurnPlayer">
 			{{ 'CURRENTTURN' | translate }}: {{playerInfo['info']['nickname']}}
 		</div>
 	</div>
-	<div align="middle">
-		{{ 'LEFTTIME' | translate }}: {{timer}}
+	<div id="backToLobbyButton" align="middle">
+		<a ng-href="{{backToLobbyUrl}}" class="btn btn-success">{{ 'BACKTOLOBBY' | translate }}</a>
 	</div>
 
 	<br/><br/><br/>
 
-	<iframe ng-src="{{ gameInfo.url }}" id='gameIFrame' scrolling="no" frameborder="0" align="middle"></iframe>
+	<iframe style="margin: 0 auto" ng-src="{{ gameInfo.url }}" id='gameIFrame' scrolling="no" frameborder="0" align="middle"></iframe>
 
 	<script>
 
 	</script>
-	<br/><br/><br/>
+	<br/><br/>
 
 	<div id="playerInfo" class="panel panel-default">
 		<div class="panel-heading">{{ 'YOURINFO' | translate }}</div>

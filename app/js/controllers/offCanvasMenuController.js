@@ -28,6 +28,8 @@ smgContainer.controller('OffCanvasMenuController',
 			// All joined onging match info
 			$scope.matchInfos = [];
 
+			$scope.hasMatch = false;
+
 			/********************************** End of Variables **********************************/
 
 			/************************************** Functions *************************************/
@@ -113,11 +115,14 @@ smgContainer.controller('OffCanvasMenuController',
 				$translate.use(langKey);
 			};
 
+			/** Refresh all match info. */
+			$rootScope.refreshMatches = function() {
+				$scope.checkMatches();
+			};
+
 			/********************************** End of Functions **********************************/
 
 			/************************************* Start point ************************************/
-
-			$scope.hasMatch = false;
 
 			getGameName();
 
