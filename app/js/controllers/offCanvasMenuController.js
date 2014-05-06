@@ -69,6 +69,7 @@ smgContainer.controller('OffCanvasMenuController',
 			/** Enter a match by given a match's info. */
 			$scope.enterMatch = function (matchInfo) {
 				$rootScope.playerIds = matchInfo['playerIds'];
+				$rootScope.hasRefreshed = false;
 				console.log("********** Entering the match by redirect to: " + matchInfo['matchUrl']);
 				$location.url(matchInfo['matchUrl']);
 				if (!$scope.$$phase) {

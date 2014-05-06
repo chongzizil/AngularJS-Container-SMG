@@ -631,6 +631,13 @@ smgContainer.controller('MatchController',
         alert('You have to log in first!');
         $location.url('/');
       } else {
+
+	      // Make sure the page will be reloaded every time.
+	      if ($rootScope.hasRefreshed === false) {
+		      $rootScope.hasRefreshed = true;
+		      location.reload();
+	      }
+
 	      // Adjust the size of the game container.
 	      adjustGameContainer();
 

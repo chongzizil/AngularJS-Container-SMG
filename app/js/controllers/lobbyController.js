@@ -156,6 +156,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 		joinQueueService.joinQueue(angular.toJson(joinQueueData))
 				.then(function (data) {
 					if (angular.isDefined(data)) {
+						$rootScope.hasRefreshed = false;
 						console.log("********** Joined the queue, waiting for auto match...");
 						if (data['playerIds']) {
 							console.log("********** Auto matched... Ready to insert a new match...");
@@ -180,6 +181,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 		console.log("Stand along url is:" + $routeParams.gameId + '/standalone?mode=pass_and_play&timeOfEachTurn=' + 0 /*$scope.timeOfEachTurn*/);
 		var opponentPlayerId = $cookies.playerId + "11111";
 		$rootScope.playerIds = [$cookies.playerId, opponentPlayerId];
+		$rootScope.hasRefreshed = false;
 		$location.url($routeParams.gameId + '/standalone?mode=pass_and_play&timeOfEachTurn=' + 0 /*$scope.timeOfEachTurn*/);
 	};
 
@@ -188,6 +190,7 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 		console.log("Stand along url is:" + $routeParams.gameId + '/standalone?mode=play_with_ai');
 		var opponentPlayerId = "0";
 		$rootScope.playerIds = [$cookies.playerId, opponentPlayerId];
+		$rootScope.hasRefreshed = false;
 		$location.url($routeParams.gameId + '/standalone?mode=play_with_ai');
 	};
 
