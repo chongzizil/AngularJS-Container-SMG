@@ -103,7 +103,7 @@
 					{{ 'EMPTY' | translate }}
 				</div>
 				<div class="list-group" ng-repeat="matchInfo in matchInfos" align="middle">
-					<button class="btn btn-primary btn-sm" ng-click="enterMatch(matchInfo)"><i
+					<button class="btn btn-primary btn-sm" ng-show="hasMatch" ng-click="enterMatch(matchInfo)"><i
 							class="fa fa-sign-in"></i> match
 					</button>
 				</div>

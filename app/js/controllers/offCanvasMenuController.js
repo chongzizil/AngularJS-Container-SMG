@@ -82,13 +82,13 @@ smgContainer.controller('OffCanvasMenuController',
 					NewMatchService.getMatchInfo($cookies.playerId, $cookies.accessSignature, $routeParams.gameId)
 							.then(function (data) {
 								if (angular.isDefined(data)) {
-									$scope.hasNoMatch = false;
+									$scope.hasMatch = true;
 									$scope.matchInfos = [
 										{matchUrl: '/' + getGameId() + '/match/' + data['matchId'], playerIds: data['playerIds']}
 									];
 								} else {
 									//TODO: need to improve the work flow
-									$scope.hasNoMatch = true;
+									$scope.hasMatch = false;
 								}
 							});
 				}
@@ -115,6 +115,8 @@ smgContainer.controller('OffCanvasMenuController',
 			/********************************** End of Functions **********************************/
 
 			/************************************* Start point ************************************/
+
+			$scope.hasMatch = false;
 
 			getGameName();
 
