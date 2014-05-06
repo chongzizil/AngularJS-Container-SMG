@@ -21,7 +21,7 @@ smgContainer.controller('MatchController',
 	    var adjustGameContainer = function () {
 		    var mainContainerWidth = $("#mainContainer").width();
 		    var windowHeight = $(window).height();
-		    var gameContainer = $("#gameIFrame");
+		    var gameIFrame = $("#gameIFrame");
 		    gameIFrame.css("width", mainContainerWidth + "px");
 		    gameIFrame.css("height", windowHeight + "px");
 	    };
@@ -120,7 +120,7 @@ smgContainer.controller('MatchController',
 	      GetGameInfoService.getGameInfo($routeParams.gameId)
 			      .then(function (data) {
 				      if (angular.isDefined(data)) {
-//					      $scope.gameInfo.url = $sce.trustAsResourceUrl(data['url']);
+					      $scope.gameInfo.url = $sce.trustAsResourceUrl(data['url']);
 //					      $scope.gameInfo.height = data['height'];
 //					      $scope.gameInfo.width = data['width'];
 //					      $scope.gameInfo.gameName = data['gameName'];
