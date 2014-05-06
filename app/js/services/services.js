@@ -3,7 +3,7 @@
 /* Services */
 
 /* Official domain*/
-var domainUrl = 'http://7.smg-server.appspot.com';
+var domainUrl = 'http://6.smg-server.appspot.com';
 
 /* Container test domain */
 //var domainUrl = 'http://6-dot-smg-server-rl.appspot.com';

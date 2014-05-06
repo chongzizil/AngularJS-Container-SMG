@@ -3,7 +3,8 @@
  */
 
 smgContainer.controller('StandaloneController',
-		function ($scope, $route, $routeParams, $rootScope, $cookies, $timeout, $q, $sce, $window, $location, $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService, SendMakeMoveService, PostMessageToFBService, NewMatchService, GetPicFromFBService) {
+		function ($scope, $route, $routeParams, $rootScope, $cookies, $timeout, $q, $sce, $window, $document, $location,
+		          $modal, NewMatchStateService, GetGameInfoService, GetPlayerInfoService) {
 
 			/******************************* Initial game container *******************************/
 
@@ -218,7 +219,7 @@ smgContainer.controller('StandaloneController',
 			 * Currently it supports two players.
 			 */
 			var replyGameReady = function () {
-				console.log("relying.......................................");
+				console.log("Log: replyGameReady");
 				var initialUpdateUI = {
 					'type': 'UpdateUI',
 					'yourPlayerId': $cookies.playerId,
@@ -333,37 +334,6 @@ smgContainer.controller('StandaloneController',
 			/****************************** Functions: "Server" Side ******************************/
 
 			/**
-			 * sendMakeMoveServicePost(auxiliary method), be called inside the sendMoveToServer method.
-			 * sendMoveToServer(fundamental method used to send operations to server)
-			 * getNewMatchState
-			 * $scope.endGame(reason, winner) 'oppo' stands for opponent and 'me' stands for the current player
-			 */
-
-			/**
-			 * Method used to call POST method inside {@code SendMakeMoveService}.
-			 */
-			var sendMakeMoveServicePost = function (jsonMove) {
-//				console.log("Log: input data for send make move to server: " + jsonMove);
-//				console.log("Post Request: Make a move in the game.")
-				SendMakeMoveService.save({matchId: $routeParams.matchId}, jsonMove).
-						$promise.then(function (data) {
-							if (angular.isDefined(data['error'])) {
-//								console.log(console.log("********** Error from sendMakeMoveServicePost()..."));
-//								console.log(angular.toJson(data));
-							} else {
-//								console.log("********** Response for making move to server: ");
-//								console.log(angular.toJson(data));
-								$scope.matchInfo.state = data['state'];
-								$scope.matchInfo.lastMove = data['lastMove'];
-								processLastMoveAndState();
-								processLastPlayer(data);
-								sendMessageToGame($cookies.playerId, $scope.matchInfo.lastMovePlayerId);
-							}
-						}
-				);
-			};
-
-			/**
 			 * Method used to shuffle the keys and returns the shuffled set
 			 */
 			var shuffle =  function(keys){
@@ -390,12 +360,12 @@ smgContainer.controller('StandaloneController',
 
 			/**
 			 * Method used to get keys of the state
-			 * @param state
+			 * @param localState
 			 * @returns {Array}
 			 */
-			var getKeys = function(state){
+			var getKeys = function(localState){
 				var keys = [];
-				for(var key in state){
+				for(var key in localState){
 					keys.push(key);
 				}
 				return keys;
@@ -407,12 +377,7 @@ smgContainer.controller('StandaloneController',
 			 * @param move
 			 */
 			var standAloneServer = function(playerId, move){
-//				console.log("********** Get state for playerId: " + angular.toJson(playerId));
-//				console.log("********** Get input Move...");
-//				console.log(angular.toJson(move));
 				var gameState = makeMoveInPassAndPlayMode(move);
-//				console.log("********** Game state in standAloneServer()...");
-//				console.log(angular.toJson(serverGameState));
 				var state = gameState['state'];
 				var visibleTo = gameState['visibleTo'];
 				lastPlayerIdThatHasTurn = currentPlayerIdThatHasTurn;
@@ -421,10 +386,6 @@ smgContainer.controller('StandaloneController',
 				// 1. get new state according to visibility.
 				var newState = clone(state);
 				var keys = getKeys(state);
-//				console.log("********** Keys in standAloneServer()...");
-//				console.log(angular.toJson(keys));
-//				console.log("********** VisibleTo in standAloneServer()...");
-//				console.log(angular.toJson(visibleTo));
 				for (var k in keys) {
 					var visibleToPlayers = visibleTo[keys[k]];
 					var value = null;
@@ -445,8 +406,6 @@ smgContainer.controller('StandaloneController',
 				};
 
 				// 3. Assign the 'data' data to {@code matchInfo}
-//				console.log("********** Data in standAloneServer()...");
-//				console.log(angular.toJson(data));
 				$scope.matchInfo.state = data['state'];
 				$scope.matchInfo.lastMove = data['lastMove'];
 
@@ -474,25 +433,17 @@ smgContainer.controller('StandaloneController',
 		   * }
 			 */
 			var makeMoveInPassAndPlayMode = function (move) {
-//    		console.log("********** makeMoveInPassAndPlayMode(): JSON typed Move data from Game...");
-//				console.log(angular.toJson(move));
 				var operations = move['operations'];
 
 				for (var i in operations) {
 					var operation = operations[i];
 
 					if (operation['type'] === 'SetTurn' ) {
-//				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - SetTurn...");
-//				    console.log(angular.toJson(operation));
 						serverGameState['playerThatHasTurn'] = operation['playerId'];
 					} else if (operation['type'] === 'Set') {
-//				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - Set...");
-//				    console.log(angular.toJson(operation));
 						serverGameState['state'][operation['key']] = operation['value'];
 						serverGameState['visibleTo'][operation['key']] = operation['visibleToPlayerIds'];
 					} else if (operation['type'] === 'SetRandomInteger') {
-//				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - SetRandomInteger...");
-//				    console.log(angular.toJson(operation));
 						var key = operation['key'];
 						var from = operation['from'];
 						var to = operation['to'];
@@ -500,17 +451,11 @@ smgContainer.controller('StandaloneController',
 						serverGameState['state'][key] = value;
 						serverGameState['visibleTo'] = "ALL";
 					} else if (operation['type'] === 'SetVisibility') {
-//				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - SetVisibility...");
-//				    console.log(angular.toJson(operation));
 						serverGameState['visibleTo'][operation['key']] = operation['visibleToPlayerIds'];
 					} else if (operation['type'] === 'Delete') {
-//				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - Delete...");
-//				    console.log(angular.toJson(operation));
 						delete serverGameState['state'][operation['key']];
 						delete serverGameState['visibleTo'][operation['key']];
 					} else if (operation['type'] === 'Shuffle') {
-//				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode - Shuffle...");
-//				    console.log(angular.toJson(operation));
 						var keys = operation.keys;
 						var shuffledKeys = shuffle(keys);
 						var oldGameState = clone(serverGameState['state']);
@@ -522,16 +467,12 @@ smgContainer.controller('StandaloneController',
 							serverGameState['visibleTo'][toKey] = oldVisibleTo[fromKey];
 						}
 					} else if (operation['type'] === 'AttemptChangeTokens') {
-//				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode: - AttemptChangeTokens...");
-//				    console.log(angular.toJson(operation));;
 						var p = operation['playerIdToNumberOfTokensInPot'];
 						for (var index in $cookies.playerIds) {
 							var id = $cookies.playerIds[index];
 							serverGameState['playerIdToNumberOfTokensInPot'][id] = p[id];
 						}
 					} else if (operation['type'] === 'EndGame') {
-//				    console.log("********** makeMoveInPassAndPlayMode(): PnP Mode: - EndGame...");
-//				    console.log(angular.toJson(operation));
 						if (operation['gameOverReason']) {
 							serverGameState['gameOverReason'] = operation['gameOverReason'];
 						}
@@ -568,12 +509,6 @@ smgContainer.controller('StandaloneController',
 					};
 				}
 
-//				var jsonMove = angular.toJson(move);
-//				sendMakeMoveServicePost(jsonMove);
-//				console.log("********** Current play mode is: " + angular.toJson(mode));
-//				console.log("********** currentPlayerIdThatHasTurn: " + currentPlayerIdThatHasTurn);
-//				console.log("********** The move from sendMoveToServer()...");
-//				console.log(angular.toJson(move));
 				standAloneServer(currentPlayerIdThatHasTurn, move);
 			};
 
@@ -617,41 +552,6 @@ smgContainer.controller('StandaloneController',
 					move["operations"][0]['playerIdToScore'][$cookies.playerId] = 1;
 				}
 				var jsonMove = angular.toJson(move);
-				sendMakeMoveServicePost(jsonMove);
-//				console.log("********** Send the end game...");
-			};
-
-			/**
-			 * Method used to get new game state in asynchronous game mode.
-			 */
-			$scope.getNewMatchState = function () {
-				NewMatchStateService.getNewMatchState($routeParams.matchId, $cookies.playerId,
-						$cookies.accessSignature)
-						.then(function (data) {
-							if (angular.isDefined(data)) {
-								// 1. Get game state and last move
-								$scope.matchInfo.state = data['state'];
-								$scope.matchInfo.lastMove = data['lastMove'];
-
-								// 2. UpdateUI for Game with the received state.
-
-								if (isStateSame($scope.matchInfo.state, {})) {
-									/*
-									 * If the state is empty, then the game is not initialized, so reply
-									 * the game ready sent by the game.
-									 */
-									replyGameReady();
-								}
-//								console.log("!isStateSame(state,$scope.matchInfo.state) " + !isStateSame(state,$scope.matchInfo.state));
-								if (!isStateSame(state, $scope.matchInfo.state)) {
-//									console.log("********** Get new match state from server to change the local one...")
-//									console.log(angular.toJson($scope.matchInfo.state));
-									processLastMoveAndState();
-									processLastPlayer(data);
-									sendMessageToGame($cookies.playerId, $scope.matchInfo.lastMovePlayerId);
-								}
-							}
-						})
 			};
 
 			/**
@@ -740,13 +640,10 @@ smgContainer.controller('StandaloneController',
 			function listener(event) {
 				var data = event.data;
 //				console.log("********** The container receives data from the game iFrame...");
-//				console.log(data['type']);
 				if (data['type'] === "GameReady") {
 					replyGameReady();
 				} else if (data['type'] === "MakeMove") {
 					var operations = data['operations'];
-//					console.log("********** The container sends operations to the server...");
-//					console.log(angular.toJson(operations));
 					sendMoveToServer(operations);
 				} else if (data['type'] === "VerifyMoveDone") {
 					// Deal with verifyMoveDone, currently deleted...
@@ -778,21 +675,6 @@ smgContainer.controller('StandaloneController',
 				} else {
 					attachEvent("onmessage", listener);
 				}
-
-//				$scope.displayGetNewStateButton = true;
-
-				// Check whether the player login with Facebook
-//				if ($cookies.FBAccessToken == "undefined" || isUndefinedOrNullOrEmpty($cookies.FBAccessToken)) {
-//					isFBLogin = false;
-//				} else {
-//					isFBLogin = true;
-//				}
-//				$scope.matchResultInfo.isFBLogin = isFBLogin;
-
-				// 0. Get the input parameters
-//				mode = $routeParams.mode;
-//				timeOfEachTurn = $routeParams.timeOfEachTurn;
-
 
 				if ($routeParams.mode === "pass_and_play") {
 					playerIds = [

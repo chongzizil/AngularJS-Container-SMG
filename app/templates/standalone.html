@@ -7,18 +7,6 @@
 	<div align="middle">
 		{{ 'LEFTTIME' | translate }}: {{timer}}
 	</div>
-	<!--<div id="refreshButton" class="col-md-offset-3 col-md-3 col-xs-6" align="middle">-->
-	<!--<button type="button" class="btn btn-primary" ng-show='displayGetNewStateButton'-->
-	<!--ng-click="getNewMatchState()"> Refresh-->
-	<!--</button>-->
-	<!--</div>-->
-	<!--<div id="endGameButton" class="col-md-3 col-xs-6" align="middle">-->
-	<!--&lt;!&ndash;<button type="button" class="btn btn-primary" ng-show="displayEndGameButton" ng-click="endGame('p','oppo')">&ndash;&gt;
-	-->
-	<!--<button type="button" class="btn btn-primary" ng-click="endGame('p','oppo')">-->
-	<!--Quit-->
-	<!--</button>-->
-	<!--</div>-->
 
 	<br/><br/><br/>
 
@@ -34,11 +22,6 @@
 		<div class="panel-body">
 			<div class="container-fluid">
 				<div ng-repeat="playerInfo in matchInfo.playersInfo | filter:filterFnCurrentPlayer">
-					<!--<div class="col-md-1 col-xs-12">-->
-					<!--<div align="middle">-->
-					<!--<img ng-src="img/giraffe.gif" hight="50" width="50"/>-->
-					<!--</div>-->
-					<!--</div>-->
 					<div class="col-md-1">
 						<img ng-src="{{imageUrl}}" hight="50" width="50"/>
 					</div>
