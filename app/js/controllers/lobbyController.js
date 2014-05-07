@@ -90,7 +90,6 @@ smgContainer.controller('LobbyController', function ($scope, $rootScope, $routeP
 				$cookies.accessSignature)
 				.then(function (data) {
 					if (angular.isDefined(data)) {
-						console.log("Got player info from the server...");
 						$cookies.playerImageUrl = data['imageURL'];
 						$scope.playerImageUrl = $cookies.playerImageUrl;
 						$cookies.playerEmail = data['email'];

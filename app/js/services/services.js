@@ -149,8 +149,8 @@ smgContainer.factory('NewMatchService', ['$resource', '$q', function ($resource,
 					.get({playerId: playerId, accessSignature: accessSignature, gameId: gameId})
 					.$promise.then(function (data) {
 						if (angular.isDefined(data['error'])) {
-							console.warn("********** Error from NewMatchService...");
-							console.warn(angular.toJson(data));
+//							console.warn("********** Error from NewMatchService...");
+//							console.warn(angular.toJson(data));
 							deferred.resolve(undefined);
 						} else {
 //							console.log("********** Get match info from the server...");
@@ -216,8 +216,8 @@ smgContainer.factory('GetAllMatchesService', ['$resource', '$q', function ($reso
 					.get({gameId: gameId})
 					.$promise.then(function (data) {
 						if (angular.isDefined(data['error'])) {
-							console.warn("********** Error from GetAllMatchesService...");
-							console.warn(angular.toJson(data));
+//							console.warn("********** Error from GetAllMatchesService...");
+//							console.warn(angular.toJson(data));
 							deferred.resolve(undefined);
 						} else {
 //							console.log("********** Get all matches...");

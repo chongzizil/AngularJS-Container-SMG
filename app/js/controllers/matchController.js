@@ -19,10 +19,12 @@ smgContainer.controller('MatchController',
 
 	    /** Adjust the game container to the full size of the broswer. */
 	    var adjustGameContainer = function () {
+		    var window = $("#mainContainer");
 		    var gameContainer = $("#gameContainer");
 		    var gameIFrame = $("#gameIFrame");
 		    gameIFrame.css("width", gameContainer.width() + "px");
-		    gameIFrame.css("height", gameContainer.height() + "px");
+		    gameIFrame.css("height", $(window).height() + "px");
+//				console.log($(window).height() + "---");
 	    };
 
 	    /** Every time the broswer is resized, adjust the size of the game container too. */
