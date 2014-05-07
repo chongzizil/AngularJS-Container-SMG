@@ -391,8 +391,7 @@ smgContainer.controller('StandaloneController',
 					var value = null;
 					if(visibleToPlayers=="ALL"){
 						value = state[keys[k]];
-					}
-					if(visibleToPlayers.indexOf(currentPlayerIdThatHasTurn)>-1){
+					} else if(visibleToPlayers.indexOf(currentPlayerIdThatHasTurn)>-1){
 						value = state[keys[k]];
 					}
 					newState[keys[k]] = value;
