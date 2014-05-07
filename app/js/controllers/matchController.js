@@ -19,12 +19,16 @@ smgContainer.controller('MatchController',
 
 	    /** Adjust the game container to the full size of the broswer. */
 	    var adjustGameContainer = function () {
-		    var window = $("#mainContainer");
+		    var windows = $(window);
 		    var gameContainer = $("#gameContainer");
 		    var gameIFrame = $("#gameIFrame");
-		    gameIFrame.css("width", gameContainer.width() + "px");
-		    gameIFrame.css("height", $(window).height() + "px");
-//				console.log($(window).height() + "---");
+//				console.log("----" + gameIFrame.width() + "," + gameIFrame.height());
+//				gameIFrame.css("width", gameContainer.width() + "px");
+//				if (windows.height() < 960) {
+		    gameIFrame.css("height", "1200px");
+//				} else {
+//					gameIFrame.css("height", windows.height() + "px");
+//				}
 	    };
 
 	    /** Every time the broswer is resized, adjust the size of the game container too. */
