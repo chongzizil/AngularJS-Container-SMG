@@ -218,6 +218,9 @@ smgContainer.controller('StandaloneController',
 				$rootScope.matchResultInfo = $scope.matchResultInfo;
 
 				$location.url('/gameResult/' + $routeParams.gameId);
+				if (!$scope.$$phase) {
+					$scope.$apply();
+				}
 			};
 
 			/**

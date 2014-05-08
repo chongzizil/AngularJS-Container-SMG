@@ -210,6 +210,9 @@ smgContainer.controller('MatchController',
 	      $rootScope.matchResultInfo = $scope.matchResultInfo;
 
 	      $location.url('/gameResult/' + $routeParams.matchId);
+	      if (!$scope.$$phase) {
+		      $scope.$apply();
+	      }
       };
 
       /**
