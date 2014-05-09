@@ -9,7 +9,7 @@ The design doc is [here] (https://docs.google.com/document/d/1Jm7VgALEnLfRTvEVG6
 
 - Youlong Li (Owner)
   - Write initial test for server V1
-  - Set up the initial project and write the design doc
+  - Set up the initial project
   - In charge of the lobby page
     - Set up the channel in sync mode
     - Handle the initial match insertion
@@ -24,7 +24,8 @@ The design doc is [here] (https://docs.google.com/document/d/1Jm7VgALEnLfRTvEVG6
       - Receive move from the game iFrame and send updateUI to the game iFrame
     - Handle the end of the game
     - Handle the disconnection of opponent in sync mode (Not complete yet)
-    - Improved the game flow
+    - Improve the game flow
+  - Support Yang Long with the pass and play & AI mode.
 
 - Long Yang (Team member)
   - Write initial test for server V3
@@ -33,8 +34,8 @@ The design doc is [here] (https://docs.google.com/document/d/1Jm7VgALEnLfRTvEVG6
       - Receive game state from the server and send player's move to the server
       - Retrieve the players info and game info from the server
     - Display the match info, also player and opponents info
-    - Added the feature related to facebook (Not complete yet)
-  - Added the pass and play mode
+    - Adde the feature related to facebook (Not complete yet)
+  - In charge of the pass and play & AI mode
 
 ## Versions
 
