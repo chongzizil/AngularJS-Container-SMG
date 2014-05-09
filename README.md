@@ -9,7 +9,8 @@ The design doc is [here] (https://docs.google.com/document/d/1Jm7VgALEnLfRTvEVG6
 
 - Youlong Li (Owner)
   - Write initial test for server V1
-  - Set up the initial project
+  - Write the initial design doc
+  - Set up the initial project and page
   - In charge of the lobby page
     - Set up the channel in sync mode
     - Handle the initial match insertion
