@@ -57,6 +57,11 @@ The design doc is [here] (https://docs.google.com/document/d/1Jm7VgALEnLfRTvEVG6
 - Added pass and play mode
 - Auto match in async mode
 
+### [Version 6] (http://6.smg-angularjs-container.appspot.com/index.html#/)
+- Improved mobile UI
+- Supported AI mode
+- Fixed bugs
+
 ## Initial server Tests
 Since the API are not determined at that time, the tests can't pass...
 
