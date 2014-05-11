@@ -25,7 +25,7 @@ smgContainer.controller('MatchController',
 //				console.log("----" + gameIFrame.width() + "," + gameIFrame.height());
 //				gameIFrame.css("width", gameContainer.width() + "px");
 //				if (windows.height() < 960) {
-		    gameIFrame.css("height", "1200px");
+		    gameIFrame.css("height", $(window).height() + "px");
 //				} else {
 //					gameIFrame.css("height", windows.height() + "px");
 //				}
