@@ -10,13 +10,13 @@ smgContainer.controller('StandaloneController',
 
 			/** Adjust the game container to the full size of the broswer. */
 			var adjustGameContainer = function () {
-				var windows = $(window);
 				var gameContainer = $("#gameContainer");
 				var gameIFrame = $("#gameIFrame");
 //				console.log("----" + gameIFrame.width() + "," + gameIFrame.height());
 //				gameIFrame.css("width", gameContainer.width() + "px");
 //				if (windows.height() < 960) {
-				gameIFrame.css("height", "1200px");
+				gameIFrame.css("height", $(window).height() + "px");
+//				console.log("The iFrame's height is: "+$(window).height());
 //				} else {
 //					gameIFrame.css("height", windows.height() + "px");
 //				}
